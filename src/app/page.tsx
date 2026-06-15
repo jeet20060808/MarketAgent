@@ -594,7 +594,7 @@ export default function Home() {
               className="flex-1 flex flex-col min-h-[90vh]"
             >
               {/* Dashboard Header Banner */}
-              <div className="border-b border-zinc-900 bg-zinc-950/40 backdrop-blur-md px-8 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="border-b border-zinc-900 bg-zinc-950/40 backdrop-blur-md px-8 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 print:hidden">
                 <div>
                   <div className="flex items-center gap-2 text-emerald-400 text-xs mb-1.5">
                     <CheckCircle2 className="w-4 h-4" />
@@ -606,11 +606,11 @@ export default function Home() {
                 {/* Actions */}
                 <div className="flex items-center gap-3 w-full md:w-auto">
                   <button
-                    onClick={downloadPackage}
-                    className="flex-1 md:flex-initial px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-500/10"
+                    onClick={() => window.print()}
+                    className="flex-1 md:flex-initial px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-500/10"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span>Export Package (PDF Tool)</span>
+                    <span>Generate PDF (PDF Tool)</span>
                   </button>
                   <button
                     onClick={handleReset}
@@ -622,125 +622,63 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Grid Dashboard Workspace */}
-              <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 min-h-0">
+              {/* Single Frame Document Workspace */}
+              <div className="flex-1 max-w-4xl mx-auto w-full px-6 py-12 flex flex-col gap-10 print:p-0">
                 
-                {/* Left navigation sidebar */}
-                <div className="lg:col-span-1 border-r border-zinc-900 bg-zinc-950/20 p-4 flex flex-col gap-2">
-                  <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold px-2 mb-2 block">Startup Package Sections</span>
+                {/* Executive Cover Header */}
+                <div className="glass-card p-8 border-zinc-900 flex flex-col gap-4 bg-zinc-950/40 print:border-none print:bg-transparent print:p-0">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-violet-400">
+                      <Rocket className="w-5 h-5" />
+                      <span className="text-xs font-bold tracking-widest uppercase">AI Founder OS</span>
+                    </div>
+                    <span className="text-[10px] text-zinc-500 font-mono">ID: {Math.random().toString(36).substr(2, 9).toUpperCase()}</span>
+                  </div>
                   
-                  {/* Package Summary Switcher */}
-                  <button
-                    onClick={() => setActiveTab("package")}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${
-                      activeTab === "package"
-                        ? "bg-violet-500/10 border border-violet-500/30 text-violet-300"
-                        : "hover:bg-zinc-900/50 border border-transparent text-zinc-400 hover:text-zinc-200"
-                    }`}
-                  >
-                    <Layers className="w-4 h-4" />
-                    <span>Executive Package Blueprint</span>
-                  </button>
-
-                  <div className="h-px bg-zinc-900 my-2" />
-
-                  {/* Individual Agent sections */}
-                  {AGENTS.map((agent) => (
-                    <button
-                      key={agent.id}
-                      onClick={() => setActiveTab(agent.id)}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${
-                        activeTab === agent.id
-                          ? "bg-zinc-900 text-zinc-100 border border-zinc-800"
-                          : "hover:bg-zinc-900/20 border border-transparent text-zinc-500 hover:text-zinc-300"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-sm">{agent.icon}</span>
-                        <span>{agent.name}</span>
-                      </div>
-                      <span className="text-[10px] text-zinc-600">{agent.role.split(" ")[0]}</span>
-                    </button>
-                  ))}
+                  <div className="border-t border-zinc-900 my-2 print:border-zinc-300" />
+                  
+                  <h1 className="text-3xl sm:text-4xl font-extrabold text-zinc-100 tracking-tight leading-tight print:text-black">
+                    {idea || "Simulated Startup Strategy"}
+                  </h1>
+                  <p className="text-zinc-500 text-xs font-medium">
+                    Unified Startup Package assembled on: {new Date().toLocaleDateString()}
+                  </p>
                 </div>
 
-                {/* Main Content Workspace Panel */}
-                <div className="lg:col-span-3 p-8 overflow-y-auto max-h-[80vh]">
-                  
-                  {/* Blueprint Summary view */}
-                  {activeTab === "package" && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex flex-col gap-8"
-                    >
-                      <div>
-                        <h3 className="text-2xl font-bold text-zinc-200 mb-2">Unified Startup Package Blueprint</h3>
-                        <p className="text-zinc-500 text-sm">A consolidated look across validation, market intelligence, product schemas, sprint maps, and marketing pipelines.</p>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {AGENTS.map((agent) => (
-                          <div 
-                            key={agent.id} 
-                            onClick={() => setActiveTab(agent.id)}
-                            className="glass-card p-5 border-zinc-900 hover:border-zinc-800 cursor-pointer flex flex-col gap-2 transition-all"
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg">{agent.icon}</span>
-                              <h4 className="text-sm font-semibold text-zinc-300">{agent.name}</h4>
+                {/* Unified Output Sections (Continuous single frame) */}
+                <div className="flex flex-col gap-10 print:gap-16">
+                  {AGENTS.map((agent) => {
+                    const agentResult = results[agent.id];
+                    return (
+                      <div 
+                        key={agent.id}
+                        className="glass-card border-zinc-900 bg-zinc-950/10 overflow-hidden flex flex-col print:border-none print:bg-transparent print:p-0"
+                      >
+                        {/* Section Header */}
+                        <div className="p-6 border-b border-zinc-900 bg-zinc-950/30 flex items-center justify-between print:border-zinc-300 print:bg-transparent print:px-0 print:py-2">
+                          <div className="flex items-center gap-3">
+                            <span className="text-xl print:hidden">{agent.icon}</span>
+                            <div>
+                              <h3 className="text-base font-bold text-zinc-200 print:text-black">{agent.name}</h3>
+                              <p className="text-[10px] text-zinc-500">{agent.role}</p>
                             </div>
-                            <p className="text-xs text-zinc-500">{agent.description}</p>
-                            <div className="flex flex-wrap gap-1.5 mt-2">
-                              {agent.outputs.slice(0, 3).map((out, idx) => (
-                                <span key={idx} className="text-[9px] bg-zinc-900/80 px-2 py-0.5 rounded text-zinc-400">
-                                  {out}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* Individual tab contents */}
-                  {activeTab !== "package" && (
-                    <motion.div
-                      key={activeTab}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex flex-col gap-6"
-                    >
-                      {/* Section Info Header */}
-                      <div className="flex items-center justify-between border-b border-zinc-900 pb-5">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-xl bg-zinc-950 flex items-center justify-center text-2xl border border-zinc-900">
-                            {AGENTS.find((a) => a.id === activeTab)?.icon}
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-bold text-zinc-200">{AGENTS.find((a) => a.id === activeTab)?.name} Report</h3>
-                            <p className="text-xs text-zinc-500">{AGENTS.find((a) => a.id === activeTab)?.description}</p>
                           </div>
                         </div>
-                        <span className="text-xs font-semibold px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-md text-zinc-400">
-                          {AGENTS.find((a) => a.id === activeTab)?.role}
-                        </span>
-                      </div>
 
-                      {/* Content Markdown rendering */}
-                      <div className="p-1">
-                        {activeResult ? (
-                          <div 
-                            className="markdown-content"
-                            dangerouslySetInnerHTML={{ __html: renderMarkdown(activeResult) }}
-                          />
-                        ) : (
-                          <p className="text-zinc-600 italic">Processing details completed, generating final markup...</p>
-                        )}
+                        {/* Markdown Output */}
+                        <div className="p-6 print:px-0 print:py-4">
+                          {agentResult ? (
+                            <div 
+                              className="markdown-content print:text-black"
+                              dangerouslySetInnerHTML={{ __html: renderMarkdown(agentResult) }}
+                            />
+                          ) : (
+                            <p className="text-zinc-600 italic">No output generated.</p>
+                          )}
+                        </div>
                       </div>
-                    </motion.div>
-                  )}
+                    );
+                  })}
                 </div>
               </div>
             </motion.div>

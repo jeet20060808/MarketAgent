@@ -299,3 +299,69 @@ body {
   border-radius: 2px;
   background: var(--gradient-primary);
 }
+
+/* ── High-Fidelity Print & PDF Styles ── */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 12pt !important;
+    line-height: 1.5 !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  .print\:border-none {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .print\:bg-transparent {
+    background: transparent !important;
+  }
+
+  .print\:text-black {
+    color: #000000 !important;
+  }
+
+  .print\:p-0 {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print\:gap-16 {
+    gap: 4rem !important;
+  }
+
+  .print\:border-zinc-300 {
+    border-color: #d4d4d8 !important;
+  }
+
+  .glass-card, .agent-card {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .markdown-content h1, 
+  .markdown-content h2, 
+  .markdown-content h3 {
+    color: #000000 !important;
+    page-break-after: avoid;
+  }
+
+  .markdown-content p, 
+  .markdown-content li {
+    color: #1f2937 !important;
+  }
+
+  /* Force page breaks between major sections to make the PDF look amazing */
+  .print\:gap-16 > div {
+    page-break-inside: avoid;
+    page-break-after: always;
+  }
+}
