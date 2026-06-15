@@ -33,8 +33,4 @@ Maximum 400 words.
   });
 
   return response.choices[0].message.content;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> fb5b74b (Add orchestrator and agent APIs)

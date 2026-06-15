@@ -8,20 +8,16 @@ export async function POST(req: Request) {
     const result = await orchestrate(body.idea);
 
     return NextResponse.json(result);
-<<<<<<< HEAD
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
 
     return NextResponse.json(
-      { error: "Something went wrong" },
-=======
-  } catch (error: unknown) {
-    return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : String(error),
+        error: error.message || "Something went wrong",
       },
->>>>>>> fb5b74b (Add orchestrator and agent APIs)
-      { status: 500 }
+      {
+        status: 500,
+      }
     );
   }
 }

@@ -26,8 +26,4 @@ export async function orchestrate(idea: string) {
     architecture,
     marketing: marketingResult,
   };
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> fb5b74b (Add orchestrator and agent APIs)
