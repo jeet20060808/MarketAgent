@@ -11,11 +11,15 @@ interface UploadedFile {
   content: string;
 }
 
-export async function orchestrate(idea: string, files?: UploadedFile[]) {
-  // Combine idea with files context if present
+export async function orchestrate(
+  idea: string,
+  files?: UploadedFile[]
+) {
   let contextPrompt = idea;
+
   if (files && files.length > 0) {
     contextPrompt += "\n\nAdditional Context from Uploaded Files:\n";
+
     files.forEach((file) => {
       contextPrompt += `\n--- File: ${file.name} (Type: ${file.type}) ---\n${file.content}\n`;
     });

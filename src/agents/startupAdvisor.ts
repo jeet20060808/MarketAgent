@@ -3,8 +3,7 @@ import { openai } from "../lib/openai";
 export async function startupAdvisor(idea: string) {
   const response = await openai.chat.completions.create({
     model: "openai/gpt-oss-120b:free",
-    max_tokens: 1000, // Add here
-
+    max_tokens: 1000,
     messages: [
       {
         role: "system",
