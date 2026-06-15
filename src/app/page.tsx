@@ -1,6 +1,28 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Rocket, 
+  Search, 
+  BookOpen, 
+  FileText, 
+  Upload, 
+  Plus, 
+  X, 
+  CheckCircle2, 
+  ArrowRight, 
+  RefreshCw, 
+  Download, 
+  Terminal, 
+  Layers, 
+  Layout, 
+  HelpCircle,
+  AlertTriangle,
+  FolderOpen,
+  GitBranch
+} from "lucide-react";
+import confetti from "canvas-confetti";
 
 // ── Agent Configurations ──
 export interface AgentConfig {
@@ -74,6 +96,12 @@ export type AgentResults = Record<string, string | null>;
 
 type AppState = "input" | "processing" | "results";
 
+interface UploadedFile {
+  name: string;
+  type: string;
+  content: string;
+}
+
 /* ── Simple markdown-to-HTML renderer ── */
 function renderMarkdown(text: string): string {
   let html = text
@@ -121,41 +149,82 @@ function renderMarkdown(text: string): string {
 export default function Home() {
   const [state, setState] = useState<AppState>("input");
   const [idea, setIdea] = useState("");
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
   const [completedAgents, setCompletedAgents] = useState<string[]>([]);
   const [results, setResults] = useState<AgentResults>({});
-  const [activeTab, setActiveTab] = useState(AGENTS[0].id);
+  const [activeTab, setActiveTab] = useState("package");
+  const [toolLogs, setToolLogs] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const processingRef = useRef(false);
+
+  // ── Tool Simulation Logs ──
+  const simulateToolExecution = useCallback((stepIndex: number) => {
+    const logs = [
+      "⚡ File Tool: Parsing uploaded documents & context...",
+      "🔍 Search Tool: Market Research Agent searching competitor matrices & TAM data...",
+      "📓 Notion Tool: Startup Advisor generating validation workspace & feedback summary...",
+      "📓 Notion Tool: Product Manager compiling Product Requirements Document (PRD)...",
+      "🐙 GitHub Tool: Architect provisioning workspace repository & generating system schemas...",
+      "🐙 GitHub Tool: Engineering Manager filing Sprint milestones & P0/P1/P2 issues...",
+      "📄 PDF Tool: Compiling unified Startup Package report..."
+    ];
+    
+    setToolLogs((prev) => [...prev, logs[stepIndex] || ""]);
+  }, []);
 
   const revealAgentsProgressively = useCallback(() => {
     const agentIds = AGENTS.map((a) => a.id);
-    const delays = [800, 1600, 2400, 3200, 3800, 4400];
+    const delays = [1000, 2200, 3400, 4600, 5800, 7000];
+
+    // Start file tool log
+    simulateToolExecution(0);
 
     agentIds.forEach((id, i) => {
       setTimeout(() => {
         setCompletedAgents((prev) => [...prev, id]);
+        
+        // Trigger corresponding tool logs
+        if (id === "research") simulateToolExecution(1);
+        if (id === "advisor") simulateToolExecution(2);
+        if (id === "product") simulateToolExecution(3);
+        if (id === "architecture") simulateToolExecution(4);
+        if (id === "engineering") simulateToolExecution(5);
 
         if (i === agentIds.length - 1) {
+          simulateToolExecution(6);
           setTimeout(() => {
             setState("results");
-          }, 800);
+            confetti({
+              particleCount: 100,
+              spread: 70,
+              origin: { y: 0.6 },
+              colors: ["#7c3aed", "#06b6d4", "#34d399", "#f472b6"]
+            });
+          }, 1200);
         }
       }, delays[i]);
     });
-  }, []);
+  }, [simulateToolExecution]);
 
   const handleSubmit = useCallback(async () => {
-    if (!idea.trim() || processingRef.current) return;
+    if (!idea.trim() && uploadedFiles.length === 0) return;
+    if (processingRef.current) return;
     processingRef.current = true;
 
     setCompletedAgents([]);
     setResults({});
+    setToolLogs([]);
     setState("processing");
 
     try {
       const res = await fetch("/api/orchestrate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idea: idea.trim() }),
+        body: JSON.stringify({ 
+          idea: idea.trim() || `Startup plan based on uploaded context: ${uploadedFiles[0]?.name}`,
+          files: uploadedFiles 
+        }),
       });
 
       if (!res.ok) {
@@ -183,345 +252,506 @@ export default function Home() {
     } finally {
       processingRef.current = false;
     }
-  }, [idea, revealAgentsProgressively]);
+  }, [idea, uploadedFiles, revealAgentsProgressively]);
 
   const handleReset = useCallback(() => {
     setState("input");
     setIdea("");
+    setUploadedFiles([]);
     setCompletedAgents([]);
     setResults({});
-    setActiveTab(AGENTS[0].id);
+    setToolLogs([]);
+    setActiveTab("package");
     processingRef.current = false;
   }, []);
 
-  const activeAgent = AGENTS.find((a) => a.id === activeTab)!;
+  // ── File Upload Handlers ──
+  const processFiles = (files: FileList) => {
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        setUploadedFiles((prev) => [
+          ...prev,
+          {
+            name: file.name,
+            type: file.type || "text/plain",
+            content: content || `[Simulated content extraction for ${file.name}]`,
+          },
+        ]);
+      };
+      reader.readAsText(file);
+    });
+  };
+
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const onDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files) {
+      processFiles(e.dataTransfer.files);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // ── Unified Package Compilation ──
+  const getUnifiedPackageText = () => {
+    let output = `# STARTUP PACKAGE: EXECUTIVE STRATEGY & PLAN\n\n`;
+    output += `Generated on: ${new Date().toLocaleDateString()}\n\n`;
+    
+    AGENTS.forEach((agent) => {
+      output += `=========================================\n`;
+      output += `${agent.icon} ${agent.name.toUpperCase()} - ${agent.role.toUpperCase()}\n`;
+      output += `=========================================\n\n`;
+      output += results[agent.id] || "No data compiled.";
+      output += `\n\n`;
+    });
+    return output;
+  };
+
+  const downloadPackage = () => {
+    const element = document.createElement("a");
+    const file = new Blob([getUnifiedPackageText()], { type: "text/plain" });
+    element.href = URL.createObjectURL(file);
+    element.download = `${idea.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-startup-package.md`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const activeAgent = AGENTS.find((a) => a.id === activeTab) || AGENTS[0];
   const activeResult = results[activeTab];
 
   return (
-    <>
-      {/* ── PHASE 1: Hero Input ── */}
-      {state === "input" && (
-        <section className="relative flex flex-col items-center justify-center min-h-screen px-6 grid-bg">
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(ellipse 60% 40% at 50% 40%, rgba(124,58,237,0.08) 0%, transparent 70%)",
-            }}
-          />
+    <div className="min-h-screen bg-[#07070d] text-zinc-100 flex flex-col font-sans selection:bg-violet-500/30">
+      
+      {/* Background Gradients */}
+      <div className="fixed inset-0 grid-bg opacity-30 pointer-events-none" />
+      <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-violet-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none" />
 
-          <div className="relative z-10 w-full max-w-2xl flex flex-col items-center animate-fade-in-up">
-            <div className="mb-8 flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
-                style={{ background: "var(--gradient-primary)" }}
-              >
-                ⚡
-              </div>
-              <span className="text-lg font-semibold tracking-tight text-zinc-200">
-                AI Founder OS
-              </span>
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl font-bold text-center leading-tight tracking-tight mb-4">
-              <span className="gradient-text">Describe your startup idea.</span>
-            </h1>
-            <p className="text-zinc-400 text-center text-lg max-w-lg mb-10 leading-relaxed">
-              Our AI founding team will validate, research, plan, architect, and market it — in seconds.
-            </p>
-
-            <div className="w-full glass-card input-glow p-1 mb-6 transition-all">
-              <textarea
-                id="idea-input"
-                value={idea}
-                onChange={(e) => setIdea(e.target.value)}
-                placeholder="e.g. AI-powered fitness coach for busy professionals"
-                rows={4}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && idea.trim()) {
-                    handleSubmit();
-                  }
-                }}
-                className="w-full bg-transparent text-zinc-100 placeholder-zinc-600 resize-none px-5 py-4 text-base leading-relaxed rounded-[14px] focus:outline-none"
-              />
-            </div>
-
-            <button
-              id="submit-btn"
-              onClick={handleSubmit}
-              disabled={!idea.trim()}
-              className="btn-primary px-8 py-3.5 text-base flex items-center gap-2.5 mb-10"
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col relative z-10">
+        <AnimatePresence mode="wait">
+          
+          {/* ──────────────── PHASE 1: INPUT ──────────────── */}
+          {state === "input" && (
+            <motion.div 
+              key="input"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.4 }}
+              className="max-w-4xl mx-auto w-full px-6 py-20 flex flex-col items-center justify-center min-h-[90vh]"
             >
-              Launch Agents
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </button>
+              {/* Header Info */}
+              <div className="flex items-center gap-3 mb-6 px-4 py-1.5 rounded-full border border-violet-500/20 bg-violet-500/5 backdrop-blur-md">
+                <Rocket className="w-4 h-4 text-violet-400" />
+                <span className="text-xs font-semibold text-violet-300 tracking-wider uppercase">Orchestrated Multi-Agent System</span>
+              </div>
 
-            <div className="flex flex-wrap justify-center gap-3">
-              {AGENTS.map((agent, i) => (
-                <div
-                  key={agent.id}
-                  className="flex items-center gap-2 px-3.5 py-2 rounded-full text-sm animate-fade-in-up"
-                  style={{
-                    animationDelay: `${0.4 + i * 0.08}s`,
-                    opacity: 0,
-                    background: `${agent.color}10`,
-                    border: `1px solid ${agent.color}20`,
-                    color: agent.color,
-                  }}
-                >
-                  <span className="text-base">{agent.icon}</span>
-                  <span className="font-medium">{agent.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+              <h1 className="text-4xl sm:text-6xl font-extrabold text-center tracking-tight leading-[1.15] mb-6">
+                Generate Your Unified <br />
+                <span className="gradient-text">Startup Plan & Artifacts</span>
+              </h1>
 
-          <p className="absolute bottom-8 text-zinc-600 text-xs">
-            Press <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 text-xs font-mono">Ctrl + Enter</kbd> to submit
-          </p>
-        </section>
-      )}
+              <p className="text-zinc-400 text-center text-lg max-w-xl mb-12 leading-relaxed">
+                Provide your idea or upload context files. Our specialized agents run parallel workflows using core system tools to deliver a comprehensive Startup Package.
+              </p>
 
-      {/* ── PHASE 2: Agent Processing ── */}
-      {state === "processing" && (
-        <section className="min-h-screen px-6 py-16 grid-bg flex flex-col items-center">
-          <div
-            className="fixed inset-0 pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(ellipse 50% 30% at 50% 30%, rgba(124,58,237,0.06) 0%, transparent 70%)",
-            }}
-          />
-
-          <div className="relative z-10 w-full max-w-5xl">
-            <div className="mb-10 animate-fade-in">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-2 h-2 rounded-full"
-                    style={{
-                      background: completedAgents.length === AGENTS.length ? "#34d399" : "#a78bfa",
-                      animation: completedAgents.length < AGENTS.length ? "progressPulse 1.5s ease-in-out infinite" : "none",
-                    }}
+              {/* Input Area */}
+              <div className="w-full glass-card p-6 flex flex-col gap-6 border-zinc-800">
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="idea-input" className="text-sm font-semibold text-zinc-300">Your Startup Idea</label>
+                  <textarea
+                    id="idea-input"
+                    value={idea}
+                    onChange={(e) => setIdea(e.target.value)}
+                    placeholder="Describe your startup idea in detail, or leave blank and upload files..."
+                    rows={4}
+                    className="w-full bg-zinc-950/50 border border-zinc-800 focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 rounded-xl resize-none px-4 py-3 text-base text-zinc-100 placeholder-zinc-600 focus:outline-none transition-all"
                   />
-                  <span className="text-sm font-medium text-zinc-300">
-                    {completedAgents.length === AGENTS.length ? "All agents complete" : "Agents working…"}
-                  </span>
                 </div>
-                <span className="text-sm font-mono text-zinc-500">
-                  {completedAgents.length}/{AGENTS.length}
-                </span>
-              </div>
-              <div className="w-full h-1.5 rounded-full bg-zinc-800/50 overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-700 ease-out"
-                  style={{
-                    width: `${(completedAgents.length / AGENTS.length) * 100}%`,
-                    background: "var(--gradient-primary)",
-                  }}
-                />
-              </div>
-            </div>
 
-            <div className="glass-card px-5 py-4 mb-8 animate-fade-in">
-              <p className="text-xs font-medium text-zinc-500 mb-1">Your Idea</p>
-              <p className="text-zinc-200 leading-relaxed">{idea}</p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {AGENTS.map((agent, i) => {
-                const isComplete = completedAgents.includes(agent.id);
-                return (
+                {/* File Dropzone */}
+                <div className="flex flex-col gap-2">
+                  <span className="text-sm font-semibold text-zinc-300">Additional Context (File Tool)</span>
                   <div
-                    key={agent.id}
-                    className="glass-card agent-card p-5 flex flex-col gap-3 animate-fade-in-up"
-                    data-agent={agent.id}
-                    style={{ animationDelay: `${i * 0.1}s`, opacity: 0 }}
+                    onDragOver={onDragOver}
+                    onDragLeave={onDragLeave}
+                    onDrop={onDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all ${
+                      isDragging 
+                        ? "border-violet-500 bg-violet-500/5" 
+                        : "border-zinc-800 hover:border-zinc-700 bg-zinc-950/20"
+                    }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
-                          style={{ background: `${agent.color}15` }}
-                        >
-                          {agent.icon}
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-semibold text-zinc-100">{agent.name}</h3>
-                          <p className="text-xs text-zinc-500">{agent.role}</p>
-                        </div>
-                      </div>
-
-                      {isComplete ? (
-                        <div
-                          className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold animate-fade-in"
-                          style={{ background: `${agent.color}20`, color: agent.color }}
-                        >
-                          ✓
-                        </div>
-                      ) : (
-                        <div className="agent-spinner" style={{ color: agent.color }} />
-                      )}
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={(e) => e.target.files && processFiles(e.target.files)}
+                      multiple
+                      className="hidden"
+                    />
+                    <div className="w-10 h-10 rounded-lg bg-zinc-900 flex items-center justify-center border border-zinc-800">
+                      <Upload className="w-5 h-5 text-zinc-400" />
                     </div>
-
-                    <div className="flex flex-col gap-1.5 mt-1">
-                      {agent.outputs.map((output, idx) => (
-                        <div key={idx} className="flex items-center gap-2 text-xs">
-                          <div
-                            className="w-1.5 h-1.5 rounded-full shrink-0"
-                            style={{
-                              background: isComplete ? agent.color : "rgba(255,255,255,0.1)",
-                              transition: "background 0.5s ease",
-                              transitionDelay: isComplete ? `${idx * 0.1}s` : "0s",
-                            }}
-                          />
-                          <span
-                            className="transition-colors duration-500"
-                            style={{
-                              color: isComplete ? "#a1a1aa" : "#3f3f46",
-                              transitionDelay: isComplete ? `${idx * 0.1}s` : "0s",
-                            }}
-                          >
-                            {output}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="mt-auto pt-2 border-t border-zinc-800/50">
-                      <p className="text-xs" style={{ color: isComplete ? agent.color : "#52525b" }}>
-                        {isComplete ? "Complete" : "Processing…"}
-                      </p>
+                    <div className="text-center">
+                      <p className="text-sm text-zinc-300 font-medium">Click to upload or drag & drop</p>
+                      <p className="text-xs text-zinc-500 mt-1">Upload business plans, competitor reports, PRDs, or idea PDFs</p>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ── PHASE 3: Results Dashboard ── */}
-      {state === "results" && (
-        <section className="min-h-screen px-6 py-12 grid-bg flex flex-col items-center">
-          <div
-            className="fixed inset-0 pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(ellipse 50% 30% at 50% 20%, rgba(124,58,237,0.05) 0%, transparent 70%)",
-            }}
-          />
-
-          <div className="relative z-10 w-full max-w-5xl">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 animate-fade-in">
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 rounded-full" style={{ background: "#34d399" }} />
-                  <span className="text-xs font-medium text-emerald-400">All {AGENTS.length} agents complete</span>
                 </div>
-                <h2 className="text-2xl font-bold text-zinc-100">Results Dashboard</h2>
-                <p className="text-zinc-500 text-sm mt-1 max-w-lg truncate">{idea}</p>
-              </div>
-              <button
-                id="reset-btn"
-                onClick={handleReset}
-                className="px-5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 border border-zinc-700/50 hover:bg-zinc-800/50 hover:border-zinc-600 transition-all flex items-center gap-2 shrink-0"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                  <path d="M3 3v5h5" />
-                </svg>
-                Try Another Idea
-              </button>
-            </div>
 
-            <div className="glass-card p-1.5 mb-6 animate-fade-in" style={{ animationDelay: "0.1s", opacity: 0 }}>
-              <div className="flex gap-1 overflow-x-auto">
-                {AGENTS.map((agent) => {
-                  const isActive = activeTab === agent.id;
-                  return (
+                {/* Uploaded Files List */}
+                {uploadedFiles.length > 0 && (
+                  <div className="flex flex-wrap gap-2.5 p-3 rounded-lg bg-zinc-950/60 border border-zinc-900">
+                    {uploadedFiles.map((file, index) => (
+                      <div 
+                        key={index} 
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-zinc-900 border border-zinc-800 text-xs text-zinc-300"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-zinc-400" />
+                        <span className="max-w-[150px] truncate">{file.name}</span>
+                        <button 
+                          onClick={() => removeFile(index)} 
+                          className="hover:text-red-400 transition-colors p-0.5"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Action Row */}
+                <div className="flex items-center justify-between pt-2 border-t border-zinc-900">
+                  <div className="flex items-center gap-1 text-zinc-500 text-xs">
+                    <Terminal className="w-3.5 h-3.5" />
+                    <span>Agent Workspace initialized. Ready to launch.</span>
+                  </div>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!idea.trim() && uploadedFiles.length === 0}
+                    className="btn-primary px-6 py-2.5 text-sm flex items-center gap-2 shadow-lg shadow-violet-500/10"
+                  >
+                    <span>Launch Startup Engine</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Workflow Details */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full mt-16">
+                <div className="p-4 rounded-xl border border-zinc-900 bg-zinc-950/20 backdrop-blur-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Search className="w-4 h-4 text-sky-400" />
+                    <span className="text-xs font-semibold text-zinc-300">Search Tool</span>
+                  </div>
+                  <p className="text-xs text-zinc-500 leading-relaxed">Runs real-time web scans to acquire fresh TAM, competitor matrices, and key market dynamics.</p>
+                </div>
+
+                <div className="p-4 rounded-xl border border-zinc-900 bg-zinc-950/20 backdrop-blur-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <GitBranch className="w-4 h-4 text-orange-400" />
+                    <span className="text-xs font-semibold text-zinc-300">GitHub Tool</span>
+                  </div>
+                  <p className="text-xs text-zinc-500 leading-relaxed">Generates technical sprint cycles, DB mapping, API endpoints, and provisions tasks.</p>
+                </div>
+
+                <div className="p-4 rounded-xl border border-zinc-900 bg-zinc-950/20 backdrop-blur-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <BookOpen className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-semibold text-zinc-300">Notion Workspace</span>
+                  </div>
+                  <p className="text-xs text-zinc-500 leading-relaxed">Compiles structured documentation, business scopes, user stories, and GTM plans.</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ──────────────── PHASE 2: PROCESSING ──────────────── */}
+          {state === "processing" && (
+            <motion.div 
+              key="processing"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="max-w-5xl mx-auto w-full px-6 py-20 flex flex-col justify-center min-h-[90vh]"
+            >
+              {/* Headings */}
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-extrabold text-zinc-100 mb-2">Compiling Startup Package</h2>
+                <p className="text-zinc-500 text-sm">6 specialized agents running automated workspace tools in parallel</p>
+              </div>
+
+              {/* Progress Slider */}
+              <div className="w-full max-w-3xl mx-auto mb-12">
+                <div className="flex justify-between items-center text-sm font-medium mb-3">
+                  <span className="text-zinc-300">Assembly Progress</span>
+                  <span className="text-zinc-400 font-mono">{completedAgents.length} / 6 Complete</span>
+                </div>
+                <div className="h-2 w-full bg-zinc-900 rounded-full overflow-hidden border border-zinc-800">
+                  <motion.div 
+                    className="h-full bg-gradient-to-r from-violet-600 to-cyan-500"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(completedAgents.length / 6) * 100}%` }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </div>
+              </div>
+
+              {/* Split layout: Left Agents, Right Terminal Tool logs */}
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                
+                {/* Agents Status Cards */}
+                <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {AGENTS.map((agent, i) => {
+                    const isComplete = completedAgents.includes(agent.id);
+                    return (
+                      <div 
+                        key={agent.id}
+                        className={`glass-card p-4 flex flex-col justify-between border-zinc-800 transition-all ${
+                          isComplete ? "opacity-100 border-zinc-700 bg-zinc-900/10" : "opacity-50"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-xl">{agent.icon}</span>
+                            <div>
+                              <h4 className="text-xs font-semibold text-zinc-300">{agent.name}</h4>
+                              <p className="text-[10px] text-zinc-500 uppercase tracking-wider">{agent.role}</p>
+                            </div>
+                          </div>
+                          {isComplete ? (
+                            <CheckCircle2 className="w-4.5 h-4.5 text-emerald-400" />
+                          ) : (
+                            <RefreshCw className="w-4 h-4 text-violet-500 animate-spin" />
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {agent.outputs.slice(0, 3).map((out, idx) => (
+                            <span key={idx} className="text-[9px] bg-zinc-950/60 text-zinc-400 border border-zinc-800 px-2 py-0.5 rounded">
+                              {out}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Tool logs console */}
+                <div className="lg:col-span-2 flex flex-col h-[380px] bg-black/80 border border-zinc-800 rounded-xl overflow-hidden shadow-2xl">
+                  <div className="bg-zinc-950 px-4 py-2 border-b border-zinc-900 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-zinc-400 tracking-wider uppercase">Automated Tool Logs</span>
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500/20 border border-red-500/30" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/20 border border-yellow-500/30" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-green-500/20 border border-green-500/30" />
+                    </div>
+                  </div>
+                  <div className="flex-1 p-4 overflow-y-auto font-mono text-[11px] text-zinc-400 flex flex-col gap-3">
+                    {toolLogs.map((log, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="p-2.5 rounded bg-zinc-900/40 border border-zinc-950 text-zinc-300"
+                      >
+                        {log}
+                      </motion.div>
+                    ))}
+                    <div className="flex items-center gap-2 text-zinc-600 mt-auto pt-2 animate-pulse">
+                      <span>&gt;_ Listening for workspace triggers...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ──────────────── PHASE 3: RESULTS ──────────────── */}
+          {state === "results" && (
+            <motion.div 
+              key="results"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex-1 flex flex-col min-h-[90vh]"
+            >
+              {/* Dashboard Header Banner */}
+              <div className="border-b border-zinc-900 bg-zinc-950/40 backdrop-blur-md px-8 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 text-emerald-400 text-xs mb-1.5">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span className="font-semibold uppercase tracking-wider">Startup package assembled successfully</span>
+                  </div>
+                  <h2 className="text-xl font-bold text-zinc-200 truncate max-w-xl">{idea || "Startup Package"}</h2>
+                </div>
+                
+                {/* Actions */}
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                  <button
+                    onClick={downloadPackage}
+                    className="flex-1 md:flex-initial px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-500/10"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Export Package (PDF Tool)</span>
+                  </button>
+                  <button
+                    onClick={handleReset}
+                    className="flex-1 md:flex-initial px-4 py-2 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-zinc-200 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-2"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>New Strategy</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Grid Dashboard Workspace */}
+              <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 min-h-0">
+                
+                {/* Left navigation sidebar */}
+                <div className="lg:col-span-1 border-r border-zinc-900 bg-zinc-950/20 p-4 flex flex-col gap-2">
+                  <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold px-2 mb-2 block">Startup Package Sections</span>
+                  
+                  {/* Package Summary Switcher */}
+                  <button
+                    onClick={() => setActiveTab("package")}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${
+                      activeTab === "package"
+                        ? "bg-violet-500/10 border border-violet-500/30 text-violet-300"
+                        : "hover:bg-zinc-900/50 border border-transparent text-zinc-400 hover:text-zinc-200"
+                    }`}
+                  >
+                    <Layers className="w-4 h-4" />
+                    <span>Executive Package Blueprint</span>
+                  </button>
+
+                  <div className="h-px bg-zinc-900 my-2" />
+
+                  {/* Individual Agent sections */}
+                  {AGENTS.map((agent) => (
                     <button
                       key={agent.id}
-                      id={`tab-${agent.id}`}
                       onClick={() => setActiveTab(agent.id)}
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap shrink-0"
-                      style={{
-                        background: isActive ? `${agent.color}12` : "transparent",
-                        color: isActive ? agent.color : "#71717a",
-                        border: isActive ? `1px solid ${agent.color}25` : "1px solid transparent",
-                      }}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${
+                        activeTab === agent.id
+                          ? "bg-zinc-900 text-zinc-100 border border-zinc-800"
+                          : "hover:bg-zinc-900/20 border border-transparent text-zinc-500 hover:text-zinc-300"
+                      }`}
                     >
-                      <span className="text-base">{agent.icon}</span>
-                      <span className="hidden sm:inline">{agent.name}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="glass-card agent-card animate-fade-in" data-agent={activeAgent.id} key={activeTab} style={{ animationDelay: "0.15s", opacity: 0 }}>
-              <div className="p-6 border-b border-zinc-800/50">
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{ background: `${activeAgent.color}12` }}>
-                    {activeAgent.icon}
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-zinc-100">{activeAgent.name}</h3>
-                    <p className="text-sm text-zinc-500">{activeAgent.description}</p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2 mb-5">
-                  {activeAgent.outputs.map((output, i) => (
-                    <div key={i} className="flex items-center gap-1.5">
-                      <div className="px-2.5 py-1 rounded-md text-xs font-medium" style={{ background: `${activeAgent.color}12`, color: activeAgent.color, border: `1px solid ${activeAgent.color}20` }}>
-                        {output}
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-sm">{agent.icon}</span>
+                        <span>{agent.name}</span>
                       </div>
-                      {i < activeAgent.outputs.length - 1 && (
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={activeAgent.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.4">
-                          <path d="M5 12h14M12 5l7 7-7 7" />
-                        </svg>
-                      )}
-                    </div>
+                      <span className="text-[10px] text-zinc-600">{agent.role.split(" ")[0]}</span>
+                    </button>
                   ))}
                 </div>
-              </div>
 
-              <div className="p-6">
-                {activeResult ? (
-                  <div className="markdown-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(activeResult) }} />
-                ) : (
-                  <p className="text-zinc-600 italic">No output received from this agent.</p>
-                )}
-              </div>
-            </div>
+                {/* Main Content Workspace Panel */}
+                <div className="lg:col-span-3 p-8 overflow-y-auto max-h-[80vh]">
+                  
+                  {/* Blueprint Summary view */}
+                  {activeTab === "package" && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex flex-col gap-8"
+                    >
+                      <div>
+                        <h3 className="text-2xl font-bold text-zinc-200 mb-2">Unified Startup Package Blueprint</h3>
+                        <p className="text-zinc-500 text-sm">A consolidated look across validation, market intelligence, product schemas, sprint maps, and marketing pipelines.</p>
+                      </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-6 gap-3 mt-6">
-              {AGENTS.map((agent, i) => {
-                const hasResult = !!results[agent.id];
-                return (
-                  <button
-                    key={agent.id}
-                    onClick={() => setActiveTab(agent.id)}
-                    className="glass-card p-3 text-center transition-all hover:scale-[1.02] animate-fade-in-up cursor-pointer"
-                    style={{
-                      animationDelay: `${0.3 + i * 0.05}s`,
-                      opacity: 0,
-                      borderColor: activeTab === agent.id ? `${agent.color}30` : undefined,
-                    }}
-                  >
-                    <div className="text-xl mb-1">{agent.icon}</div>
-                    <p className="text-xs font-medium text-zinc-400">{agent.name}</p>
-                    <div className="w-1.5 h-1.5 rounded-full mx-auto mt-2" style={{ background: hasResult ? agent.color : "#27272a" }} />
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
-    </>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {AGENTS.map((agent) => (
+                          <div 
+                            key={agent.id} 
+                            onClick={() => setActiveTab(agent.id)}
+                            className="glass-card p-5 border-zinc-900 hover:border-zinc-800 cursor-pointer flex flex-col gap-2 transition-all"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">{agent.icon}</span>
+                              <h4 className="text-sm font-semibold text-zinc-300">{agent.name}</h4>
+                            </div>
+                            <p className="text-xs text-zinc-500">{agent.description}</p>
+                            <div className="flex flex-wrap gap-1.5 mt-2">
+                              {agent.outputs.slice(0, 3).map((out, idx) => (
+                                <span key={idx} className="text-[9px] bg-zinc-900/80 px-2 py-0.5 rounded text-zinc-400">
+                                  {out}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Individual tab contents */}
+                  {activeTab !== "package" && (
+                    <motion.div
+                      key={activeTab}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex flex-col gap-6"
+                    >
+                      {/* Section Info Header */}
+                      <div className="flex items-center justify-between border-b border-zinc-900 pb-5">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl bg-zinc-950 flex items-center justify-center text-2xl border border-zinc-900">
+                            {AGENTS.find((a) => a.id === activeTab)?.icon}
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-bold text-zinc-200">{AGENTS.find((a) => a.id === activeTab)?.name} Report</h3>
+                            <p className="text-xs text-zinc-500">{AGENTS.find((a) => a.id === activeTab)?.description}</p>
+                          </div>
+                        </div>
+                        <span className="text-xs font-semibold px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-md text-zinc-400">
+                          {AGENTS.find((a) => a.id === activeTab)?.role}
+                        </span>
+                      </div>
+
+                      {/* Content Markdown rendering */}
+                      <div className="p-1">
+                        {activeResult ? (
+                          <div 
+                            className="markdown-content"
+                            dangerouslySetInnerHTML={{ __html: renderMarkdown(activeResult) }}
+                          />
+                        ) : (
+                          <p className="text-zinc-600 italic">Processing details completed, generating final markup...</p>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+
+      {/* Mini footer details */}
+      <footer className="border-t border-zinc-950 bg-black/20 py-4 px-8 text-center text-[10px] text-zinc-600">
+        AI Founder OS System Workspace · Tools Connected: Search Tool, GitHub API, Notion Workspace, PDF Compiler, File Reader.
+      </footer>
+    </div>
   );
 }
