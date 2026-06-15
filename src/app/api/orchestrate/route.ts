@@ -8,12 +8,13 @@ export async function POST(req: Request) {
     const result = await orchestrate(body.idea);
 
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error) {
     console.error(error);
+    const errorMessage = error instanceof Error ? error.message : "Something went wrong";
 
     return NextResponse.json(
       {
-        error: error.message || "Something went wrong",
+        error: errorMessage,
       },
       {
         status: 500,
