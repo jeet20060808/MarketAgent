@@ -4,6 +4,8 @@ import { productManager } from "@/agents/productManager";
 import { architect } from "@/agents/architect";
 import { marketing } from "@/agents/marketing";
 import { engineeringManager } from "@/agents/engineering";
+import { riskAnalyst } from "@/agents/riskAnalyst";
+import { financialAnalyst } from "@/agents/financialAnalyst";
 
 interface UploadedFile {
   name: string;
@@ -21,7 +23,10 @@ export async function orchestrate(
     contextPrompt += "\n\nAdditional Context from Uploaded Files:\n";
 
     files.forEach((file) => {
-      contextPrompt += `\n--- File: ${file.name} (Type: ${file.type}) ---\n${file.content}\n`;
+      contextPrompt += `
+--- File: ${file.name} (Type: ${file.type}) ---
+${file.content}
+`;
     });
   }
 
@@ -32,6 +37,8 @@ export async function orchestrate(
     architecture,
     marketingResult,
     engineering,
+    risk,
+    financial,
   ] = await Promise.all([
     startupAdvisor(contextPrompt),
     marketResearch(contextPrompt),
@@ -39,6 +46,8 @@ export async function orchestrate(
     architect(contextPrompt),
     marketing(contextPrompt),
     engineeringManager(contextPrompt),
+    riskAnalyst(contextPrompt),
+    financialAnalyst(contextPrompt),
   ]);
 
   return {
@@ -48,5 +57,7 @@ export async function orchestrate(
     architecture,
     marketing: marketingResult,
     engineering,
+    risk,
+    financial,
   };
 }
