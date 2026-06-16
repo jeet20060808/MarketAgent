@@ -7,7 +7,6 @@ import {
   Search, 
   BookOpen, 
   FileText, 
-  Upload, 
   X, 
   CheckCircle2, 
   ArrowRight, 
@@ -18,7 +17,19 @@ import {
   Copy,
   ChevronRight,
   AlertCircle,
-  FileDown
+  FileDown,
+  Plus,
+  ArrowUp,
+  Brain,
+  BarChart3,
+  ClipboardList,
+  Cog,
+  Wrench,
+  AlertTriangle,
+  DollarSign,
+  TrendingUp,
+  Activity,
+  type LucideIcon,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 
@@ -26,7 +37,7 @@ import confetti from "canvas-confetti";
 export interface AgentConfig {
   id: string;
   name: string;
-  icon: string;
+  Icon: LucideIcon;
   color: string;
   accentClass: string;
   numberClass: string;
@@ -35,11 +46,15 @@ export interface AgentConfig {
   outputs: string[];
 }
 
+function AgentIcon({ Icon, color, size = 15, className = "" }: { Icon: LucideIcon; color: string; size?: number; className?: string }) {
+  return <Icon size={size} className={`flex-shrink-0 ${className}`} style={{ color }} />;
+}
+
 export const AGENTS: AgentConfig[] = [
   {
     id: "advisor",
     name: "Startup Advisor",
-    icon: "🧠",
+    Icon: Brain,
     color: "#F7C948",
     accentClass: "badge-yellow",
     numberClass: "section-number-yellow",
@@ -50,7 +65,7 @@ export const AGENTS: AgentConfig[] = [
   {
     id: "research",
     name: "Market Research",
-    icon: "📊",
+    Icon: BarChart3,
     color: "#3B82F6",
     accentClass: "badge-blue",
     numberClass: "section-number-blue",
@@ -61,7 +76,7 @@ export const AGENTS: AgentConfig[] = [
   {
     id: "product",
     name: "Product Manager",
-    icon: "📋",
+    Icon: ClipboardList,
     color: "#22C55E",
     accentClass: "badge-yellow",
     numberClass: "section-number-green",
@@ -72,7 +87,7 @@ export const AGENTS: AgentConfig[] = [
   {
     id: "architecture",
     name: "Architect",
-    icon: "⚙️",
+    Icon: Cog,
     color: "#F97316",
     accentClass: "badge-pink",
     numberClass: "section-number-orange",
@@ -83,7 +98,7 @@ export const AGENTS: AgentConfig[] = [
   {
     id: "marketing",
     name: "Marketing",
-    icon: "🚀",
+    Icon: Rocket,
     color: "#EC4899",
     accentClass: "badge-pink",
     numberClass: "section-number-pink",
@@ -94,13 +109,35 @@ export const AGENTS: AgentConfig[] = [
   {
     id: "engineering",
     name: "Engineering Manager",
-    icon: "🛠️",
+    Icon: Wrench,
     color: "#8B5CF6",
     accentClass: "badge-blue",
     numberClass: "section-number-yellow",
     role: "Engineering Execution",
     description: "Plans sprints, team structure, backlog, and release strategy",
     outputs: ["Execution Strategy", "Team Requirements", "Sprint Plan", "Timeline", "Risks", "Backlog", "Team KPIs", "Release Strategy"],
+  },
+  {
+    id: "risk",
+    name: "Risk Analyst",
+    Icon: AlertTriangle,
+    color: "#EF4444",
+    accentClass: "badge-pink",
+    numberClass: "section-number-orange",
+    role: "Risk Assessment",
+    description: "Identifies market, technical, financial, and compliance risks with mitigation strategies",
+    outputs: ["Market Risks", "Technical Risks", "Compliance Risks", "Risk Score", "Top Critical Risks", "Mitigation Plan"],
+  },
+  {
+    id: "financial",
+    name: "Financial Analyst",
+    Icon: DollarSign,
+    color: "#10B981",
+    accentClass: "badge-yellow",
+    numberClass: "section-number-green",
+    role: "Financial Modeling",
+    description: "Models revenue, pricing, CAC/LTV, burn rate, and funding requirements",
+    outputs: ["Revenue Model", "Pricing Strategy", "CAC & LTV", "Break-even Estimate", "Funding Requirements", "Investment Recommendation"],
   },
 ];
 
@@ -126,44 +163,79 @@ function formatFileSize(bytes: number): string {
 
 /* ── Simple markdown-to-HTML renderer ── */
 function renderMarkdown(text: string): string {
-  let html = text
+  const blocks = text.split("\n");
+  const processed: string[] = [];
+  let tableBuffer: string[] = [];
+
+  const flushTable = () => {
+    if (tableBuffer.length === 0) return;
+    const rows = tableBuffer.filter((row) => !row.match(/^\|[\s\-:|]+\|$/));
+    if (rows.length === 0) {
+      tableBuffer = [];
+      return;
+    }
+    const headerCells = rows[0].split("|").filter(Boolean).map((c) => c.trim());
+    const bodyRows = rows.slice(1);
+    let tableHtml = '<table class="md-table"><thead><tr>';
+    headerCells.forEach((cell) => {
+      tableHtml += `<th>${cell}</th>`;
+    });
+    tableHtml += "</tr></thead><tbody>";
+    bodyRows.forEach((row) => {
+      const cells = row.split("|").filter(Boolean).map((c) => c.trim());
+      tableHtml += "<tr>" + cells.map((c) => `<td>${c}</td>`).join("") + "</tr>";
+    });
+    tableHtml += "</tbody></table>";
+    processed.push(tableHtml);
+    tableBuffer = [];
+  };
+
+  blocks.forEach((line) => {
+    if (line.trim().startsWith("|")) {
+      tableBuffer.push(line.trim());
+      return;
+    }
+    flushTable();
+    processed.push(line);
+  });
+  flushTable();
+
+  let html = processed.join("\n")
     .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
     .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="md-emphasis">$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/^#### (.+)$/gm, '<h4 class="md-section">$1</h4>')
+    .replace(/^### (.+)$/gm, '<h3 class="md-section">$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2 class="md-section">$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1 class="md-section">$1</h1>')
     .replace(/^---$/gm, '<hr/>')
     .replace(/^[*-] (.+)$/gm, '<li>$1</li>')
-    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
-    .replace(/^\|(.+)\|$/gm, (match, content) => {
-      const cells = content.split('|').map((c: string) => c.trim());
-      if (cells.every((c: string) => /^[-:]+$/.test(c))) return '';
-      return '<tr>' + cells.map((c: string) => `<td>${c}</td>`).join('') + '</tr>';
-    });
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
 
   html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
-  html = html.replace(/((?:<tr>.*<\/tr>\n?)+)/g, '<table>$1</table>');
   html = html
-    .split('\n\n')
+    .split("\n\n")
     .map((block) => {
       const trimmed = block.trim();
-      if (!trimmed) return '';
+      if (!trimmed) return "";
       if (
-        trimmed.startsWith('<h') ||
-        trimmed.startsWith('<ul') ||
-        trimmed.startsWith('<ol') ||
-        trimmed.startsWith('<pre') ||
-        trimmed.startsWith('<table') ||
-        trimmed.startsWith('<hr')
+        trimmed.startsWith("<h") ||
+        trimmed.startsWith("<ul") ||
+        trimmed.startsWith("<ol") ||
+        trimmed.startsWith("<pre") ||
+        trimmed.startsWith("<table") ||
+        trimmed.startsWith("<hr")
       ) {
         return trimmed;
       }
       return `<p>${trimmed}</p>`;
     })
-    .join('\n');
+    .join("\n");
+
+  html = html
+    .replace(/<p>([^<]*(?:Score|Recommendation|Critical|Overall|Final|Verdict|Viability|Break-even|Top \d|Key Finding)[^<]*)<\/p>/gi, '<p class="md-key-line">$1</p>')
+    .replace(/<li>([^<]*(?:High|Medium|Low|Severe|Critical)[^<]*)<\/li>/gi, '<li class="md-key-li">$1</li>');
 
   return html;
 }
@@ -180,164 +252,168 @@ function distillInsights(results: AgentResults): string[] {
       const agent = AGENTS.find(a => a.id === agentId);
       const firstLine = lines[0].replace(/^[\*\-\d\.]+\s*/, '').replace(/\*\*/g, '').trim();
       if (firstLine.length > 10 && agent) {
-        insights.push(`${agent.icon} **${agent.name}**: ${firstLine.slice(0, 150)}${firstLine.length > 150 ? '...' : ''}`);
+        insights.push(`**${agent.name}**: ${firstLine.slice(0, 150)}${firstLine.length > 150 ? '...' : ''}`);
       }
     }
   }
   
-  return insights.slice(0, 6);
+  return insights.slice(0, AGENTS.length);
 }
 
 /* ── Generate Notion-compatible markdown ── */
 function generateNotionDoc(idea: string, results: AgentResults): string {
-  let doc = `# 📋 Startup Package: ${idea}\n\n`;
+  let doc = `# Startup Package: ${idea}\n\n`;
   doc += `> Generated by AI Founder OS on ${new Date().toLocaleDateString()}\n\n`;
   doc += `---\n\n`;
   
   AGENTS.forEach((agent, i) => {
-    doc += `## ${agent.icon} ${i + 1}. ${agent.name} — ${agent.role}\n\n`;
+    doc += `## ${i + 1}. ${agent.name} — ${agent.role}\n\n`;
     
     if (results[agent.id]) {
       doc += `> **Agent Output:**\n\n`;
       doc += results[agent.id];
       doc += `\n\n`;
     } else {
-      doc += `> ⚠️ No output generated for this agent.\n\n`;
+      doc += `> No output generated for this agent.\n\n`;
     }
     
     doc += `---\n\n`;
   });
   
-  doc += `## 📊 Summary\n\n`;
+  doc += `## Summary\n\n`;
   doc += `| Agent | Role | Status |\n`;
   doc += `|-------|------|--------|\n`;
   AGENTS.forEach(agent => {
-    const status = results[agent.id] ? '✅ Complete' : '❌ No Data';
-    doc += `| ${agent.icon} ${agent.name} | ${agent.role} | ${status} |\n`;
+    const status = results[agent.id] ? 'Complete' : 'No Data';
+    doc += `| ${agent.name} | ${agent.role} | ${status} |\n`;
   });
   
   return doc;
 }
 
-/* ── SVG Pie Chart Component ── */
-function BusinessPieChart() {
-  const segments = [
-    { label: "Market Opportunity", value: 25, color: "#3B82F6" },
-    { label: "Product Development", value: 20, color: "#22C55E" },
-    { label: "Technical Infra", value: 20, color: "#F97316" },
-    { label: "Go-To-Market", value: 20, color: "#EC4899" },
-    { label: "Operations", value: 15, color: "#8B5CF6" },
-  ];
+/* ── Compact Business Breakdown — 3 chart panels ── */
+const BREAKDOWN_SEGMENTS = [
+  { label: "Market", value: 18, color: "#3B82F6" },
+  { label: "Product", value: 14, color: "#22C55E" },
+  { label: "Technical", value: 14, color: "#F97316" },
+  { label: "GTM", value: 14, color: "#EC4899" },
+  { label: "Ops", value: 12, color: "#8B5CF6" },
+  { label: "Risk", value: 14, color: "#EF4444" },
+  { label: "Finance", value: 14, color: "#10B981" },
+];
 
+const PILLAR_BARS = [
+  { label: "Validation", value: 82, color: "#F7C948" },
+  { label: "Market Fit", value: 76, color: "#3B82F6" },
+  { label: "Product", value: 88, color: "#22C55E" },
+  { label: "Execution", value: 71, color: "#8B5CF6" },
+  { label: "Financial", value: 79, color: "#10B981" },
+];
+
+function DonutChart({ segments, size = 96 }: { segments: typeof BREAKDOWN_SEGMENTS; size?: number }) {
   const total = segments.reduce((sum, s) => sum + s.value, 0);
-  let cumulativeAngle = 0;
-  const cx = 100, cy = 100, r = 80;
+  let cumulative = 0;
+  const cx = 50, cy = 50, r = 38, ir = 24;
 
   const paths = segments.map((seg, i) => {
-    const startAngle = cumulativeAngle;
+    const startAngle = cumulative;
     const sliceAngle = (seg.value / total) * 360;
-    cumulativeAngle += sliceAngle;
-    const endAngle = cumulativeAngle;
-
+    cumulative += sliceAngle;
     const startRad = (startAngle - 90) * (Math.PI / 180);
-    const endRad = (endAngle - 90) * (Math.PI / 180);
-
-    const x1 = cx + r * Math.cos(startRad);
-    const y1 = cy + r * Math.sin(startRad);
-    const x2 = cx + r * Math.cos(endRad);
-    const y2 = cy + r * Math.sin(endRad);
-
+    const endRad = (cumulative - 90) * (Math.PI / 180);
+    const x1o = cx + r * Math.cos(startRad), y1o = cy + r * Math.sin(startRad);
+    const x2o = cx + r * Math.cos(endRad), y2o = cy + r * Math.sin(endRad);
+    const x1i = cx + ir * Math.cos(endRad), y1i = cy + ir * Math.sin(endRad);
+    const x2i = cx + ir * Math.cos(startRad), y2i = cy + ir * Math.sin(startRad);
     const largeArc = sliceAngle > 180 ? 1 : 0;
-    const d = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
-
-    return (
-      <path
-        key={i}
-        d={d}
-        fill={seg.color}
-        stroke="#FAF6EF"
-        strokeWidth="2"
-        style={{ 
-          opacity: 0,
-          animation: `fadeIn 0.4s ease-out ${0.15 * i}s forwards`
-        }}
-      />
-    );
+    const d = `M ${x1o} ${y1o} A ${r} ${r} 0 ${largeArc} 1 ${x2o} ${y2o} L ${x1i} ${y1i} A ${ir} ${ir} 0 ${largeArc} 0 ${x2i} ${y2i} Z`;
+    return <path key={i} d={d} fill={seg.color} stroke="#FAF6EF" strokeWidth="1" />;
   });
 
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-6">
-      <svg viewBox="0 0 200 200" className="w-[180px] h-[180px] flex-shrink-0">
-        {paths}
-      </svg>
-      <div className="flex flex-col gap-2">
-        {segments.map((seg, i) => (
-          <div key={i} className="flex items-center gap-2.5">
-            <div 
-              className="w-3 h-3 rounded-sm border border-[#1A1A1A]" 
-              style={{ background: seg.color }}
-            />
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' as const, color: '#4A4A4A' }}>
-              {seg.label}
-            </span>
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: '14px', fontWeight: 700, color: '#1A1A1A' }}>
-              {seg.value}%
-            </span>
+    <svg viewBox="0 0 100 100" style={{ width: size, height: size }}>
+      {paths}
+    </svg>
+  );
+}
+
+function HorizontalBarChart({ bars }: { bars: typeof PILLAR_BARS }) {
+  return (
+    <div className="flex flex-col gap-1.5 w-full">
+      {bars.map((bar) => (
+        <div key={bar.label} className="flex items-center gap-2">
+          <span className="text-[9px] w-14 truncate uppercase tracking-wide" style={{ fontFamily: "var(--font-mono)", color: "var(--ink-muted)" }}>
+            {bar.label}
+          </span>
+          <div className="flex-1 h-2 rounded-sm overflow-hidden" style={{ background: "var(--cream-dark)", border: "1px solid var(--border-light)" }}>
+            <div className="h-full rounded-sm transition-all" style={{ width: `${bar.value}%`, background: bar.color }} />
           </div>
-        ))}
-      </div>
+          <span className="text-[9px] w-7 text-right font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--ink)" }}>
+            {bar.value}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
 
-/* ── Agent Tree Structure Component ── */
-function AgentTree() {
-  const treeAgents = AGENTS;
-  
+function AgentOutputChart({ results }: { results: AgentResults }) {
   return (
-    <div className="w-full overflow-x-auto">
-      <div className="flex flex-col items-center gap-0 min-w-[300px] py-4">
-        {treeAgents.map((agent, i) => (
-          <div key={agent.id} className="flex flex-col items-center">
-            {/* Connector line from above */}
-            {i > 0 && (
-              <div 
-                className="w-[2px] h-6 bg-[#1A1A1A]"
-                style={{ 
-                  opacity: 0,
-                  animation: `fadeIn 0.3s ease-out ${0.2 * i}s forwards`
-                }}
-              />
-            )}
-            {/* Node */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 * i, duration: 0.35 }}
-              className="tree-node flex items-center gap-3"
-            >
-              <span 
-                className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#1A1A1A]"
-                style={{ background: agent.color, color: '#fff' }}
-              >
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <span className="text-xs">{agent.icon} {agent.name}</span>
-            </motion.div>
-            {/* Arrow */}
-            {i < treeAgents.length - 1 && (
-              <div 
-                className="flex flex-col items-center"
-                style={{ 
-                  opacity: 0,
-                  animation: `fadeIn 0.3s ease-out ${0.2 * (i + 1)}s forwards`
-                }}
-              >
-                <ChevronRight className="w-4 h-4 text-[#1A1A1A] rotate-90" />
-              </div>
-            )}
+    <div className="flex items-end justify-between gap-1 h-[72px] w-full px-1">
+      {AGENTS.map((agent) => {
+        const len = results[agent.id]?.length ?? 0;
+        const height = Math.max(12, Math.min(72, (len / 1200) * 72));
+        return (
+          <div key={agent.id} className="flex flex-col items-center gap-1 flex-1 min-w-0">
+            <div
+              className="w-full max-w-[14px] rounded-t-sm"
+              style={{ height, background: agent.color, opacity: len ? 1 : 0.25 }}
+              title={agent.name}
+            />
+            <AgentIcon Icon={agent.Icon} color={agent.color} size={10} />
           </div>
-        ))}
+        );
+      })}
+    </div>
+  );
+}
+
+function BusinessBreakdownCharts({ results }: { results: AgentResults }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="breakdown-chart-card">
+        <div className="flex items-center gap-1.5 mb-2">
+          <TrendingUp size={13} style={{ color: "var(--accent-blue)" }} />
+          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)", color: "var(--ink)" }}>Allocation</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <DonutChart segments={BREAKDOWN_SEGMENTS} />
+          <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+            {BREAKDOWN_SEGMENTS.slice(0, 4).map((seg) => (
+              <div key={seg.label} className="flex items-center gap-1.5 text-[9px]">
+                <span className="w-2 h-2 rounded-sm flex-shrink-0" style={{ background: seg.color }} />
+                <span className="truncate" style={{ color: "var(--ink-muted)" }}>{seg.label}</span>
+                <span className="ml-auto font-semibold" style={{ color: "var(--ink)" }}>{seg.value}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="breakdown-chart-card">
+        <div className="flex items-center gap-1.5 mb-2">
+          <BarChart3 size={13} style={{ color: "var(--accent-green)" }} />
+          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)", color: "var(--ink)" }}>Pillar Scores</span>
+        </div>
+        <HorizontalBarChart bars={PILLAR_BARS} />
+      </div>
+
+      <div className="breakdown-chart-card">
+        <div className="flex items-center gap-1.5 mb-2">
+          <Activity size={13} style={{ color: "var(--accent-orange)" }} />
+          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)", color: "var(--ink)" }}>Agent Output</span>
+        </div>
+        <AgentOutputChart results={results} />
       </div>
     </div>
   );
@@ -366,7 +442,10 @@ export default function Home() {
       "📓 Notion Tool: Startup Advisor generating validation workspace & feedback summary...",
       "📓 Notion Tool: Product Manager compiling Product Requirements Document (PRD)...",
       "🐙 GitHub Tool: Architect provisioning workspace repository & generating system schemas...",
+      "📓 Notion Tool: Marketing Agent drafting launch copy & GTM strategy...",
       "🐙 GitHub Tool: Engineering Manager filing Sprint milestones & P0/P1/P2 issues...",
+      "⚠️ Risk Tool: Risk Analyst scoring market, technical & compliance exposure...",
+      "💰 Finance Tool: Financial Analyst modeling revenue, CAC/LTV & burn rate...",
       "📄 PDF Tool: Compiling unified Startup Package report..."
     ];
     
@@ -387,7 +466,7 @@ export default function Home() {
 
   const revealAgentsProgressively = useCallback(() => {
     const agentIds = AGENTS.map((a) => a.id);
-    const delays = [1000, 2200, 3400, 4600, 5800, 7000];
+    const delays = agentIds.map((_, i) => 1000 + i * 1200);
 
     // Start file tool log
     simulateToolExecution(0);
@@ -401,10 +480,13 @@ export default function Home() {
         if (id === "advisor") simulateToolExecution(2);
         if (id === "product") simulateToolExecution(3);
         if (id === "architecture") simulateToolExecution(4);
-        if (id === "engineering") simulateToolExecution(5);
+        if (id === "marketing") simulateToolExecution(5);
+        if (id === "engineering") simulateToolExecution(6);
+        if (id === "risk") simulateToolExecution(7);
+        if (id === "financial") simulateToolExecution(8);
 
         if (i === agentIds.length - 1) {
-          simulateToolExecution(6);
+          simulateToolExecution(9);
           setTimeout(() => {
             setState("results");
             confetti({
@@ -454,6 +536,8 @@ export default function Home() {
         architecture: data.architecture ?? null,
         marketing: data.marketing ?? null,
         engineering: data.engineering ?? null,
+        risk: data.risk ?? null,
+        financial: data.financial ?? null,
       };
 
       setResults(mapped);
@@ -544,7 +628,7 @@ export default function Home() {
     
     AGENTS.forEach((agent) => {
       output += `=========================================\n`;
-      output += `${agent.icon} ${agent.name.toUpperCase()} - ${agent.role.toUpperCase()}\n`;
+      output += `${agent.name.toUpperCase()} - ${agent.role.toUpperCase()}\n`;
       output += `=========================================\n\n`;
       output += results[agent.id] || "No data compiled.";
       output += `\n\n`;
@@ -599,6 +683,8 @@ export default function Home() {
           <span>STRATEGY & VALIDATION</span>
           <span>MARKET INTELLIGENCE</span>
           <span>PRODUCT ARCHITECTURE</span>
+          <span>RISK ANALYSIS</span>
+          <span>FINANCIAL MODELING</span>
         </div>
       </div>
 
@@ -616,140 +702,104 @@ export default function Home() {
               transition={{ duration: 0.4 }}
               className="max-w-4xl mx-auto w-full px-6 py-16 flex flex-col items-center justify-center min-h-[85vh]"
             >
-              {/* Badge */}
-              <div className="badge-yellow mb-8 animate-stamp">
-                <Rocket className="w-3.5 h-3.5" />
-                <span>Orchestrated Multi-Agent System</span>
-              </div>
-
-              {/* Headline — editorial serif */}
-              <h1 className="text-4xl sm:text-6xl text-center tracking-tight leading-[1.1] mb-6" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>
-                Generate Your Unified<br />
-                <em style={{ fontStyle: 'italic' }}>Startup Plan & Artifacts</em>
+              {/* Headline */}
+              <h1 className="text-3xl sm:text-4xl text-center tracking-tight leading-tight mb-3" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>
+                What&apos;s on the agenda today?
               </h1>
 
-              <p className="text-center text-base max-w-xl mb-12 leading-relaxed" style={{ color: 'var(--ink-muted)' }}>
-                Provide your idea or upload context files. Our specialized agents run parallel workflows using core system tools to deliver a comprehensive Startup Package.
+              <p className="text-center text-sm max-w-lg mb-8" style={{ color: 'var(--ink-muted)' }}>
+                Describe your startup idea or attach context files. Eight specialized agents will compile your unified package.
               </p>
 
-              {/* Input Area */}
-              <div className="w-full editorial-card p-6 flex flex-col gap-5">
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="idea-input" className="text-xs font-bold tracking-wider uppercase" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-light)', letterSpacing: '0.08em' }}>Your Startup Idea</label>
+              {/* Chat-style composer */}
+              <div className="w-full max-w-3xl">
+                <div
+                  className={`chat-composer${isDragging ? " chat-composer-dragging" : ""}`}
+                  onDragOver={onDragOver}
+                  onDragLeave={onDragLeave}
+                  onDrop={onDrop}
+                >
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={(e) => e.target.files && processFiles(e.target.files)}
+                    multiple
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="chat-composer-plus"
+                    title="Attach files"
+                  >
+                    <Plus size={18} />
+                  </button>
                   <textarea
                     id="idea-input"
                     value={idea}
                     onChange={(e) => setIdea(e.target.value)}
-                    placeholder="Describe your startup idea in detail, or leave blank and upload files..."
-                    rows={4}
-                    className="w-full resize-none px-4 py-3 text-base focus:outline-none transition-all"
-                    style={{ 
-                      background: 'var(--cream)',
-                      border: '2px solid var(--border-light)',
-                      borderRadius: '4px',
-                      color: 'var(--ink)',
-                      fontFamily: 'var(--font-body)',
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = 'var(--ink)';
-                      e.target.style.boxShadow = '3px 3px 0px var(--ink)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = 'var(--border-light)';
-                      e.target.style.boxShadow = 'none';
+                    placeholder="Ask anything about your startup idea..."
+                    rows={1}
+                    className="chat-composer-input"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        if (idea.trim() || uploadedFiles.length > 0) handleSubmit();
+                      }
                     }}
                   />
-                </div>
-
-                {/* File Dropzone */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold tracking-wider uppercase" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-light)', letterSpacing: '0.08em' }}>
-                      Additional Context (File Tool)
-                    </span>
-                    <span className="text-[10px]" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)' }}>
-                      {formatFileSize(totalUploadSize)} / 1 MB
-                    </span>
-                  </div>
-                  <div
-                    onDragOver={onDragOver}
-                    onDragLeave={onDragLeave}
-                    onDrop={onDrop}
-                    onClick={() => fileInputRef.current?.click()}
-                    className={`border-2 border-dashed p-6 flex flex-col items-center justify-center gap-2.5 cursor-pointer transition-all`}
-                    style={{
-                      borderColor: isDragging ? 'var(--ink)' : 'var(--border-light)',
-                      background: isDragging ? 'var(--cream-dark)' : 'transparent',
-                      borderRadius: '4px',
-                    }}
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={!idea.trim() && uploadedFiles.length === 0}
+                    className="chat-composer-send"
+                    title="Launch agents"
                   >
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={(e) => e.target.files && processFiles(e.target.files)}
-                      multiple
-                      className="hidden"
-                    />
-                    <div className="w-9 h-9 rounded flex items-center justify-center" style={{ background: 'var(--cream-dark)', border: '2px solid var(--border-light)' }}>
-                      <Upload className="w-4 h-4" style={{ color: 'var(--ink-muted)' }} />
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm font-medium" style={{ color: 'var(--ink)' }}>Click to upload or drag & drop</p>
-                      <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)' }}>Max 500KB per file · Business plans, reports, PRDs, or PDFs</p>
-                    </div>
-                  </div>
+                    <ArrowUp size={18} />
+                  </button>
                 </div>
 
-                {/* File Error */}
+                <div className="flex items-center justify-between mt-2 px-1">
+                  <span className="text-[10px]" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)' }}>
+                    {uploadedFiles.length > 0 ? `${uploadedFiles.length} file(s) attached` : "Press + to attach files · Max 500KB each"}
+                  </span>
+                  <span className="text-[10px]" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)' }}>
+                    {formatFileSize(totalUploadSize)} / 1 MB
+                  </span>
+                </div>
+
                 {fileError && (
-                  <div className="flex items-center gap-2 px-3 py-2 rounded" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
+                  <div className="flex items-center gap-2 px-3 py-2 mt-2 rounded" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
                     <AlertCircle className="w-4 h-4 flex-shrink-0" style={{ color: '#EF4444' }} />
                     <span className="text-xs" style={{ color: '#DC2626' }}>{fileError}</span>
                   </div>
                 )}
 
-                {/* Uploaded Files List */}
                 {uploadedFiles.length > 0 && (
-                  <div className="flex flex-wrap gap-2.5 p-3 rounded" style={{ background: 'var(--cream-dark)', border: '1px solid var(--border-light)' }}>
+                  <div className="flex flex-wrap gap-2 mt-3">
                     {uploadedFiles.map((file, index) => (
-                      <div 
-                        key={index} 
-                        className="flex items-center gap-2 px-3 py-1.5 rounded text-xs"
-                        style={{ background: 'var(--surface)', border: '1px solid var(--border-light)', color: 'var(--ink-light)' }}
+                      <div
+                        key={index}
+                        className="flex items-center gap-2 px-2.5 py-1 rounded-full text-[11px]"
+                        style={{ background: 'var(--cream-dark)', border: '1px solid var(--border-light)', color: 'var(--ink-light)' }}
                       >
-                        <FileText className="w-3.5 h-3.5" style={{ color: 'var(--ink-muted)' }} />
-                        <span className="max-w-[120px] truncate font-medium">{file.name}</span>
-                        <span className="text-[10px]" style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-mono)' }}>{formatFileSize(file.size)}</span>
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); removeFile(index); }} 
+                        <FileText className="w-3 h-3" style={{ color: 'var(--ink-muted)' }} />
+                        <span className="max-w-[140px] truncate font-medium">{file.name}</span>
+                        <span style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-mono)' }}>{formatFileSize(file.size)}</span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); removeFile(index); }}
                           className="hover:text-red-500 transition-colors p-0.5"
                         >
-                          <X className="w-3.5 h-3.5" />
+                          <X className="w-3 h-3" />
                         </button>
                       </div>
                     ))}
                   </div>
                 )}
-
-                {/* Action Row */}
-                <div className="flex items-center justify-between pt-3" style={{ borderTop: '2px solid var(--border-light)' }}>
-                  <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.04em' }}>
-                    <Terminal className="w-3.5 h-3.5" />
-                    <span>AGENT WORKSPACE INITIALIZED · READY TO LAUNCH</span>
-                  </div>
-                  <button
-                    onClick={handleSubmit}
-                    disabled={!idea.trim() && uploadedFiles.length === 0}
-                    className="btn-primary px-6 py-2.5 flex items-center gap-2"
-                  >
-                    <span>Launch Engine</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
               </div>
 
               {/* Tool Cards — Field Notes style */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full mt-14">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 w-full mt-14">
                 <div className="editorial-card p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Search className="w-4 h-4" style={{ color: 'var(--accent-blue)' }} />
@@ -773,6 +823,22 @@ export default function Home() {
                   </div>
                   <p className="text-xs leading-relaxed" style={{ color: 'var(--ink-muted)' }}>Compiles structured docs, user stories, and GTM plans.</p>
                 </div>
+
+                <div className="editorial-card p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertCircle className="w-4 h-4" style={{ color: '#EF4444' }} />
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink)' }}>Risk Tool</span>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: 'var(--ink-muted)' }}>Scores market, technical, and compliance risks with mitigation strategies.</p>
+                </div>
+
+                <div className="editorial-card p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileDown className="w-4 h-4" style={{ color: '#10B981' }} />
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink)' }}>Finance Tool</span>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: 'var(--ink-muted)' }}>Builds revenue models, CAC/LTV projections, and funding requirements.</p>
+                </div>
               </div>
             </motion.div>
           )}
@@ -795,7 +861,7 @@ export default function Home() {
                   Assembling Startup Package
                 </h2>
                 <p className="text-sm" style={{ color: 'var(--ink-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.04em', textTransform: 'uppercase' as const }}>
-                  6 agents · sequential workspace tools · rolling pipeline
+                  {AGENTS.length} agents · sequential workspace tools · rolling pipeline
                 </p>
               </div>
 
@@ -803,14 +869,14 @@ export default function Home() {
               <div className="w-full max-w-3xl mx-auto mb-10">
                 <div className="flex justify-between items-center text-xs font-bold mb-2" style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.04em', textTransform: 'uppercase' as const }}>
                   <span style={{ color: 'var(--ink)' }}>Assembly Progress</span>
-                  <span style={{ color: 'var(--ink-muted)' }}>{completedAgents.length} / 6 Complete</span>
+                  <span style={{ color: 'var(--ink-muted)' }}>{completedAgents.length} / {AGENTS.length} Complete</span>
                 </div>
                 <div className="h-3 w-full overflow-hidden" style={{ background: 'var(--cream-dark)', border: '2px solid var(--border)', borderRadius: '2px' }}>
                   <motion.div 
                     className="h-full"
                     style={{ background: 'var(--accent-yellow)' }}
                     initial={{ width: 0 }}
-                    animate={{ width: `${(completedAgents.length / 6) * 100}%` }}
+                    animate={{ width: `${(completedAgents.length / AGENTS.length) * 100}%` }}
                     transition={{ duration: 0.5 }}
                   />
                 </div>
@@ -880,8 +946,9 @@ export default function Home() {
                                   {String(i + 1).padStart(2, '0')}
                                 </span>
                                 <div>
-                                  <h3 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>
-                                    {agent.icon} {agent.name}
+                                  <h3 className="text-lg font-bold flex items-center gap-2" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>
+                                    <AgentIcon Icon={agent.Icon} color={agent.color} size={18} />
+                                    {agent.name}
                                   </h3>
                                   <p className="text-[10px] uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)' }}>
                                     {agent.role}
@@ -1019,10 +1086,10 @@ export default function Home() {
               </div>
 
               {/* ── Consolidated Summary Report (1-2 pages max) ── */}
-              <div className="summary-report flex-1 max-w-4xl mx-auto w-full px-6 py-10 flex flex-col gap-8 print:p-4 print:gap-6">
+              <div className="summary-report flex-1 max-w-4xl mx-auto w-full px-6 py-6 flex flex-col gap-4 print:p-4 print:gap-4">
                 
                 {/* Cover Header */}
-                <section className="editorial-card p-8 print:border print:border-gray-300">
+                <section className="editorial-card p-5 print:border print:border-gray-300">
                   <div className="flex items-center justify-between mb-4">
                     <div className="badge-pink">
                       <Rocket className="w-3 h-3" />
@@ -1039,28 +1106,25 @@ export default function Home() {
                     {idea || "Startup Strategy Report"}
                   </h1>
                   <p className="text-xs mt-2" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' as const }}>
-                    Unified Package · {new Date().toLocaleDateString()} · 6 Agent Compilation
+                    Unified Package · {new Date().toLocaleDateString()} · {AGENTS.length} Agent Compilation
                   </p>
                 </section>
 
                 {/* Key Insights */}
                 {insights.length > 0 && (
-                  <section className="editorial-card p-6">
-                    <div className="flex items-center gap-3 mb-4">
+                  <section className="editorial-card p-4">
+                    <div className="flex items-center gap-2 mb-3">
                       <span className="section-number section-number-yellow" style={{ fontFamily: 'var(--font-heading)' }}>01</span>
-                      <div>
-                        <h2 className="text-xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Key Insights</h2>
-                        <span className="text-[10px] uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)' }}>Field Note</span>
-                      </div>
+                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Key Insights</h2>
                     </div>
-                    <div className="flex flex-col gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {insights.map((insight, i) => (
-                        <div 
-                          key={i} 
-                          className="flex gap-3 p-3 rounded text-sm leading-relaxed"
+                        <div
+                          key={i}
+                          className="flex gap-2 p-2.5 rounded text-xs leading-relaxed"
                           style={{ background: 'var(--cream)', border: '1px solid var(--border-light)', color: 'var(--ink-light)' }}
                         >
-                          <ChevronRight className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--accent-yellow)' }} />
+                          <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: 'var(--accent-yellow)' }} />
                           <span dangerouslySetInnerHTML={{ __html: renderMarkdown(insight) }} />
                         </div>
                       ))}
@@ -1069,43 +1133,55 @@ export default function Home() {
                 )}
 
                 {/* Agent Summary Table */}
-                <section className="editorial-card p-6">
-                  <div className="flex items-center gap-3 mb-4">
+                <section className="editorial-card p-4">
+                  <div className="flex items-center gap-2 mb-3">
                     <span className="section-number section-number-pink" style={{ fontFamily: 'var(--font-heading)' }}>02</span>
-                    <div>
-                      <h2 className="text-xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Agent Summary</h2>
-                      <span className="text-[10px] uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)' }}>Field Note</span>
-                    </div>
+                    <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Agent Summary</h2>
                   </div>
                   <div className="overflow-x-auto">
-                    <table className="w-full" style={{ borderCollapse: 'collapse' }}>
+                    <table className="agent-summary-table w-full">
+                      <colgroup>
+                        <col style={{ width: "36px" }} />
+                        <col style={{ width: "148px" }} />
+                        <col style={{ width: "112px" }} />
+                        <col />
+                        <col style={{ width: "72px" }} />
+                      </colgroup>
                       <thead>
                         <tr>
-                          <th className="text-left p-3 text-[10px] uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', background: 'var(--cream-dark)', border: '2px solid var(--border)', color: 'var(--ink)' }}>#</th>
-                          <th className="text-left p-3 text-[10px] uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', background: 'var(--cream-dark)', border: '2px solid var(--border)', color: 'var(--ink)' }}>Agent</th>
-                          <th className="text-left p-3 text-[10px] uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', background: 'var(--cream-dark)', border: '2px solid var(--border)', color: 'var(--ink)' }}>Role</th>
-                          <th className="text-left p-3 text-[10px] uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', background: 'var(--cream-dark)', border: '2px solid var(--border)', color: 'var(--ink)' }}>Top Finding</th>
+                          <th>#</th>
+                          <th>Agent</th>
+                          <th>Role</th>
+                          <th>Top Finding</th>
+                          <th>Status</th>
                         </tr>
                       </thead>
                       <tbody>
                         {AGENTS.map((agent, i) => {
                           const agentResult = results[agent.id];
-                          const topFinding = agentResult 
-                            ? agentResult.split('\n').filter(l => l.trim() && !l.startsWith('#') && !l.startsWith('---'))[0]?.replace(/^[\*\-\d\.]+\s*/, '').replace(/\*\*/g, '').trim().slice(0, 100) || "—"
+                          const topFinding = agentResult
+                            ? agentResult.split('\n').filter(l => l.trim() && !l.startsWith('#') && !l.startsWith('---'))[0]?.replace(/^[\*\-\d\.]+\s*/, '').replace(/\*\*/g, '').trim().slice(0, 90) || "—"
                             : "—";
+                          const hasResult = Boolean(agentResult);
                           return (
-                            <tr key={agent.id}>
-                              <td className="p-3 text-sm font-bold" style={{ border: '2px solid var(--border)', fontFamily: 'var(--font-heading)', color: agent.color }}>
+                            <tr key={agent.id} className={hasResult ? "row-complete" : ""}>
+                              <td className="cell-num" style={{ color: agent.color }}>
                                 {String(i + 1).padStart(2, '0')}
                               </td>
-                              <td className="p-3 text-sm font-semibold" style={{ border: '2px solid var(--border)', color: 'var(--ink)' }}>
-                                {agent.icon} {agent.name}
+                              <td className="cell-agent">
+                                <span className="inline-flex items-center gap-1.5">
+                                  <AgentIcon Icon={agent.Icon} color={agent.color} size={13} />
+                                  <span className="font-semibold">{agent.name}</span>
+                                </span>
                               </td>
-                              <td className="p-3 text-[10px] uppercase tracking-wider" style={{ border: '2px solid var(--border)', fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)' }}>
-                                {agent.role}
-                              </td>
-                              <td className="p-3 text-xs" style={{ border: '2px solid var(--border)', color: 'var(--ink-light)' }}>
-                                {topFinding}
+                              <td className="cell-role">{agent.role}</td>
+                              <td className="cell-finding">{topFinding}</td>
+                              <td className="cell-status">
+                                {hasResult ? (
+                                  <span className="status-pill status-complete"><CheckCircle2 size={11} /> Done</span>
+                                ) : (
+                                  <span className="status-pill status-empty">—</span>
+                                )}
                               </td>
                             </tr>
                           );
@@ -1115,68 +1191,50 @@ export default function Home() {
                   </div>
                 </section>
 
-                {/* Business Breakdown: Pie Chart + Agent Tree */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Pie Chart */}
-                  <section className="editorial-card p-6">
-                    <div className="flex items-center gap-3 mb-5">
-                      <span className="section-number section-number-blue" style={{ fontFamily: 'var(--font-heading)' }}>03</span>
-                      <div>
-                        <h2 className="text-xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Business Breakdown</h2>
-                        <span className="text-[10px] uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)' }}>Field Note</span>
-                      </div>
-                    </div>
-                    <BusinessPieChart />
-                  </section>
-
-                  {/* Agent Tree */}
-                  <section className="editorial-card p-6">
-                    <div className="flex items-center gap-3 mb-5">
-                      <span className="section-number section-number-green" style={{ fontFamily: 'var(--font-heading)' }}>04</span>
-                      <div>
-                        <h2 className="text-xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Agent Pipeline</h2>
-                        <span className="text-[10px] uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)' }}>Tree Structure</span>
-                      </div>
-                    </div>
-                    <AgentTree />
-                  </section>
-                </div>
+                {/* Business Breakdown — 3 compact charts */}
+                <section className="editorial-card p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="section-number section-number-blue" style={{ fontFamily: 'var(--font-heading)' }}>03</span>
+                    <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Business Breakdown</h2>
+                  </div>
+                  <BusinessBreakdownCharts results={results} />
+                </section>
 
                 {/* Full Compiled Report — compact single rendering */}
                 <section className="editorial-card overflow-hidden">
-                  <div className="p-5 flex items-center justify-between" style={{ borderBottom: '2px solid var(--border)', background: 'var(--cream-dark)' }}>
-                    <div className="flex items-center gap-3">
-                      <span className="section-number section-number-orange" style={{ fontFamily: 'var(--font-heading)' }}>05</span>
-                      <div>
-                        <h2 className="text-xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Detailed Analysis</h2>
-                        <span className="text-[10px] uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)' }}>All Agents Combined</span>
-                      </div>
+                  <div className="p-4 flex items-center justify-between" style={{ borderBottom: '2px solid var(--border)', background: 'var(--cream-dark)' }}>
+                    <div className="flex items-center gap-2">
+                      <span className="section-number section-number-orange" style={{ fontFamily: 'var(--font-heading)' }}>04</span>
+                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Detailed Analysis</h2>
                     </div>
                     <button onClick={downloadPackage} className="btn-secondary px-3 py-1.5 flex items-center gap-1.5 text-[10px]">
                       <FileDown className="w-3 h-3" />
                       <span>Download .md</span>
                     </button>
                   </div>
-                  <div className="p-6 print:p-4">
-                    <div className="flex flex-col gap-6">
+                  <div className="p-4 print:p-3">
+                    <div className="flex flex-col gap-4">
                       {AGENTS.map((agent, i) => {
                         const agentResult = results[agent.id];
                         return (
-                          <div key={agent.id}>
-                            <div className="flex items-center gap-2.5 mb-3 pb-2" style={{ borderBottom: '1px solid var(--border-light)' }}>
-                              <span className="text-base font-bold" style={{ fontFamily: 'var(--font-heading)', color: agent.color }}>
+                          <div key={agent.id} className="agent-output-block">
+                            <div className="flex items-center gap-2 mb-2 pb-1.5" style={{ borderBottom: '1px solid var(--border-light)' }}>
+                              <span className="text-sm font-bold" style={{ fontFamily: 'var(--font-heading)', color: agent.color }}>
                                 {String(i + 1).padStart(2, '0')}
                               </span>
-                              <span className="text-sm font-bold" style={{ color: 'var(--ink)' }}>{agent.icon} {agent.name}</span>
+                              <span className="text-sm font-bold inline-flex items-center gap-1.5" style={{ color: 'var(--ink)' }}>
+                                <AgentIcon Icon={agent.Icon} color={agent.color} size={14} />
+                                {agent.name}
+                              </span>
                               <span className="text-[9px] uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)' }}>— {agent.role}</span>
                             </div>
                             {agentResult ? (
-                              <div 
-                                className="markdown-content print:text-black text-sm"
+                              <div
+                                className="markdown-content markdown-compact print:text-black text-xs"
                                 dangerouslySetInnerHTML={{ __html: renderMarkdown(agentResult) }}
                               />
                             ) : (
-                              <p className="text-sm italic" style={{ color: 'var(--ink-muted)' }}>No output generated.</p>
+                              <p className="text-xs italic" style={{ color: 'var(--ink-muted)' }}>No output generated.</p>
                             )}
                           </div>
                         );

@@ -501,6 +501,230 @@ body {
   color: #4A4A4A;
 }
 
+.markdown-content .md-section {
+  color: #1A1A1A;
+  border-left: 3px solid #F7C948;
+  padding-left: 0.6rem;
+  margin-left: 0;
+}
+
+.markdown-content .md-emphasis {
+  color: #1A1A1A;
+  font-weight: 700;
+  background: linear-gradient(transparent 60%, rgba(247, 201, 72, 0.35) 60%);
+}
+
+.markdown-content .md-key-line {
+  margin: 0.35rem 0;
+  padding: 0.45rem 0.65rem;
+  background: #F0EBE0;
+  border-left: 3px solid #1A1A1A;
+  border-radius: 0 4px 4px 0;
+  color: #1A1A1A;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.markdown-content .md-key-li {
+  background: #FAF6EF;
+  border-radius: 3px;
+  padding-left: 0.25rem;
+  font-weight: 500;
+}
+
+.markdown-content .md-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+  font-size: 0.75rem;
+}
+
+.markdown-content .md-table th,
+.markdown-content .md-table td {
+  border: 1px solid #D4CFC5;
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.markdown-content .md-table th {
+  background: #F0EBE0;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.markdown-compact h1 { font-size: 1.05rem; margin: 0.6rem 0 0.35rem; }
+.markdown-compact h2 { font-size: 0.95rem; margin: 0.5rem 0 0.3rem; }
+.markdown-compact h3 { font-size: 0.875rem; margin: 0.4rem 0 0.25rem; }
+.markdown-compact p { margin: 0.3rem 0; line-height: 1.55; font-size: 0.8125rem; }
+.markdown-compact ul, .markdown-compact ol { margin: 0.3rem 0; padding-left: 1.1rem; }
+.markdown-compact li { margin: 0.15rem 0; line-height: 1.45; }
+
+/* ── Chat composer (reference-style pill input) ── */
+.chat-composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  background: #1A1A1A;
+  border: 1px solid #2E2E2E;
+  border-radius: 9999px;
+  box-shadow: 0 8px 24px rgba(26, 26, 26, 0.12);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.chat-composer-dragging {
+  border-color: #F7C948;
+  box-shadow: 0 0 0 2px rgba(247, 201, 72, 0.25);
+}
+
+.chat-composer-plus,
+.chat-composer-send {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.chat-composer-plus {
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  background: transparent;
+  color: #E5E5E5;
+}
+
+.chat-composer-plus:hover {
+  background: #2E2E2E;
+}
+
+.chat-composer-input {
+  flex: 1;
+  min-height: 36px;
+  max-height: 120px;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #F5F5F5;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  padding: 0.45rem 0.25rem;
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.chat-composer-input::placeholder {
+  color: #8A8578;
+}
+
+.chat-composer-send {
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  background: #10B981;
+  color: #fff;
+}
+
+.chat-composer-send:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.chat-composer-send:not(:disabled):hover {
+  background: #059669;
+}
+
+/* ── Compact agent summary table ── */
+.agent-summary-table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.6875rem;
+}
+
+.agent-summary-table th,
+.agent-summary-table td {
+  border: 1px solid #D4CFC5;
+  padding: 0.4rem 0.5rem;
+  text-align: left;
+  vertical-align: middle;
+  line-height: 1.35;
+}
+
+.agent-summary-table th {
+  background: #F0EBE0;
+  color: #1A1A1A;
+  font-family: var(--font-mono-code), monospace;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.625rem;
+}
+
+.agent-summary-table .cell-num {
+  font-family: var(--font-heading), Georgia, serif;
+  font-weight: 700;
+  text-align: center;
+}
+
+.agent-summary-table .cell-role {
+  color: #8A8578;
+  font-family: var(--font-mono-code), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 0.6rem;
+}
+
+.agent-summary-table .cell-finding {
+  color: #4A4A4A;
+  word-break: break-word;
+}
+
+.agent-summary-table .cell-status {
+  text-align: center;
+}
+
+.agent-summary-table tr.row-complete {
+  background: rgba(34, 197, 94, 0.04);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-family: var(--font-mono-code), monospace;
+}
+
+.status-complete {
+  color: #16A34A;
+}
+
+.status-empty {
+  color: #8A8578;
+}
+
+/* ── Business breakdown mini charts ── */
+.breakdown-chart-card {
+  padding: 0.65rem 0.75rem;
+  background: #FAF6EF;
+  border: 1px solid #D4CFC5;
+  border-radius: 6px;
+  min-height: 118px;
+}
+
+.agent-output-block {
+  padding-bottom: 0.25rem;
+}
+
 /* ── Agent Spinner — editorial ── */
 .agent-spinner {
   width: 20px;

@@ -63,6 +63,24 @@ export const AGENTS: AgentConfig[] = [
     description: "Plans sprints, team structure, backlog, and release strategy",
     outputs: ["Execution Strategy", "Team Requirements", "Sprint Plan", "Timeline", "Risks", "Backlog", "Team KPIs", "Release Strategy"],
   },
+  {
+    id: "risk",
+    name: "Risk Analyst",
+    icon: "⚠️",
+    color: "#f87171",
+    role: "Risk Assessment",
+    description: "Identifies market, technical, financial, and compliance risks with mitigation strategies",
+    outputs: ["Market Risks", "Technical Risks", "Compliance Risks", "Risk Score", "Top Critical Risks", "Mitigation Plan"],
+  },
+  {
+    id: "financial",
+    name: "Financial Analyst",
+    icon: "💰",
+    color: "#34d399",
+    role: "Financial Modeling",
+    description: "Models revenue, pricing, CAC/LTV, burn rate, and funding requirements",
+    outputs: ["Revenue Model", "Pricing Strategy", "CAC & LTV", "Break-even Estimate", "Funding Requirements", "Investment Recommendation"],
+  },
 ];
 
 export type AgentId = (typeof AGENTS)[number]["id"];

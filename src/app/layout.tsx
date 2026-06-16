@@ -22,7 +22,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "AI Founder OS — Your AI Founding Team",
   description:
-    "Turn a single startup idea into a validated plan, market research, PRD, architecture, and marketing strategy — powered by 6 specialized AI agents working in sequence.",
+    "Turn a single startup idea into a validated plan, market research, PRD, architecture, marketing strategy, risk assessment, and financial model — powered by 8 specialized AI agents working in sequence.",
 };
 
 export default function RootLayout({
