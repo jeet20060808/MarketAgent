@@ -9,16 +9,17 @@ import {
   FileText, 
   X, 
   CheckCircle2, 
-  ArrowRight, 
-  RefreshCw, 
-  Download, 
-  Terminal, 
+  ArrowRight,
+  RefreshCw,
+  Download,
+  Terminal,
   GitBranch,
   Copy,
   ChevronRight,
   AlertCircle,
   FileDown,
   Plus,
+  Mic,
   ArrowUp,
   Brain,
   BarChart3,
@@ -431,8 +432,79 @@ export default function Home() {
   const [fileError, setFileError] = useState<string | null>(null);
   const [showNotionModal, setShowNotionModal] = useState(false);
   const [notionCopied, setNotionCopied] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
   const processingRef = useRef(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setSpeechSupported(false);
+      return;
+    }
+
+    setSpeechSupported(true);
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+    recognition.continuous = false;
+
+    recognition.onstart = () => setIsRecording(true);
+    recognition.onend = () => setIsRecording(false);
+    recognition.onerror = (event: any) => {
+      const errorType = event?.error ?? event?.message ?? "unknown";
+      // Permission errors are common when users deny microphone access — handle quietly
+      if (errorType === "not-allowed" || errorType === "service-not-allowed" || errorType === "permission-denied") {
+        console.warn("Speech recognition permission denied:", errorType);
+        setIsRecording(false);
+        setSpeechSupported(false);
+        return;
+      }
+
+      console.error("Speech recognition error:", errorType, event);
+      setIsRecording(false);
+    };
+
+    recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results || [])
+        .filter((result: any) => result.isFinal)
+        .map((result: any) => result[0]?.transcript ?? "")
+        .join(" ")
+        .trim();
+
+      if (!transcript) return;
+      setIdea((prev) => `${prev.trim()}${prev.trim() ? " " : ""}${transcript}`);
+    };
+
+    recognitionRef.current = recognition;
+
+    return () => {
+      recognition.stop?.();
+      recognitionRef.current = null;
+    };
+  }, []);
+
+  const toggleVoiceRecording = useCallback(() => {
+    const recognition = recognitionRef.current;
+    if (!recognition) return;
+
+    if (isRecording) {
+      recognition.stop();
+      return;
+    }
+
+    try {
+      recognition.start();
+    } catch (error) {
+      console.error("Voice recognition failed to start:", error);
+      setIsRecording(false);
+    }
+  }, [isRecording]);
 
   // ── Tool Simulation Logs ──
   const simulateToolExecution = useCallback((stepIndex: number) => {
@@ -733,6 +805,15 @@ export default function Home() {
                     title="Attach files"
                   >
                     <Plus size={18} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={toggleVoiceRecording}
+                    className="chat-composer-plus"
+                    title={speechSupported ? (isRecording ? "Stop voice input" : "Start voice input") : "Voice input not supported"}
+                    disabled={!speechSupported}
+                  >
+                    <Mic size={18} className={isRecording ? "text-green-400" : ""} />
                   </button>
                   <textarea
                     id="idea-input"
