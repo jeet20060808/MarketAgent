@@ -2,9 +2,9 @@ import { openai } from "@/lib/openai";
 
 export async function financialAnalyst(idea: string) {
   const response = await openai.chat.completions.create({
-    model: "google/gemini-2.5-flash",
+    model: "nvidia/nemotron-3-super-120b-a12b",
 
-    max_tokens: 2000,
+    max_tokens: 1000,
 
     messages: [
       {

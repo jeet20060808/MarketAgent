@@ -2,7 +2,7 @@ import { openai } from "@/lib/openai";
 
 export async function engineeringManager(idea: string) {
   const response = await openai.chat.completions.create({
-    model: "google/gemini-2.5-flash",
+    model: "nvidia/nemotron-3-super-120b-a12b",
     max_tokens: 1200,
 
     messages: [

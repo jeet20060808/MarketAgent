@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -202,41 +204,55 @@ function DecorativeShards() {
 //   );
 // }
 function FloatingBubbles() {
+  const [bubbles, setBubbles] = React.useState<
+    { size: number; left: string; top: string; xDrift: number[]; duration: number; delay: number }[]
+  >([]);
+
+  React.useEffect(() => {
+    setBubbles(
+      Array.from({ length: 15 }, () => {
+        const size = 10 + Math.random() * 30;
+        return {
+          size,
+          left: `${Math.random() * 100}%`,
+          top: `${100 + Math.random() * 20}%`,
+          xDrift: [0, Math.random() * 40 - 20, Math.random() * 40 - 20],
+          duration: 8 + Math.random() * 5,
+          delay: Math.random() * 8,
+        };
+      })
+    );
+  }, []);
+
+  if (bubbles.length === 0) return null;
+
   return (
     <>
-      {Array.from({ length: 15 }).map((_, i) => {
-        const size = 10 + Math.random() * 30;
-
-        return (
-          <motion.div
-            key={i}
-            className="absolute rounded-full bg-[#f2eeeb]/40 border- border-[#f2eeeb]"
-            style={{
-              width: size,
-              height: size,
-              left: `${Math.random() * 100}%`,
-              top: `${100 + Math.random() * 20}%`,
-              zIndex: 25,
-            }}
-            animate={{
-              y: [-600],
-              opacity: [0, 1, 1, 0],
-              x: [
-                0,
-                Math.random() * 40 - 20,
-                Math.random() * 40 - 20,
-              ],
-            }}
-            transition={{
-              duration: 8 + Math.random() * 5,
-              repeat: Infinity,
-              repeatType: "loop",
-              delay: Math.random() * 8,
-              ease: "linear",
-            }}
-          />
-        );
-      })}
+      {bubbles.map((b, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full bg-[#f2eeeb]/40 border- border-[#f2eeeb]"
+          style={{
+            width: b.size,
+            height: b.size,
+            left: b.left,
+            top: b.top,
+            zIndex: 25,
+          }}
+          animate={{
+            y: [-600],
+            opacity: [0, 1, 1, 0],
+            x: b.xDrift,
+          }}
+          transition={{
+            duration: b.duration,
+            repeat: Infinity,
+            repeatType: "loop",
+            delay: b.delay,
+            ease: "linear",
+          }}
+        />
+      ))}
     </>
   );
 }
@@ -270,7 +286,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-2.5">
             <PixelLogo />
             <span className="landing-heading font-bold text-lg md:text-xl tracking-tight text-[#1a1a1a]">
-              MarketAgent
+              AXORA AI
             </span>
           </div>
 

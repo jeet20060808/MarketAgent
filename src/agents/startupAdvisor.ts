@@ -2,8 +2,8 @@ import { openai } from "../lib/openai";
 
 export async function startupAdvisor(idea: string) {
   const response = await openai.chat.completions.create({
-    model: "openai/gpt-oss-120b:free",
-    max_tokens: 1000,
+    model: "nvidia/nemotron-3-super-120b-a12b",
+    max_tokens: 550,
     messages: [
       {
         role: "system",

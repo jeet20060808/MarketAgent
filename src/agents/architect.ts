@@ -2,8 +2,8 @@ import { openai } from "@/lib/openai";
 
 export async function architect(idea: string) {
   const response = await openai.chat.completions.create({
-    model: "google/gemini-2.5-flash",
-    max_tokens: 1000,
+    model: "nvidia/nemotron-3-super-120b-a12b",
+    max_tokens: 900,
 
     messages: [
       {
