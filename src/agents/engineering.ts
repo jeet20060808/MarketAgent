@@ -70,7 +70,9 @@ Define:
 - Beta
 - Production
 
-Return the response in markdown.
+CRITICAL INSTRUCTION 1: You MUST format the Sprint Plan as a Markdown Table.
+CRITICAL INSTRUCTION 2: You MUST include a concrete GitHub Actions CI/CD pipeline template using a \`\`\`yaml\`\`\` code block.
+
 Be concise, practical, and execution-focused.
 Maximum 1000 words.
         `,

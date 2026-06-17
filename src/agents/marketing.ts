@@ -19,11 +19,10 @@ Analyze the startup idea and generate:
 4. Email Campaign Draft
 5. Marketing Channels
 
-Format the response in markdown.
+CRITICAL INSTRUCTION: You MUST format the Marketing Channels section as a detailed Markdown Table with columns for Channel, Estimated Cost, and Expected ROI.
 
 Keep it concise and professional.
-Maximum 400 words.
-        `,
+Maximum 500 words.`,
       },
       {
         role: "user",

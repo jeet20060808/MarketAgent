@@ -18,11 +18,11 @@ Analyze the startup idea and generate:
 3. Recommended Tech Stack
 4. High-Level System Architecture
 
-Format your response in markdown.
+CRITICAL INSTRUCTION 1: You MUST format the Database Tables and API Endpoints as strict Markdown Tables.
+CRITICAL INSTRUCTION 2: You MUST include at least one concrete architectural diagram or code snippet using a \`\`\`typescript\`\`\` code block.
 
 Keep it concise and professional.
-Maximum 400 words.
-        `,
+Maximum 500 words.`,
       },
       {
         role: "user",

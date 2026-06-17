@@ -432,22 +432,38 @@ body {
   color: #4A4A4A;
 }
 .markdown-content p {
-  margin: 0.5rem 0;
-  line-height: 1.75;
-  color: #4A4A4A;
+  margin: 1rem 0;
+  line-height: 1.8;
+  color: #2A2A2A;
+  font-size: 0.95rem;
 }
 .markdown-content ul, .markdown-content ol {
-  margin: 0.5rem 0;
+  margin: 1rem 0;
   padding-left: 1.5rem;
-  color: #4A4A4A;
+  color: #2A2A2A;
 }
 .markdown-content li {
-  margin: 0.25rem 0;
-  line-height: 1.65;
+  margin: 0.5rem 0;
+  line-height: 1.7;
+  font-size: 0.95rem;
 }
 .markdown-content strong {
   color: #1A1A1A;
   font-weight: 700;
+  background: linear-gradient(transparent 65%, rgba(247, 201, 72, 0.4) 65%);
+  padding: 0 0.15em;
+}
+.markdown-content blockquote {
+  border-left: 4px solid #F7C948;
+  padding-left: 1.25rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  font-family: var(--font-heading), 'Georgia', serif;
+  color: #4A4A4A;
+  font-size: 1.1rem;
+  background: #F5F0E8;
+  padding: 1rem 1.25rem;
+  border-radius: 0 4px 4px 0;
 }
 .markdown-content code {
   background: #F0EBE0;
