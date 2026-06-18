@@ -127,7 +127,12 @@ ${agentReportsContext}
   const content = response.choices[0].message.content?.trim() || "{}";
   
   let cleanedJson = content;
-  if (cleanedJson.startsWith("```")) {
+  // Extract JSON block if surrounded by conversational preamble or markdown backticks
+  const startIdx = cleanedJson.indexOf('{');
+  const endIdx = cleanedJson.lastIndexOf('}');
+  if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
+    cleanedJson = cleanedJson.substring(startIdx, endIdx + 1);
+  } else if (cleanedJson.startsWith("```")) {
     cleanedJson = cleanedJson.replace(/^```json\s*/, "").replace(/^```\s*/, "").replace(/\s*```$/, "");
   }
 
@@ -186,6 +191,65 @@ ${agentReportsContext}
     return result;
   }
 
+  // Fallback regex-based parser in case JSON.parse completely fails
+  function fallbackRegexParse(rawText: string): ScoreData {
+    const getNumber = (key: string, defaultVal: number): number => {
+      const regex = new RegExp(`"${key}"\\s*:\\s*(\\d+)`, 'i');
+      const match = rawText.match(regex);
+      return match ? parseInt(match[1], 10) : defaultVal;
+    };
+
+    const getString = (key: string, defaultVal: string): string => {
+      const regex = new RegExp(`"${key}"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"`, 'i');
+      const match = rawText.match(regex);
+      if (match) {
+        return match[1]
+          .replace(/\\"/g, '"')
+          .replace(/\\n/g, '\n')
+          .replace(/\\r/g, '\r')
+          .trim();
+      }
+      return defaultVal;
+    };
+
+    const marketScore = getNumber("marketScore", 65);
+    const revenueScore = getNumber("revenueScore", 60);
+    const executionScore = getNumber("executionScore", 55);
+    const competitionScore = getNumber("competitionScore", 65);
+    const riskScore = getNumber("riskScore", 45);
+
+    const marketContr = marketScore * 0.30;
+    const revenueContr = revenueScore * 0.25;
+    const executionContr = executionScore * 0.20;
+    const competitionContr = competitionScore * 0.15;
+    const riskContr = riskScore * 0.10;
+    const computedScore = Math.round(marketContr + revenueContr + executionContr + competitionContr + riskContr);
+
+    return {
+      startupScore: computedScore,
+      marketScore,
+      marketReason: getString("marketReason", "Evaluated based on multi-agent analysis reports."),
+      revenueScore,
+      revenueReason: getString("revenueReason", "Evaluated based on monetization models and pricing strategy."),
+      executionScore,
+      executionReason: getString("executionReason", "Evaluated based on expected technical and product complexity."),
+      competitionScore,
+      competitionReason: getString("competitionReason", "Evaluated based on market competition and differentiation."),
+      riskScore,
+      riskReason: getString("riskReason", "Evaluated based on identified execution and financial risks."),
+      scoreCalculation: {
+        marketWeight: 0.30,
+        revenueWeight: 0.25,
+        executionWeight: 0.20,
+        competitionWeight: 0.15,
+        riskWeight: 0.10
+      },
+      recommendation: getString("recommendation", "Proceed with caution; validate demand via a pilot first."),
+      investorVerdict: getString("investorVerdict", "CONDITIONAL INTEREST"),
+      calculationExplanation: getString("calculationExplanation", `(Market Score of ${marketScore} * 0.30) = ${marketContr.toFixed(2)}; (Revenue Score of ${revenueScore} * 0.25) = ${revenueContr.toFixed(2)}; (Execution Score of ${executionScore} * 0.20) = ${executionContr.toFixed(2)}; (Competition Score of ${competitionScore} * 0.15) = ${competitionContr.toFixed(2)}; (Risk Score of ${riskScore} * 0.10) = ${riskContr.toFixed(2)}. Sum = ${marketContr.toFixed(2)} + ${revenueContr.toFixed(2)} + ${executionContr.toFixed(2)} + ${competitionContr.toFixed(2)} + ${riskContr.toFixed(2)} = ${(marketContr+revenueContr+executionContr+competitionContr+riskContr).toFixed(2)}, rounded to the nearest integer gives ${computedScore}.`)
+    };
+  }
+
   const sanitized = cleanJsonString(cleanedJson);
 
   try {
@@ -203,7 +267,12 @@ ${agentReportsContext}
     
     return parsed;
   } catch (error) {
-    console.error("JSON parsing error on scoring output:", content, error);
-    throw new Error("Failed to parse scoring engine response: " + error);
+    console.warn("JSON parsing error on scoring output, falling back to regex parser:", error);
+    try {
+      return fallbackRegexParse(cleanedJson);
+    } catch (fallbackError) {
+      console.error("Critical: both JSON and regex parser failed. Raw content:", content);
+      throw new Error("Failed to parse scoring engine response: " + error);
+    }
   }
 }

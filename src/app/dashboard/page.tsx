@@ -1647,6 +1647,12 @@ export default function Home() {
                           {/* SVG Circular Gauge */}
                           <div className="relative w-36 h-36 flex items-center justify-center">
                             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                              <defs>
+                                <linearGradient id="scoreProgressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                  <stop offset="0%" stopColor="#F7C948" />
+                                  <stop offset="100%" stopColor="#EC4899" />
+                                </linearGradient>
+                              </defs>
                               {/* Background Track */}
                               <circle
                                 cx="50"
@@ -1662,30 +1668,30 @@ export default function Home() {
                                 cy="50"
                                 r="40"
                                 fill="transparent"
-                                stroke="var(--accent-yellow)"
+                                stroke="url(#scoreProgressGradient)"
                                 strokeWidth="8"
                                 strokeDasharray={251.2}
                                 initial={{ strokeDashoffset: 251.2 }}
                                 animate={{ strokeDashoffset: 251.2 - (251.2 * scoreData.startupScore) / 100 }}
                                 transition={{ duration: 1.5, ease: "easeOut" }}
                                 strokeLinecap="round"
-                                style={{ filter: "drop-shadow(0px 0px 4px rgba(247, 201, 72, 0.65))" }}
+                                style={{ filter: "drop-shadow(0px 0px 4px rgba(236, 72, 153, 0.4))" }}
                               />
                             </svg>
                             <div className="absolute flex flex-col items-center justify-center">
                               <AnimatedScore value={scoreData.startupScore} />
-                              <span className="text-[9px] font-mono tracking-widest text-[#8A8578] uppercase mt-0.5">
+                              <span className="text-[9px] font-mono tracking-widest text-ink-muted uppercase mt-0.5">
                                 OVERALL
                               </span>
                             </div>
                           </div>
                           
-                          <div className="text-center mt-3">
-                            <span className="text-[9px] font-mono uppercase tracking-widest block text-[#8A8578]">
+                          <div className="text-center mt-3 px-2">
+                            <span className="text-[9px] font-mono uppercase tracking-widest block text-ink-muted">
                               INVESTOR VERDICT
                             </span>
-                            <h4 className="text-sm font-bold text-ink uppercase mt-0.5">
-                              {scoreData.investorVerdict}
+                            <h4 className="text-xs font-bold text-ink uppercase mt-0.5 tracking-tight line-clamp-2" title={scoreData.investorVerdict}>
+                              {scoreData.investorVerdict.split(/[-–—:]/)[0].trim()}
                             </h4>
                           </div>
                         </div>

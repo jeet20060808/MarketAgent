@@ -223,23 +223,66 @@ body {
   transform: translateY(-3px);
 }
 
-/* Ensure light sub-panels inside dark cards have dark text */
+/* Ensure text elements directly inside the dark cards are readable */
+.editorial-card h1,
+.editorial-card h2,
+.editorial-card h3,
+.editorial-card h4 {
+  color: #FAF6EF !important;
+}
+
+.editorial-card p,
+.editorial-card span,
+.editorial-card div,
+.editorial-card label {
+  color: #E2E8F0 !important;
+}
+
+/* BUT restore dark text for sub-panels with light backgrounds */
 .gauge-card,
 .breakdown-chart-card,
-.recommendations-box {
+.recommendations-box,
+.agent-summary-table {
+  color: #1A1A1A !important;
+  background: #FAF6EF !important;
+}
+
+.gauge-card *,
+.breakdown-chart-card *,
+.recommendations-box *,
+.agent-summary-table * {
   color: #1A1A1A !important;
 }
 
-.recommendations-box span,
-.recommendations-box p,
-.recommendations-box div {
-  color: #1A1A1A !important;
+/* Ensure secondary styling like muted text in sub-panels uses proper dark values */
+.gauge-card .text-ink-muted,
+.agent-summary-table .cell-role {
+  color: #8A8578 !important;
+}
+
+.agent-summary-table .cell-finding {
+  color: #4A4A4A !important;
+}
+
+/* Allow badge, status, and custom colored text to bypass override */
+.editorial-card .badge-pink,
+.editorial-card .badge-pink *,
+.editorial-card .badge-yellow,
+.editorial-card .badge-yellow *,
+.editorial-card .status-pill,
+.editorial-card .status-pill *,
+.editorial-card .score-glow-text,
+.editorial-card .score-glow-text *,
+.editorial-card .cell-num {
+  color: inherit !important;
 }
 
 /* Chic glowing & pulsing overall score animation */
 .score-glow-text {
-  color: #1A1A1A;
-  text-shadow: 0 0 15px rgba(247, 201, 72, 0.25);
+  background: linear-gradient(135deg, #F7C948 0%, #EC4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   display: inline-block;
   animation: scoreBounce 2.5s infinite ease-in-out;
 }
