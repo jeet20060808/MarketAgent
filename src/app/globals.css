@@ -231,63 +231,63 @@ body {
   color: #FAF6EF !important;
 }
 
-.editorial-card p,
-.editorial-card span,
-.editorial-card div,
-.editorial-card label {
+ .editorial-card p,
+ .editorial-card span,
+ .editorial-card div,
+ .editorial-card label {
   color: #E2E8F0 !important;
-}
+ }
 
-/* BUT restore dark text for sub-panels with light backgrounds */
-.gauge-card,
-.breakdown-chart-card,
-.recommendations-box,
-.agent-summary-table {
+ /* BUT restore dark text for sub-panels with light backgrounds */
+ .gauge-card,
+ .breakdown-chart-card,
+ .recommendations-box,
+ .agent-summary-table {
   color: #1A1A1A !important;
   background: #FAF6EF !important;
-}
+ }
 
-.gauge-card *,
-.breakdown-chart-card *,
-.recommendations-box *,
-.agent-summary-table * {
+ .gauge-card *,
+ .breakdown-chart-card *,
+ .recommendations-box *,
+ .agent-summary-table * {
   color: #1A1A1A !important;
-}
+ }
 
-/* Ensure secondary styling like muted text in sub-panels uses proper dark values */
-.gauge-card .text-ink-muted,
-.agent-summary-table .cell-role {
+ /* Ensure secondary styling like muted text in sub-panels uses proper dark values */
+ .gauge-card .text-ink-muted,
+ .agent-summary-table .cell-role {
   color: #8A8578 !important;
-}
+ }
 
-.agent-summary-table .cell-finding {
+ .agent-summary-table .cell-finding {
   color: #4A4A4A !important;
-}
+ }
 
-/* Allow badge, status, and custom colored text to bypass override */
-.editorial-card .badge-pink,
-.editorial-card .badge-pink *,
-.editorial-card .badge-yellow,
-.editorial-card .badge-yellow *,
-.editorial-card .status-pill,
-.editorial-card .status-pill *,
-.editorial-card .score-glow-text,
-.editorial-card .score-glow-text *,
-.editorial-card .cell-num {
+ /* Allow badge, status, and custom colored text to bypass override */
+ .editorial-card .badge-pink,
+ .editorial-card .badge-pink *,
+ .editorial-card .badge-yellow,
+ .editorial-card .badge-yellow *,
+ .editorial-card .status-pill,
+ .editorial-card .status-pill *,
+ .editorial-card .score-glow-text,
+ .editorial-card .score-glow-text *,
+ .editorial-card .cell-num {
   color: inherit !important;
-}
+ }
 
-/* Chic glowing & pulsing overall score animation */
-.score-glow-text {
+ /* Chic glowing & pulsing overall score animation */
+ .score-glow-text {
   background: linear-gradient(135deg, #F7C948 0%, #EC4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   display: inline-block;
   animation: scoreBounce 2.5s infinite ease-in-out;
-}
+ }
 
-@keyframes scoreBounce {
+ @keyframes scoreBounce {
   0%, 100% {
     transform: scale(1);
     text-shadow: 0 0 15px rgba(247, 201, 72, 0.25);
@@ -296,50 +296,50 @@ body {
     transform: scale(1.06);
     text-shadow: 0 0 25px rgba(247, 201, 72, 0.6), 0 0 10px rgba(247, 201, 72, 0.3);
   }
-}
+ }
 
-/* Specific styling for markdown content inside dark editorial cards */
-.editorial-card .markdown-content h1,
-.editorial-card .markdown-content h2,
-.editorial-card .markdown-content h3,
-.editorial-card .markdown-content h4,
-.editorial-card .markdown-content .md-section {
+ /* Specific styling for markdown content inside dark editorial cards */
+ .editorial-card .markdown-content h1,
+ .editorial-card .markdown-content h2,
+ .editorial-card .markdown-content h3,
+ .editorial-card .markdown-content h4,
+ .editorial-card .markdown-content .md-section {
   color: #FAF6EF !important;
-}
+ }
 
-.editorial-card .markdown-content p,
-.editorial-card .markdown-content li,
-.editorial-card .markdown-content td {
+ .editorial-card .markdown-content p,
+ .editorial-card .markdown-content li,
+ .editorial-card .markdown-content td {
   color: #E2E8F0 !important;
-}
+ }
 
-.editorial-card .markdown-content table,
-.editorial-card .markdown-content th,
-.editorial-card .markdown-content td {
+ .editorial-card .markdown-content table,
+ .editorial-card .markdown-content th,
+ .editorial-card .markdown-content td {
   border-color: #3F3F46 !important;
-}
+ }
 
-.editorial-card .markdown-content th {
+ .editorial-card .markdown-content th {
   background: #27272A !important;
   color: #FAF6EF !important;
-}
+ }
 
-.editorial-card .markdown-content code {
+ .editorial-card .markdown-content code {
   background: #27272A !important;
   color: #EC4899 !important;
   border-color: #3F3F46 !important;
-}
+ }
 
-.editorial-card .markdown-content a {
+ .editorial-card .markdown-content a {
   color: #3B82F6 !important;
   text-decoration: underline;
   transition: color 0.2s ease;
-}
+ }
 
-.editorial-card .markdown-content a:hover {
+ .editorial-card .markdown-content a:hover {
   color: #F7C948 !important;
   text-shadow: 0 0 8px rgba(247, 201, 72, 0.4);
-}
+ }
 
 /* Glass card (legacy compat — now editorial) */
 .glass-card {
@@ -350,7 +350,7 @@ body {
 }
 
 .glass-card:hover {
-  background: #F5F0E8;
+  background: #5b5b5a;
 }
 
 /* ── Agent Cards ── */

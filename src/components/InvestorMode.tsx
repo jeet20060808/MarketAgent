@@ -26,37 +26,60 @@ function extractSection(text: string | null, keywords: string[]): string {
   if (!text) return "";
   const lines = text.split('\n');
   let capturing = false;
-  let content = [];
-  
+  let content: string[] = [];
+
   for (const line of lines) {
-    if (line.startsWith('#')) {
-      const isMatch = keywords.some(k => line.toLowerCase().includes(k.toLowerCase()));
+    const trimmed = line.trim();
+    let headingMatch = null;
+    let inlineContent = "";
+
+    if (/^#+\s*/.test(trimmed)) {
+      headingMatch = trimmed.replace(/^#+\s*/, "");
+    } else if (/^\d+\.\s*(.*)$/.test(trimmed)) {
+      headingMatch = trimmed.replace(/^\d+\.\s*/, "");
+    } else if (/^([A-Za-z][A-Za-z\s]+?):\s*(.*)$/.test(trimmed)) {
+      const [, heading, rest] = trimmed.match(/^([A-Za-z][A-Za-z\s]+?):\s*(.*)$/)!;
+      headingMatch = heading;
+      inlineContent = rest;
+    }
+
+    if (headingMatch) {
+      const isMatch = keywords.some(k => headingMatch!.toLowerCase().includes(k.toLowerCase()));
       if (isMatch) {
         capturing = true;
-        continue; // skip the heading line itself
-      } else if (capturing) {
-        break; // stop capturing on next heading
-      }
-    } else if (line.match(/^\d+\.\s/)) {
-        // sometimes agents use numbered lists as headings (e.g. "1. Problem Statement")
-        const isMatch = keywords.some(k => line.toLowerCase().includes(k.toLowerCase()));
-        if (isMatch && !capturing) {
-            capturing = true;
-            continue; // skip the heading line itself
+        if (inlineContent) {
+          content.push(inlineContent);
         }
+        continue;
+      }
+
+      if (capturing) {
+        break;
+      }
+      continue;
     }
-    
-    if (capturing) content.push(line);
+
+    if (capturing) {
+      content.push(line);
+    }
   }
-  
+
   const res = content.join('\n').trim();
-  if (!res && text.length > 0) {
-      // fallback: grab first paragraph
-      const paras = text.split('\n\n');
-      return paras.slice(0, 2).join('\n\n').replace(/^#+\s+.*$/gm, '').replace(/^\d+\.\s+[A-Za-z\s]+(?!.)/gm, '');
+  if (res) {
+    return res;
   }
-  
-  return res;
+
+  const lower = text.toLowerCase();
+  for (const keyword of keywords) {
+    const escapedKeyword = keyword.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+    const regex = new RegExp(`([^\\n.?!]*\\b${escapedKeyword}\\b[^\\n.?!]*[.?!])`, 'i');
+    const match = regex.exec(text);
+    if (match) {
+      return match[1].trim();
+    }
+  }
+
+  return "";
 }
 
 export function InvestorMode({ 

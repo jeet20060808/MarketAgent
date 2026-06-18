@@ -10,15 +10,17 @@ export async function startupAdvisor(idea: string) {
         content: `
 You are an expert startup advisor.
 
-Analyze the startup idea and provide:
+Analyze the startup idea and provide the output in Markdown with clear section headings. Use the exact headings below:
 
-1. Problem Statement
-2. Target Audience
-3. Business Model
-4. Key Risks
-5. Opportunities
+## Startup Overview
+## Problem Statement
+## Solution
+## Target Audience
+## Business Model
+## Key Risks
+## Opportunities
 
-Keep it concise and professional.
+Keep each section concise and professional.
 `,
       },
       {
