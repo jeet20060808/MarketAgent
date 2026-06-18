@@ -126,14 +126,70 @@ ${agentReportsContext}
 
   const content = response.choices[0].message.content?.trim() || "{}";
   
-  // Clean potential markdown wrapping if the model ignored the instructions
   let cleanedJson = content;
   if (cleanedJson.startsWith("```")) {
     cleanedJson = cleanedJson.replace(/^```json\s*/, "").replace(/^```\s*/, "").replace(/\s*```$/, "");
   }
 
+  // Helper to fix unescaped double quotes and newlines in JSON values from LLM response
+  function cleanJsonString(str: string): string {
+    let inString = false;
+    let isEscaped = false;
+    let result = "";
+    
+    for (let i = 0; i < str.length; i++) {
+      const char = str[i];
+      
+      if (char === '"' && !isEscaped) {
+        if (inString) {
+          // Check if this is a real closing quote by looking at the next non-whitespace char
+          let nextChar = "";
+          for (let j = i + 1; j < str.length; j++) {
+            if (!/\s/.test(str[j])) {
+              nextChar = str[j];
+              break;
+            }
+          }
+          if (nextChar === ',' || nextChar === '}' || nextChar === ']' || nextChar === ':') {
+            inString = false;
+            result += char;
+          } else {
+            result += '\\"'; // Escape unescaped double quote inside string value
+          }
+        } else {
+          inString = true;
+          result += char;
+        }
+      } else {
+        if (inString) {
+          if (char === '\n') {
+            result += '\\n';
+            isEscaped = false;
+          } else if (char === '\r') {
+            result += '\\r';
+            isEscaped = false;
+          } else if (char === '\\') {
+            isEscaped = !isEscaped;
+            result += char;
+          } else {
+            isEscaped = false;
+            result += char;
+          }
+        } else {
+          result += char;
+        }
+      }
+    }
+    
+    // Fix trailing commas before closing braces
+    result = result.replace(/,\s*([\]}])/g, '$1');
+    return result;
+  }
+
+  const sanitized = cleanJsonString(cleanedJson);
+
   try {
-    const parsed: ScoreData = JSON.parse(cleanedJson);
+    const parsed: ScoreData = JSON.parse(sanitized);
     
     // Ensure calculation is strictly correct on the server side
     const marketContr = (parsed.marketScore || 0) * 0.30;

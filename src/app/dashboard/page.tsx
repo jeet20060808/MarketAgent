@@ -336,6 +336,117 @@ function generateNotionDoc(idea: string, results: AgentResults, scoreData?: Scor
   return doc;
 }
 
+/* ── Extract a section from agent markdown content ── */
+function extractPrdSection(text: string | null, keywords: string[], fallbackTitle?: string): string {
+  if (!text) return "";
+  const lines = text.split("\n");
+  let capturing = false;
+  let content: string[] = [];
+  
+  for (const line of lines) {
+    const cleanLine = line.trim();
+    if (cleanLine.startsWith("#")) {
+      const isMatch = keywords.some(k => cleanLine.toLowerCase().includes(k.toLowerCase()));
+      if (isMatch) {
+        capturing = true;
+        continue; // skip the heading line itself
+      } else if (capturing) {
+        break; // stop capturing on next heading
+      }
+    } else if (cleanLine.match(/^\d+\.\s/)) {
+      const isMatch = keywords.some(k => cleanLine.toLowerCase().includes(k.toLowerCase()));
+      if (isMatch) {
+        if (!capturing) {
+          capturing = true;
+          continue;
+        } else {
+          break;
+        }
+      }
+    }
+    
+    if (capturing) {
+      content.push(line);
+    }
+  }
+  
+  const res = content.join("\n").trim();
+  if (!res && fallbackTitle) {
+    // Return first 3 paragraphs as fallback
+    const paras = text.split("\n\n").filter(p => p.trim() && !p.trim().startsWith("#"));
+    return paras.slice(0, 3).join("\n\n");
+  }
+  return res;
+}
+
+/* ── Generate Product Requirements Document (PRD) markdown ── */
+function generatePRD(idea: string, results: AgentResults): string {
+  let doc = `# Product Requirements Document (PRD)\n\n`;
+  doc += `## Project: ${idea}\n`;
+  doc += `* **Author**: AI PM Agent\n`;
+  doc += `* **Date**: ${new Date().toLocaleDateString()}\n`;
+  doc += `* **Version**: 1.0 (Draft)\n`;
+  doc += `* **Status**: Compiled & Validated\n\n`;
+  doc += `> This Product Requirements Document specifies the functional requirements, user experiences, technical architecture, and launch strategies synthesized by AI Founder OS.\n\n`;
+  doc += `---\n\n`;
+
+  // 1. Objectives & Executive Summary
+  doc += `## 1. Executive Summary & Vision\n\n`;
+  const vision = extractPrdSection(results.advisor, ["overview", "vision", "summary", "fit"], "Overview");
+  if (vision) {
+    doc += `${vision}\n\n`;
+  } else {
+    doc += `The primary goal of **${idea}** is to address market problems through a scalable, automated service.\n\n`;
+  }
+
+  // 2. User Problems & Audience
+  doc += `## 2. Target Audience & Core Problems\n\n`;
+  const problem = extractPrdSection(results.advisor, ["problem", "audience", "target"], "Problem Statement");
+  if (problem) {
+    doc += `${problem}\n\n`;
+  } else {
+    doc += `### Core User Pain Points:\n* Lack of automated solutions for this workflow.\n* High barriers of entry for new market entrants.\n\n`;
+  }
+
+  // 3. MVP Features & Functional Spec
+  doc += `## 3. Functional Requirements & MVP Features\n\n`;
+  const features = extractPrdSection(results.product, ["features", "user stories", "scope", "mvp"], "Features");
+  if (features) {
+    doc += `${features}\n\n`;
+  } else {
+    doc += `### MVP Scope Items:\n* Core Dashboard visualization.\n* Multi-agent execution panel.\n* Consolidated reporting engine.\n\n`;
+  }
+
+  // 4. Tech Stack & Architecture
+  doc += `## 4. Technical Architecture & Database Schema\n\n`;
+  const tech = extractPrdSection(results.architecture, ["database", "schema", "api", "tech stack"], "Database Tables");
+  if (tech) {
+    doc += `${tech}\n\n`;
+  } else {
+    doc += `### Technical Stack:\n* **Frontend**: React, Next.js, Tailwind CSS\n* **Database**: SQL-compatible schema\n* **APIs**: Rest endpoints for orchestrating prompts\n\n`;
+  }
+
+  // 5. Release Roadmap & Sprint Plan
+  doc += `## 5. Release Roadmap & Sprint Plan\n\n`;
+  const roadmap = extractPrdSection(results.engineering, ["timeline", "sprint", "milestones", "plan"], "Sprint Plan");
+  if (roadmap) {
+    doc += `${roadmap}\n\n`;
+  } else {
+    doc += `### Launch Milestones:\n* **Week 1-2**: Backend Setup & API schemas.\n* **Week 3-4**: Frontend implementation and Dashboard layout.\n* **Week 5**: Release Candidate & Polish.\n\n`;
+  }
+
+  // 6. GTM Strategy
+  doc += `## 6. Go-To-Market & Growth Channels\n\n`;
+  const gtm = extractPrdSection(results.marketing, ["gtm", "channel", "launch", "campaign"], "Channels");
+  if (gtm) {
+    doc += `${gtm}\n\n`;
+  } else {
+    doc += `### Growth Channels:\n* Product Hunt & Hacker News organic launch.\n* Targeted outreach to startup newsletters and communities.\n\n`;
+  }
+
+  return doc;
+}
+
 /* ── Compact Business Breakdown — 3 chart panels ── */
 const BREAKDOWN_SEGMENTS = [
   { label: "Market", value: 18, color: "#3B82F6" },
@@ -423,6 +534,40 @@ function AgentOutputChart({ results }: { results: AgentResults }) {
   );
 }
 
+function AnimatedScore({ value, duration = 1500 }: { value: number; duration?: number }) {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const end = value;
+    if (start === end) {
+      setDisplayValue(end);
+      return;
+    }
+
+    const totalMiliseconds = duration;
+    const incrementTime = Math.max(Math.floor(totalMiliseconds / end), 15);
+    
+    const timer = setInterval(() => {
+      start += 1;
+      if (start >= end) {
+        setDisplayValue(end);
+        clearInterval(timer);
+      } else {
+        setDisplayValue(start);
+      }
+    }, incrementTime);
+
+    return () => clearInterval(timer);
+  }, [value, duration]);
+
+  return (
+    <span className="text-5xl font-extrabold tracking-tighter text-[#1A1A1A] score-glow-text" style={{ fontFamily: 'var(--font-heading)' }}>
+      {displayValue}
+    </span>
+  );
+}
+
 function BusinessBreakdownCharts({ results }: { results: AgentResults }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -487,6 +632,13 @@ export default function Home() {
   const [scoreData, setScoreData] = useState<ScoreData | null>(null);
   const [isScoring, setIsScoring] = useState(false);
   const [scoreError, setScoreError] = useState<string | null>(null);
+
+  // ── PRD Generation States ──
+  const [showPrdModal, setShowPrdModal] = useState(false);
+  const [isCalculatingPrd, setIsCalculatingPrd] = useState(false);
+  const [prdStepIndex, setPrdStepIndex] = useState(0);
+  const [prdContent, setPrdContent] = useState("");
+  const [prdCopied, setPrdCopied] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -831,6 +983,45 @@ export default function Home() {
     const file = new Blob([doc], { type: "text/markdown" });
     element.href = URL.createObjectURL(file);
     element.download = `${idea.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-notion-doc.md`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const handleGeneratePrd = () => {
+    setIsCalculatingPrd(true);
+    setPrdStepIndex(0);
+    setPrdCopied(false);
+    
+    // Simulate steps of consolidation
+    const totalSteps = 5;
+    let currentStep = 0;
+    
+    const interval = setInterval(() => {
+      currentStep += 1;
+      if (currentStep < totalSteps) {
+        setPrdStepIndex(currentStep);
+      } else {
+        clearInterval(interval);
+        const compiledPrd = generatePRD(idea || "Startup Package", results);
+        setPrdContent(compiledPrd);
+        setIsCalculatingPrd(false);
+        setShowPrdModal(true);
+      }
+    }, 850); // 850ms per step, total ~4.2 seconds
+  };
+
+  const handleCopyPrd = () => {
+    navigator.clipboard.writeText(prdContent);
+    setPrdCopied(true);
+    setTimeout(() => setPrdCopied(false), 2000);
+  };
+
+  const handleDownloadPrd = () => {
+    const element = document.createElement("a");
+    const file = new Blob([prdContent], { type: "text/markdown" });
+    element.href = URL.createObjectURL(file);
+    element.download = `${idea.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-prd.md`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
@@ -1280,6 +1471,14 @@ export default function Home() {
                     <span>Notion Doc</span>
                   </button>
                   <button
+                    onClick={handleGeneratePrd}
+                    className="btn-primary px-4 py-2 flex items-center gap-2"
+                    style={{ background: '#EC4899', color: '#ffffff' }}
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Generate PRD</span>
+                  </button>
+                  <button
                     onClick={handleReset}
                     className="btn-secondary px-4 py-2 flex items-center gap-2"
                   >
@@ -1441,7 +1640,7 @@ export default function Home() {
                     <div className="flex flex-col gap-6">
                       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
                         {/* Circle Gauge on Left */}
-                        <div className="md:col-span-4 flex flex-col items-center justify-center p-6 rounded bg-[#FAF6EF] border border-[#D4CFC5] shadow-inner relative overflow-hidden min-h-[220px]">
+                        <div className="md:col-span-4 flex flex-col items-center justify-center p-6 rounded-2xl bg-[#FAF6EF] border border-[#D4CFC5] shadow-inner relative overflow-hidden min-h-[220px] gauge-card">
                           {/* Glow behind circle */}
                           <div className="absolute w-24 h-24 rounded-full bg-[#F7C948]/10 blur-xl pointer-events-none" />
                           
@@ -1470,12 +1669,11 @@ export default function Home() {
                                 animate={{ strokeDashoffset: 251.2 - (251.2 * scoreData.startupScore) / 100 }}
                                 transition={{ duration: 1.5, ease: "easeOut" }}
                                 strokeLinecap="round"
+                                style={{ filter: "drop-shadow(0px 0px 4px rgba(247, 201, 72, 0.65))" }}
                               />
                             </svg>
                             <div className="absolute flex flex-col items-center justify-center">
-                              <span className="text-4xl font-extrabold tracking-tighter" style={{ fontFamily: 'var(--font-heading)' }}>
-                                {scoreData.startupScore}
-                              </span>
+                              <AnimatedScore value={scoreData.startupScore} />
                               <span className="text-[9px] font-mono tracking-widest text-[#8A8578] uppercase mt-0.5">
                                 OVERALL
                               </span>
@@ -1576,7 +1774,7 @@ export default function Home() {
 
                         <div className="flex flex-col gap-1.5">
                           <h4 className="text-[10px] font-mono tracking-widest uppercase text-ink">Main Recommendations</h4>
-                          <p className="text-xs text-ink-light leading-relaxed bg-[#F5F0E8] p-3 rounded border border-border-light">{scoreData.recommendation}</p>
+                          <p className="text-xs text-ink-light leading-relaxed bg-[#F5F0E8] p-3 rounded border border-border-light recommendations-box">{scoreData.recommendation}</p>
                         </div>
                       </div>
                     </div>
@@ -1672,6 +1870,88 @@ export default function Home() {
               <button onClick={handleDownloadNotion} className="btn-primary px-4 py-2 flex items-center gap-2">
                 <Download className="w-3.5 h-3.5" />
                 <span>Download .md</span>
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* ── PRD Calculation Loading Overlay ── */}
+      {isCalculatingPrd && (
+        <div className="prd-modal-overlay">
+          <motion.div 
+            className="bg-[#1A1A1A] p-8 rounded-2xl max-w-md w-full flex flex-col items-center text-center prd-loading-card"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+          >
+            <div className="w-16 h-16 rounded-full bg-[#EC4899]/10 border-2 border-[#EC4899] flex items-center justify-center mb-6 animate-pulse">
+              <Brain className="w-8 h-8 text-[#EC4899]" />
+            </div>
+            
+            <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
+              Consolidating PRD Spec
+            </h3>
+            
+            <p className="text-xs text-[#a1a1aa] uppercase tracking-wider mb-6 font-mono">
+              Synthesizing multi-agent outputs
+            </p>
+            
+            {/* Custom loader bar */}
+            <div className="w-full bg-[#27272A] h-1.5 rounded-full overflow-hidden mb-4">
+              <div 
+                className="h-full bg-[#EC4899] transition-all duration-300"
+                style={{ width: `${((prdStepIndex + 1) / 5) * 100}%` }}
+              />
+            </div>
+            
+            {/* Stepper text messages */}
+            <div className="text-xs text-gray-300 min-h-[32px] font-medium">
+              {prdStepIndex === 0 && "Step 1: Extracting user stories & feature definitions..."}
+              {prdStepIndex === 1 && "Step 2: Processing target audience & problem statements..."}
+              {prdStepIndex === 2 && "Step 3: Compiling API schemas & data structures..."}
+              {prdStepIndex === 3 && "Step 4: Structuring sprint execution milestones..."}
+              {prdStepIndex === 4 && "Step 5: Formatting Product Requirements Document..."}
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* ── PRD View Modal ── */}
+      {showPrdModal && (
+        <div className="prd-modal-overlay" onClick={() => setShowPrdModal(false)}>
+          <motion.div 
+            className="prd-modal"
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="prd-modal-header">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-[#EC4899]" />
+                <span className="text-[#EC4899]">Compiled Product Requirements Spec</span>
+              </div>
+              <button onClick={() => setShowPrdModal(false)} className="p-1 text-[#EC4899] hover:opacity-60 transition-opacity">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="prd-modal-body">
+              <div 
+                className="markdown-content text-white text-xs leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: renderMarkdown(prdContent) }}
+              />
+            </div>
+            
+            <div className="prd-modal-footer">
+              <button onClick={handleCopyPrd} className="btn-secondary px-4 py-2 flex items-center gap-2">
+                <Copy className="w-3.5 h-3.5" />
+                <span>{prdCopied ? "Copied!" : "Copy Spec"}</span>
+              </button>
+              <button onClick={handleDownloadPrd} className="btn-primary px-4 py-2 flex items-center gap-2" style={{ background: '#EC4899', color: '#ffffff', borderColor: '#EC4899' }}>
+                <Download className="w-3.5 h-3.5" />
+                <span>Download Spec</span>
               </button>
             </div>
           </motion.div>
