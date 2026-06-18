@@ -209,16 +209,22 @@ body {
    ══════════════════════════════════════ */
 
 .editorial-card {
-  background: #FFFFFF;
-  border: 2px solid #1A1A1A;
-  border-radius: 4px;
-  transition: all 0.25s ease;
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.75rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+  color: #ffffff;
 }
 
 .editorial-card:hover {
-  background: #F5F0E8;
-  box-shadow: 4px 4px 0px #1A1A1A;
-  transform: translate(-2px, -2px);
+  background: #111111;
+  box-shadow: 0 24px 45px rgba(255, 138, 0, 0.22), 0 0 0 1px rgba(255, 138, 0, 0.18);
+  transform: translateY(-3px);
+}
+
+.editorial-card .text-[10px],
+.editorial-card p {
+  color: inherit;
 }
 
 /* Glass card (legacy compat — now editorial) */

@@ -896,44 +896,44 @@ export default function Home() {
 
               {/* Tool Cards — Field Notes style */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 w-full mt-14">
-                <div className="editorial-card p-4">
+                <div className="editorial-card tool-card p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Search className="w-4 h-4" style={{ color: 'var(--accent-blue)' }} />
-                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink)' }}>Search Tool</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)' }}>Search Tool</span>
                   </div>
-                  <p className="text-xs leading-relaxed" style={{ color: 'var(--ink-muted)' }}>Runs real-time web scans for TAM, competitor data, and market dynamics.</p>
+                  <p className="text-xs leading-relaxed">Runs real-time web scans for TAM, competitor data, and market dynamics.</p>
                 </div>
 
-                <div className="editorial-card p-4">
+                <div className="editorial-card tool-card p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <GitBranch className="w-4 h-4" style={{ color: 'var(--accent-orange)' }} />
-                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink)' }}>GitHub Tool</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)' }}>GitHub Tool</span>
                   </div>
-                  <p className="text-xs leading-relaxed" style={{ color: 'var(--ink-muted)' }}>Generates sprint cycles, DB mapping, API endpoints, and tasks.</p>
+                  <p className="text-xs leading-relaxed">Generates sprint cycles, DB mapping, API endpoints, and tasks.</p>
                 </div>
 
-                <div className="editorial-card p-4">
+                <div className="editorial-card tool-card p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <BookOpen className="w-4 h-4" style={{ color: 'var(--accent-green)' }} />
-                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink)' }}>Notion Workspace</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)' }}>Notion Workspace</span>
                   </div>
-                  <p className="text-xs leading-relaxed" style={{ color: 'var(--ink-muted)' }}>Compiles structured docs, user stories, and GTM plans.</p>
+                  <p className="text-xs leading-relaxed">Compiles structured docs, user stories, and GTM plans.</p>
                 </div>
 
-                <div className="editorial-card p-4">
+                <div className="editorial-card tool-card p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <AlertCircle className="w-4 h-4" style={{ color: '#EF4444' }} />
-                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink)' }}>Risk Tool</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)' }}>Risk Tool</span>
                   </div>
-                  <p className="text-xs leading-relaxed" style={{ color: 'var(--ink-muted)' }}>Scores market, technical, and compliance risks with mitigation strategies.</p>
+                  <p className="text-xs leading-relaxed">Scores market, technical, and compliance risks with mitigation strategies.</p>
                 </div>
 
-                <div className="editorial-card p-4">
+                <div className="editorial-card tool-card p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <FileDown className="w-4 h-4" style={{ color: '#10B981' }} />
-                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink)' }}>Finance Tool</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)' }}>Finance Tool</span>
                   </div>
-                  <p className="text-xs leading-relaxed" style={{ color: 'var(--ink-muted)' }}>Builds revenue models, CAC/LTV projections, and funding requirements.</p>
+                  <p className="text-xs leading-relaxed">Builds revenue models, CAC/LTV projections, and funding requirements.</p>
                 </div>
               </div>
             </motion.div>
