@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ChevronsRight, Menu, ChevronsLeft, Plus } from "lucide-react";
 import Aurora from "../components/Aurora/Aurora";
+import AgentsSection from "../components/AgentsSection";
 
 const float = (
   delay = 0,
@@ -258,6 +258,7 @@ function FloatingBubbles() {
 }
 export default function LandingPage() {
   return (
+    
     <div className="landing-shell min-h-screen bg-[#f5ebe4 p-3 md:p-5 flex items-center justify-center">
       <div className="landing-window relative w-full max-w-[1440px] min-h-[calc(100vh-24px)] md:min-h-[calc(100vh-40px)] bg-[#f5dccb] border-[10px] border-[#adacaa] rounded-[28px] md:rounded-[36px] overflow-hidden flex flex-col shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)]">
   <div className="absolute inset-0 z-0 opacity-70">
@@ -272,11 +273,11 @@ export default function LandingPage() {
   {/* rest of your content */}
       <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
 
-<span className="landing-pixel-text absolute left-[2%] top-[52%] text-white opacity-90 leading-none z-[50]">
+<span className="landing-pixel-text absolute left-[2%] top-[28%] text-white opacity-90 leading-none z-[50]">
   AXORA
 </span>
 
-<span className="landing-pixel-text absolute right-[2%] top-[65%] text-white opacity-90 leading-none z-[1]">
+<span className="landing-pixel-text absolute right-[2%] top-[36%] text-white opacity-90 leading-none z-[1]">
   AGENT
 </span>
 
@@ -303,6 +304,14 @@ export default function LandingPage() {
 </h1>
           </div>
 
+          <div className="absolute right-6 md:right-10 top-[6%] md:top-[8%] z-30 text-right">
+            <Plus className="w-5 h-5 text-[#999] ml-auto mb-1" strokeWidth={2} />
+            
+            {/* <div className="text-[11px] font-mono font-semibold text-[#888] tracking-[0.15em] mt-1 uppercase">
+              Efficiency
+            </div> */}
+          </div>
+
           {/* 3D device scene — laptop centered, devices in semicircle */}
           <div className="absolute inset-0 z-10 pointer-events-none">
             {/* Aurora Background */}
@@ -321,6 +330,7 @@ export default function LandingPage() {
             <DecorativeShards />
             {/* <FloatingParticles /> */}
             <FloatingBubbles />
+            
             <div
               className="absolute left-1/2 top-[50%] -translate-x-1/2 w-[300px] md:w-[360px] h-[36px] rounded-[50%] bg-black/[0.1] blur-2xl"
               style={{ zIndex: 8 }}
@@ -438,7 +448,7 @@ height={105}
             /> */}
           </div>
 
-          <div className="absolute left-6 md:left-10 bottom-[14%] md:bottom-[12%] z-30 max-w-[340px]">
+          <div className="absolute left-6 md:left-10 bottom-[2%] md:bottom-[2%] z-30 max-w-[340px]">
             {/* <p className="text-[13px] md:text-sm font-semibold text-[#4a4a4a] leading-relaxed mb-5">
               We deploy AI agents that automate market research, validate ideas, draft PRDs, and architect go-to-market strategies.
             </p> */}
@@ -468,7 +478,7 @@ height={105}
           </div>
         </main>
 
-        <footer className="relative z-40 flex justify-center -mb-[1px]">
+        <footer className="relative z-40 flex justify-center mt-25">
           <div className="landing-scroll-pill bg-[#d8d8d8] border border-[#c0c0c0] border-b-0 px-8 py-2.5 rounded-t-[20px] flex items-center gap-2.5 text-[10px] font-mono font-bold tracking-[0.12em] text-[#888] uppercase">
             <svg width="12" height="18" viewBox="0 0 12 18" fill="none" className="opacity-60">
               <rect x="1" y="1" width="10" height="16" rx="5" stroke="#888" strokeWidth="1.5" />
@@ -476,8 +486,10 @@ height={105}
             </svg>
             Scroll to explore more
           </div>
-        </footer>
+                </footer>
+                <AgentsSection />
       </div>
     </div>
+    
   );
 }
