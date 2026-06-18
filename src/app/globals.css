@@ -223,19 +223,12 @@ body {
   transform: translateY(-3px);
 }
 
-<<<<<<< Updated upstream
 /* Ensure text elements directly inside the dark cards are readable */
 .editorial-card h1,
 .editorial-card h2,
 .editorial-card h3,
 .editorial-card h4 {
   color: #FAF6EF !important;
-=======
-.editorial-card span,
-.editorial-card p,
-.editorial-card div {
-  color: #d25353 !important;
->>>>>>> Stashed changes
 }
 
  .editorial-card p,
