@@ -295,6 +295,7 @@ export default function LandingPage() {
         <main className="relative z-10 flex-1 px-6 md:px-10 pb-6 md:pb-8 min-h-[520px] md:min-h-[600px]">
 
           <div className="absolute left-6 md:left-10 top-[4%] md:top-[6%] z-30 max-w-[320px]">
+
             <h1 className="landing-heading text-[clamp(1.5rem,3.5vw,2.8rem)] font-bold leading-[1.02] tracking-tight text-[#1a1a1a] uppercase">
   RESEARCH DEEP
   <br />
