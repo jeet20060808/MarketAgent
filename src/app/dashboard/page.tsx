@@ -30,9 +30,12 @@ import {
   DollarSign,
   TrendingUp,
   Activity,
+  Presentation,
   type LucideIcon,
 } from "lucide-react";
 import confetti from "canvas-confetti";
+import { InvestorMode } from "@/components/InvestorMode";
+import Aurora from "@/components/Aurora/Aurora";
 
 // ── Agent Configurations ──
 export interface AgentConfig {
@@ -431,6 +434,7 @@ export default function Home() {
   const [toolLogs, setToolLogs] = useState<string[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
   const [showNotionModal, setShowNotionModal] = useState(false);
+  const [investorMode, setInvestorMode] = useState(false);
   const [notionCopied, setNotionCopied] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
@@ -740,7 +744,18 @@ export default function Home() {
   const totalUploadSize = uploadedFiles.reduce((sum, f) => sum + f.size, 0);
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'var(--background)', color: 'var(--foreground)', fontFamily: 'var(--font-body)' }}>
+    <div className="landing-shell min-h-screen bg-[#f5ebe4] p-3 md:p-5 flex items-center justify-center">
+      <div className="landing-window relative w-full max-w-[1440px] min-h-[calc(100vh-24px)] md:min-h-[calc(100vh-40px)] bg-[#f5dccb] border-[10px] border-[#adacaa] rounded-[28px] md:rounded-[36px] overflow-hidden flex flex-col shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)]">
+        <div className="absolute inset-0 z-0 opacity-70 pointer-events-none">
+          <Aurora
+            colorStops={["#FF8A00", "#FFB347", "#FFD6A5"]}
+            blend={0.45}
+            amplitude={1.2}
+            speed={0.4}
+          />
+        </div>
+        
+        <div className="relative z-10 flex-1 flex flex-col overflow-y-auto" style={{ color: 'var(--foreground)', fontFamily: 'var(--font-body)' }}>
       
       {/* ── Marquee Banner ── */}
       <div className="marquee-banner">
@@ -1008,8 +1023,8 @@ export default function Home() {
                               duration: 0.5, 
                               ease: [0.22, 0.61, 0.36, 1]
                             }}
-                            className="w-full editorial-card p-6 flex flex-col gap-4"
-                            style={{ borderColor: agent.color }}
+                            className="w-full editorial-card p-6 flex flex-col gap-4 bg-[#1a1a1a]"
+                            style={{ borderColor: agent.color, boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}
                           >
                             {/* Agent Header */}
                             <div className="flex items-center justify-between">
@@ -1027,11 +1042,11 @@ export default function Home() {
                                   {String(i + 1).padStart(2, '0')}
                                 </span>
                                 <div>
-                                  <h3 className="text-lg font-bold flex items-center gap-2" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>
+                                  <h3 className="text-lg font-bold flex items-center gap-2" style={{ fontFamily: 'var(--font-heading)', color: '#fff' }}>
                                     <AgentIcon Icon={agent.Icon} color={agent.color} size={18} />
                                     {agent.name}
                                   </h3>
-                                  <p className="text-[10px] uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)' }}>
+                                  <p className="text-[10px] uppercase tracking-widest" style={{ fontFamily: 'var(--font-mono)', color: '#a1a1aa' }}>
                                     {agent.role}
                                   </p>
                                 </div>
@@ -1044,7 +1059,7 @@ export default function Home() {
                             </div>
 
                             {/* Description */}
-                            <p className="text-sm leading-relaxed" style={{ color: 'var(--ink-light)' }}>
+                            <p className="text-sm leading-relaxed" style={{ color: '#d4d4d8' }}>
                               {agent.description}
                             </p>
 
@@ -1055,9 +1070,9 @@ export default function Home() {
                                   key={idx} 
                                   className="text-[9px] px-2.5 py-1 rounded font-semibold uppercase"
                                   style={{ 
-                                    background: 'var(--cream-dark)', 
-                                    border: '1px solid var(--border-light)',
-                                    color: 'var(--ink-light)',
+                                    background: '#27272a', 
+                                    border: '1px solid #3f3f46',
+                                    color: '#e4e4e7',
                                     fontFamily: 'var(--font-mono)',
                                     letterSpacing: '0.04em'
                                   }}
@@ -1127,17 +1142,21 @@ export default function Home() {
               exit={{ opacity: 0 }}
               className="flex-1 flex flex-col min-h-[85vh]"
             >
-              {/* Dashboard Header Banner */}
-              <div className="print:hidden px-6 sm:px-8 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4" style={{ borderBottom: '2px solid var(--border)', background: 'var(--surface)' }}>
-                <div>
-                  <div className="badge-yellow mb-2 animate-stamp">
-                    <CheckCircle2 className="w-3 h-3" />
-                    <span>Package Assembled</span>
-                  </div>
-                  <h2 className="text-xl font-bold truncate max-w-xl" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>
-                    {idea || "Startup Package"}
-                  </h2>
-                </div>
+              {investorMode ? (
+                <InvestorMode results={results} onClose={() => setInvestorMode(false)} />
+              ) : (
+                <>
+                  {/* Dashboard Header Banner */}
+                  <div className="print:hidden px-6 sm:px-8 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4" style={{ borderBottom: '2px solid var(--border)', background: 'var(--surface)' }}>
+                    <div>
+                      <div className="badge-yellow mb-2 animate-stamp">
+                        <CheckCircle2 className="w-3 h-3" />
+                        <span>Package Assembled</span>
+                      </div>
+                      <h2 className="text-xl font-bold truncate max-w-xl" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>
+                        {idea || "Startup Package"}
+                      </h2>
+                    </div>
                 
                 {/* Actions */}
                 <div className="flex items-center gap-3 w-full md:w-auto flex-wrap">
@@ -1147,6 +1166,14 @@ export default function Home() {
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>PDF Report</span>
+                  </button>
+                  <button
+                    onClick={() => setInvestorMode(true)}
+                    className="btn-primary px-4 py-2 flex items-center gap-2"
+                    style={{ background: '#FF8A00', color: '#1a1a1a' }}
+                  >
+                    <Presentation className="w-3.5 h-3.5" />
+                    <span>Pitch This Startup</span>
                   </button>
                   <button
                     onClick={() => setShowNotionModal(true)}
@@ -1324,6 +1351,8 @@ export default function Home() {
                   </div>
                 </section>
               </div>
+              </>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -1371,6 +1400,8 @@ export default function Home() {
           AI Founder OS System Workspace · Tools: Search · GitHub · Notion · PDF · File Reader
         </span>
       </footer>
+    </div>
+    </div>
     </div>
   );
 }
