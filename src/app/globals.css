@@ -213,19 +213,161 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 1.75rem;
   transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
-  color: #ffb834 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 138, 0, 0.03);
 }
 
 .editorial-card:hover {
   background: #111111 !important;
-  box-shadow: 0 24px 45px rgba(255, 138, 0, 0.22), 0 0 0 1px rgba(255, 138, 0, 0.18);
+  box-shadow: 0 24px 45px rgba(255, 138, 0, 0.25), 0 0 25px rgba(255, 138, 0, 0.15), 0 0 0 1px rgba(255, 138, 0, 0.25);
   transform: translateY(-3px);
 }
 
-.editorial-card span,
+/* Ensure text elements directly inside the dark cards are readable */
+.editorial-card h1,
+.editorial-card h2,
+.editorial-card h3,
+.editorial-card h4 {
+  color: #FAF6EF !important;
+}
+
 .editorial-card p,
-.editorial-card div {
-  color: #d25353 !important;
+.editorial-card span,
+.editorial-card div,
+.editorial-card label {
+  color: #FFFFFF !important;
+}
+
+/* BUT restore dark text for sub-panels with light backgrounds */
+.gauge-card,
+.breakdown-chart-card,
+.recommendations-box,
+.agent-summary-table {
+  color: #1A1A1A !important;
+  background: #FAF6EF !important;
+}
+
+.editorial-card .gauge-card *,
+.editorial-card .breakdown-chart-card *,
+.editorial-card .recommendations-box *,
+.editorial-card .agent-summary-table *,
+.editorial-card .gauge-card p,
+.editorial-card .gauge-card span,
+.editorial-card .gauge-card div,
+.editorial-card .gauge-card label,
+.editorial-card .breakdown-chart-card p,
+.editorial-card .breakdown-chart-card span,
+.editorial-card .breakdown-chart-card div,
+.editorial-card .breakdown-chart-card label,
+.editorial-card .recommendations-box p,
+.editorial-card .recommendations-box span,
+.editorial-card .recommendations-box div,
+.editorial-card .recommendations-box label,
+.editorial-card .agent-summary-table p,
+.editorial-card .agent-summary-table span,
+.editorial-card .agent-summary-table div,
+.editorial-card .agent-summary-table label,
+.editorial-card .agent-summary-table td,
+.editorial-card .agent-summary-table th {
+  color: #1A1A1A !important;
+}
+
+/* Ensure secondary styling like muted text in sub-panels uses proper dark values */
+.editorial-card .gauge-card .text-ink-muted,
+.editorial-card .agent-summary-table .cell-role {
+  color: #8A8578 !important;
+}
+
+.editorial-card .agent-summary-table .cell-finding {
+  color: #4A4A4A !important;
+}
+
+/* Allow badge, status, and custom colored text to bypass override */
+.editorial-card .badge-pink,
+.editorial-card .badge-pink *,
+.editorial-card .badge-yellow,
+.editorial-card .badge-yellow *,
+.editorial-card .status-pill,
+.editorial-card .status-pill *,
+.editorial-card .score-glow-text,
+.editorial-card .score-glow-text *,
+.editorial-card .cell-num {
+  color: inherit !important;
+}
+
+/* Chic glowing & pulsing overall score animation */
+.score-glow-text {
+  background: linear-gradient(135deg, #F7C948 0%, #EC4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;
+  animation: scoreBounce 2.5s infinite ease-in-out;
+}
+
+@keyframes scoreBounce {
+  0%, 100% {
+    transform: scale(1);
+    text-shadow: 0 0 15px rgba(247, 201, 72, 0.25);
+  }
+  50% {
+    transform: scale(1.06);
+    text-shadow: 0 0 25px rgba(247, 201, 72, 0.6), 0 0 10px rgba(247, 201, 72, 0.3);
+  }
+}
+
+/* Specific styling for markdown content inside dark editorial cards */
+.editorial-card .markdown-content h1,
+.editorial-card .markdown-content h2,
+.editorial-card .markdown-content h3,
+.editorial-card .markdown-content h4,
+.editorial-card .markdown-content .md-section {
+  color: #FAF6EF !important;
+}
+
+.editorial-card .markdown-content p,
+.editorial-card .markdown-content li,
+.editorial-card .markdown-content td,
+.editorial-card .markdown-content blockquote {
+  color: #FFFFFF !important;
+}
+
+.editorial-card .markdown-content strong,
+.editorial-card .markdown-content .md-emphasis {
+  color: #FFFFFF !important;
+  background: linear-gradient(transparent 60%, rgba(247, 201, 72, 0.35) 60%) !important;
+}
+
+.editorial-card .markdown-content blockquote {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.editorial-card .markdown-content table,
+.editorial-card .markdown-content th,
+.editorial-card .markdown-content td {
+  border-color: #3F3F46 !important;
+}
+
+.editorial-card .markdown-content th {
+  background: #27272A !important;
+  color: #FAF6EF !important;
+}
+
+.editorial-card .markdown-content code {
+  background: #27272A !important;
+  color: #EC4899 !important;
+  border-color: #3F3F46 !important;
+}
+
+.editorial-card .markdown-content a {
+  color: #3B82F6 !important;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.editorial-card .markdown-content a:hover {
+  color: #F7C948 !important;
+  text-shadow: 0 0 8px rgba(247, 201, 72, 0.4);
 }
 
 /* Glass card (legacy compat — now editorial) */
@@ -237,7 +379,7 @@ body {
 }
 
 .glass-card:hover {
-  background: #5b5b5a;
+  background: #F5F0E8;
 }
 
 /* ── Agent Cards ── */
@@ -556,6 +698,15 @@ body {
   font-weight: 500;
 }
 
+.editorial-card .markdown-content .md-key-line,
+.editorial-card .markdown-content .md-key-li,
+.prd-modal .markdown-content .md-key-line,
+.prd-modal .markdown-content .md-key-li,
+.markdown-content .md-key-line,
+.markdown-content .md-key-li {
+  color: #1A1A1A !important;
+}
+
 .markdown-content .md-table {
   width: 100%;
   border-collapse: collapse;
@@ -742,6 +893,113 @@ body {
   border: 1px solid #D4CFC5;
   border-radius: 6px;
   min-height: 118px;
+  color: #1A1A1A !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s ease;
+}
+
+.breakdown-chart-card:hover {
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.12), 0 0 10px rgba(59, 130, 246, 0.05);
+  transform: translateY(-2px);
+}
+
+.breakdown-chart-card span,
+.breakdown-chart-card p,
+.breakdown-chart-card div {
+  color: inherit;
+}
+
+/* ── Overall Gauge sub-card ── */
+.gauge-card {
+  background: #FAF6EF;
+  border: 1px solid #D4CFC5;
+  color: #1A1A1A !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s ease;
+}
+
+.gauge-card:hover {
+  box-shadow: 0 15px 35px rgba(247, 201, 72, 0.18), 0 0 15px rgba(247, 201, 72, 0.08);
+  transform: translateY(-2px);
+}
+
+.gauge-card span,
+.gauge-card p,
+.gauge-card div {
+  color: inherit;
+}
+
+/* PRD Custom Glow Styles */
+.prd-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.prd-modal {
+  background: #000000;
+  border: 2px solid #EC4899;
+  box-shadow: 0 0 35px rgba(236, 72, 153, 0.25), 0 0 15px rgba(236, 72, 153, 0.15);
+  border-radius: 1.25rem;
+  width: 90%;
+  max-width: 800px;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.prd-modal-header {
+  padding: 18px 24px;
+  border-bottom: 2px solid #EC4899;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono-code), 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #EC4899;
+  box-shadow: 0 4px 20px rgba(236, 72, 153, 0.1);
+}
+
+.prd-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  background: #111111;
+}
+
+.prd-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  background: #000000;
+}
+
+.prd-loading-card {
+  border: 2px solid #EC4899;
+  box-shadow: 0 0 40px rgba(236, 72, 153, 0.3);
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(236, 72, 153, 0.25);
+    border-color: rgba(236, 72, 153, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(236, 72, 153, 0.45);
+    border-color: rgba(236, 72, 153, 1);
+  }
 }
 
 .agent-output-block {
@@ -929,4 +1187,67 @@ body {
   text-transform: uppercase;
   color: rgba(89, 85, 85, 0.45);
   user-select: none;
+}
+
+/* Style overrides for markdown content inside the PRD modal */
+.prd-modal .markdown-content h1,
+.prd-modal .markdown-content h2,
+.prd-modal .markdown-content h3,
+.prd-modal .markdown-content h4,
+.prd-modal .markdown-content .md-section {
+  color: #EC4899 !important;
+  border-left-color: #EC4899 !important;
+}
+
+.prd-modal .markdown-content p,
+.prd-modal .markdown-content li,
+.prd-modal .markdown-content td,
+.prd-modal .markdown-content blockquote {
+  color: #FFFFFF !important;
+  font-size: 0.825rem;
+  line-height: 1.6;
+}
+
+.prd-modal .markdown-content blockquote {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-left-color: #EC4899 !important;
+}
+
+.prd-modal .markdown-content strong,
+.prd-modal .markdown-content .md-emphasis {
+  color: #FFFFFF !important;
+  background: linear-gradient(transparent 65%, rgba(236, 72, 153, 0.25) 65%) !important;
+}
+
+.prd-modal .markdown-content code {
+  background: #27272A !important;
+  color: #F472B6 !important;
+  border-color: #3F3F46 !important;
+}
+
+/* Tabs for innovative PRD UI */
+.prd-tab-btn {
+  font-family: var(--font-mono-code), monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 8px 16px;
+  border-radius: 6px;
+  color: #A1A1AA;
+  border: 1px solid transparent;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.prd-tab-btn:hover {
+  color: #FAF6EF;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.prd-tab-btn.active {
+  color: #EC4899;
+  background: rgba(236, 72, 153, 0.08);
+  border: 1px solid rgba(236, 72, 153, 0.25);
+  box-shadow: 0 0 10px rgba(236, 72, 153, 0.08);
 }

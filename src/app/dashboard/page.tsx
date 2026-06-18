@@ -1186,7 +1186,8 @@ export default function Home() {
                 <div className="editorial-card tool-card p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Search className="w-4 h-4" style={{ color: 'var(--accent-blue)' }} />
-                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)' }}>Search Tool</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)' }}>Search Tool</span>
+
                   </div>
                   <p className="text-xs leading-relaxed">Runs real-time web scans for TAM, competitor data, and market dynamics.</p>
                 </div>

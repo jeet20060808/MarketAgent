@@ -2,7 +2,7 @@
 
 > Your founding team, on demand. Turn a single startup idea into a comprehensive, print-ready Startup Package in seconds.
 
-AI Founder OS is a high-performance **Multi-Agent Orchestration System** built on Next.js. A team of **6 specialized AI agents** work in parallel using simulated system workspace tools to validate, research, draft, design, plan, and market your startup idea.
+AI Founder OS is a high-performance **Multi-Agent Orchestration System** built on Next.js. A team of **8 specialized AI agents** work in parallel using simulated system workspace tools to validate, research, draft, design, plan, model, assess, and market your startup idea.
 
 ---
 
@@ -22,6 +22,10 @@ Each agent is fully equipped with context-driven tools to execute their specific
    - **Notion Tool**: Crafts landing page headlines, launch value propositions, social copy, and initial email outreach campaigns.
 6. **🛠️ Engineering Manager Agent** — *Engineering Execution*
    - **GitHub Tool**: Formulates development execution blueprints, maps engineering staffing requirements, structures sprint milestones, and populates P0/P1/P2 backlogs.
+7. **🛡️ Risk Analyst Agent** — *Risk Assessment*
+   - **Risk Tool**: Identifies market, technical, financial, and compliance risks with detailed mitigation strategies.
+8. **💰 Financial Analyst Agent** — *Financial Modeling*
+   - **Finance Tool**: Models revenue streams, pricing strategies, CAC/LTV projections, break-even estimations, and funding requirements.
 
 ---
 
