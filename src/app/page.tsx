@@ -259,7 +259,7 @@ function FloatingBubbles() {
 export default function LandingPage() {
   return (
     
-    <div className="landing-shell min-h-screen bg-[#f5ebe4 p-3 md:p-5 flex items-center justify-center">
+    <div className="landing-shell min-h-screen bg-[#f5ebe4 p-3 md:p-5">
       <div className="landing-window relative w-full max-w-[1440px] min-h-[calc(100vh-24px)] md:min-h-[calc(100vh-40px)] bg-[#f5dccb] border-[10px] border-[#adacaa] rounded-[28px] md:rounded-[36px] overflow-hidden flex flex-col shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)]">
   <div className="absolute inset-0 z-0 opacity-70">
     <Aurora
@@ -273,11 +273,11 @@ export default function LandingPage() {
   {/* rest of your content */}
       <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
 
-<span className="landing-pixel-text absolute left-[2%] top-[28%] text-white opacity-90 leading-none z-[50]">
+<span className="landing-pixel-text absolute left-[2%] top-[55%] text-white opacity-100 leading-none z-[50]">
   AXORA
 </span>
 
-<span className="landing-pixel-text absolute right-[2%] top-[36%] text-white opacity-90 leading-none z-[1]">
+<span className="landing-pixel-text absolute right-[2%] top-[68%] text-white opacity-100 leading-none z-[1]">
   AGENT
 </span>
 
@@ -297,9 +297,9 @@ export default function LandingPage() {
 
           <div className="absolute left-6 md:left-10 top-[4%] md:top-[6%] z-30 max-w-[320px]">
             <span className="text-[11px] font-mono font-semibold text-[#888] tracking-wide mb-3 block">
-              ( 1/6 )
+              
             </span>
-            <h1 className="landing-heading text-[clamp(1.5rem,3.5vw,2.8rem)] font-bold leading-[1.02] tracking-tight text-[#1a1a1a] uppercase">
+            <h1 className="landing-heading  text-[clamp(1.5rem,3.5vw,2.8rem)] font-bold leading-[1.02] tracking-tight text-[#1a1a1a] uppercase">
   RESEARCH DEEP
   <br />
   PLAN BETTER
@@ -347,7 +347,7 @@ export default function LandingPage() {
   width={480}
 height={470}
   x="50%"
-  y="50%"
+  y="65%"
   zIndex={30}
   duration={7}
   distance={6}
@@ -363,7 +363,7 @@ height={470}
   width={120}
 height={120}
   x="70%"
-  y="65%"
+  y="75%"
   zIndex={31}
   rotate={-10}
   duration={3}
@@ -375,8 +375,8 @@ height={120}
   alt="Phone"
   width={295}
 height={295}
-  x="30%"
-  y="55%"
+  x="28%"
+  y="68%"
   zIndex={15}
   rotate={-3}
   duration={4}
@@ -390,7 +390,7 @@ height={295}
   width={150}
   height={150}
   x="35%"
-  y="20%"
+  y="35%"
   zIndex={18}
   rotate={30}
   duration={5}
@@ -404,7 +404,7 @@ height={295}
   width={200}
 height={200}
   x="50%"
-  y="10%"
+  y="25%"
   zIndex={25}
   rotate={-35}
   duration={8}
@@ -417,8 +417,8 @@ height={200}
   alt="Analytics"
   width={120}
 height={120}
-  x="68%"
-  y="15%"
+  x="65%"
+  y="25%"
   zIndex={36}
   rotate={8}
   duration={3}
@@ -431,7 +431,7 @@ height={120}
   width={105}
 height={105}
   x="73%"
-  y="40%"
+  y="50%"
   zIndex={28}
   rotate={-45}
   duration={5}
@@ -491,9 +491,12 @@ height={105}
             Scroll to explore more
           </div>
                 </footer>
-                <AgentsSection />
-      </div>
-    </div>
+                </div> {/* END landing-window */}
+
+<div className="mt-6">
+  <AgentsSection />
+</div>
+</div> 
     
   );
 }
