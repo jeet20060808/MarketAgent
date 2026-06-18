@@ -289,23 +289,11 @@ export default function LandingPage() {
               AXORA AI
             </span>
           </div>
-
-          <div className="flex flex-col gap-1.5">
-            <button className="w-10 h-10 bg-[#1a1a1a] text-white rounded-lg flex items-center justify-center hover:bg-black transition-colors">
-              <Menu className="w-[18px] h-[18px]" strokeWidth={2.5} />
-            </button>
-            <button className="w-10 h-10 bg-[#d4d4d4] text-[#666] rounded-lg flex items-center justify-center hover:bg-[#c8c8c8] transition-colors border border-[#bbb]">
-              <ChevronsLeft className="w-[18px] h-[18px]" strokeWidth={2.5} />
-            </button>
-          </div>
         </header>
 
         <main className="relative z-10 flex-1 px-6 md:px-10 pb-6 md:pb-8 min-h-[520px] md:min-h-[600px]">
 
           <div className="absolute left-6 md:left-10 top-[4%] md:top-[6%] z-30 max-w-[320px]">
-            <span className="text-[11px] font-mono font-semibold text-[#888] tracking-wide mb-3 block">
-              ( 1/6 )
-            </span>
             <h1 className="landing-heading text-[clamp(1.5rem,3.5vw,2.8rem)] font-bold leading-[1.02] tracking-tight text-[#1a1a1a] uppercase">
   RESEARCH DEEP
   <br />
@@ -313,16 +301,6 @@ export default function LandingPage() {
   <br />
   LAUNCH FASTER
 </h1>
-          </div>
-
-          <div className="absolute right-6 md:right-10 top-[6%] md:top-[8%] z-30 text-right">
-            <Plus className="w-5 h-5 text-[#999] ml-auto mb-1" strokeWidth={2} />
-            <div className="landing-heading text-[clamp(2rem,5vw,3.5rem)] font-bold text-[#1a1a1a] leading-none tracking-tight">
-              240%
-            </div>
-            <div className="text-[11px] font-mono font-semibold text-[#888] tracking-[0.15em] mt-1 uppercase">
-              Efficiency
-            </div>
           </div>
 
           {/* 3D device scene — laptop centered, devices in semicircle */}
