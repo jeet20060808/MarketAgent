@@ -290,15 +290,12 @@ export default function LandingPage() {
               AXORA AI
             </span>
           </div>
-
         </header>
 
         <main className="relative z-10 flex-1 px-6 md:px-10 pb-6 md:pb-8 min-h-[520px] md:min-h-[600px]">
 
           <div className="absolute left-6 md:left-10 top-[4%] md:top-[6%] z-30 max-w-[320px]">
-            <span className="text-[11px] font-mono font-semibold text-[#888] tracking-wide mb-3 block">
-              ( 1/6 )
-            </span>
+
             <h1 className="landing-heading text-[clamp(1.5rem,3.5vw,2.8rem)] font-bold leading-[1.02] tracking-tight text-[#1a1a1a] uppercase">
   RESEARCH DEEP
   <br />
@@ -459,10 +456,11 @@ height={105}
             <div className="flex items-center gap-3 flex-wrap">
               <Link
                 href="/dashboard"
-                className="landing-heading bg-[#FF8A00] text-[#1a1a1a] font-bold text-[13px] pl-5 pr-1.5 py-1.5 rounded-xl flex items-center gap-3 hover:bg-[#e07d00] transition-colors group shadow-sm"
+                className="landing-heading relative overflow-hidden bg-gradient-to-r from-[#ff8a00] via-[#ff9f34] to-[#ffbc54] text-[#1a1a1a] font-bold text-[13px] px-5 py-3 rounded-full inline-flex items-center gap-3 hover:bg-[#ff9f34] hover:shadow-[0_0_28px_rgba(255,138,0,0.35)] transition-all duration-300 ease-out transform hover:-translate-y-0.5 group"
               >
-                <span>START NOW</span>
-                <div className="bg-white text-[#1a1a1a] p-2 rounded-lg">
+                <span className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,_rgba(255,156,54,0.35),_transparent_55%)] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100" />
+                <span className="relative">START NOW</span>
+                <div className="relative bg-white text-[#1a1a1a] p-2 rounded-full shadow-sm">
                   <ChevronsRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" strokeWidth={2.5} />
                 </div>
               </Link>
