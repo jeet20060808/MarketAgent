@@ -4,8 +4,8 @@ import { productManager } from "@/agents/productManager";
 import { architect } from "@/agents/architect";
 import { marketing } from "@/agents/marketing";
 import { engineeringManager } from "@/agents/engineering";
-// import { riskAnalyst } from "@/agents/riskAnalyst";
-// import { financialAnalyst } from "@/agents/financialAnalyst";
+import { riskAnalyst } from "@/agents/riskAnalyst";
+import { financialAnalyst } from "@/agents/financialAnalyst";
 
 interface UploadedFile {
   name: string;

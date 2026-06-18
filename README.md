@@ -39,9 +39,9 @@ Each agent is fully equipped with context-driven tools to execute their specific
 
 ### Prerequisites
 
-Create a `.env.local` file in the root directory and add your OpenRouter API key:
+Create a `.env.local` file in the root directory and add your NVIDIA API key:
 ```env
-OPENROUTER_API_KEY=your-api-key-here
+NVIDIA_API_KEY=your-api-key-here
 ```
 
 ### Installation
@@ -66,5 +66,5 @@ OPENROUTER_API_KEY=your-api-key-here
 - **Styling**: TailwindCSS & Vanilla CSS
 - **Animation**: Framer Motion
 - **Icons**: Lucide React
-- **LLM Orchestration**: OpenAI SDK (routed via OpenRouter APIs)
+- **LLM Orchestration**: OpenAI SDK (routed via NVIDIA Integrate APIs)
 - **Exporting**: High-fidelity `@media print` CSS configurations
