@@ -14,8 +14,16 @@ import pptxgen from "pptxgenjs";
 function renderMarkdown(text: string): string {
   if (!text) return "<p class='text-zinc-500 italic'>No data compiled yet.</p>";
   
+  // Escape raw HTML tags to prevent XSS before parsing markdown
+  const escapedText = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
   // Strip out remaining unwanted markdown headers if they leaked through
-  let cleanedText = text.replace(/^#+\s+.*$/gm, '').trim();
+  let cleanedText = escapedText.replace(/^#+\s+.*$/gm, '').trim();
   // Strip out numbered list items if they were used as headings and leaked through at the very start
   cleanedText = cleanedText.replace(/^\d+\.\s+[A-Za-z\s]+(?!.)/gm, '').trim();
   

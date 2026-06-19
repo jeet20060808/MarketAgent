@@ -1,8 +1,8 @@
-# AI Founder OS 🚀
+# AXORA AI 🚀
 
 > Your founding team, on demand. Turn a single startup idea into a comprehensive, print-ready Startup Package in seconds.
 
-AI Founder OS is a high-performance **Multi-Agent Orchestration System** built on Next.js. A team of **8 specialized AI agents** work in parallel using simulated system workspace tools to validate, research, draft, design, plan, model, assess, and market your startup idea.
+Axora AI is a high-performance **Multi-Agent Orchestration System** built on Next.js. A team of **8 specialized AI agents** work in parallel using simulated system workspace tools to validate, research, draft, design, plan, model, assess, and market your startup idea.
 
 ---
 
@@ -10,21 +10,21 @@ AI Founder OS is a high-performance **Multi-Agent Orchestration System** built o
 
 Each agent is fully equipped with context-driven tools to execute their specific startup lifecycle workflow:
 
-1. **🧠 Startup Advisor Agent** — *Idea Validation*
+1. **🧠 Startup Advisor Agent** — _Idea Validation_
    - **Notion Tool**: Generates validation workspaces, evaluates problem-market fit, analyzes target audiences, business models, and potential project risks.
-2. **📊 Market Research Agent** — *Market Intelligence*
+2. **📊 Market Research Agent** — _Market Intelligence_
    - **Search Tool**: Scans active web data for competitor matrices, TAM assessments, and key market growth trends.
-3. **📋 Product Manager Agent** — *Product Strategy*
+3. **📋 Product Manager Agent** — _Product Strategy_
    - **Notion Tool**: Drafts detailed Product Requirements Documents (PRDs), compiles MVP feature scopes, and defines user stories.
-4. **⚙️ Architect Agent** — *Technical Design*
+4. **⚙️ Architect Agent** — _Technical Design_
    - **GitHub Tool**: Generates high-level technical layouts, recommended tech stacks, API endpoints, and database schemas.
-5. **🚀 Marketing Agent** — *Go-To-Market Strategy*
+5. **🚀 Marketing Agent** — _Go-To-Market Strategy_
    - **Notion Tool**: Crafts landing page headlines, launch value propositions, social copy, and initial email outreach campaigns.
-6. **🛠️ Engineering Manager Agent** — *Engineering Execution*
+6. **🛠️ Engineering Manager Agent** — _Engineering Execution_
    - **GitHub Tool**: Formulates development execution blueprints, maps engineering staffing requirements, structures sprint milestones, and populates P0/P1/P2 backlogs.
-7. **🛡️ Risk Analyst Agent** — *Risk Assessment*
+7. **🛡️ Risk Analyst Agent** — _Risk Assessment_
    - **Risk Tool**: Identifies market, technical, financial, and compliance risks with detailed mitigation strategies.
-8. **💰 Financial Analyst Agent** — *Financial Modeling*
+8. **💰 Financial Analyst Agent** — _Financial Modeling_
    - **Finance Tool**: Models revenue streams, pricing strategies, CAC/LTV projections, break-even estimations, and funding requirements.
 
 ---
@@ -44,6 +44,7 @@ Each agent is fully equipped with context-driven tools to execute their specific
 ### Prerequisites
 
 Create a `.env.local` file in the root directory and add your NVIDIA API key:
+
 ```env
 NVIDIA_API_KEY=your-api-key-here
 ```
@@ -51,11 +52,13 @@ NVIDIA_API_KEY=your-api-key-here
 ### Installation
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
 
 2. Run the local development server:
+
    ```bash
    npm run dev
    ```

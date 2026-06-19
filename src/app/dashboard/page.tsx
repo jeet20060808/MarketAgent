@@ -191,7 +191,17 @@ function formatFileSize(bytes: number): string {
 
 /* ── Simple markdown-to-HTML renderer ── */
 function renderMarkdown(text: string): string {
-  const blocks = text.split("\n");
+  if (!text) return "";
+  
+  // Escape raw HTML tags to prevent XSS before parsing markdown
+  const escapedText = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+  const blocks = escapedText.split("\n");
   const processed: string[] = [];
   let tableBuffer: string[] = [];
 
