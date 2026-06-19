@@ -209,18 +209,19 @@ body {
    ══════════════════════════════════════ */
 
 .editorial-card {
-  background: #000000 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1.75rem;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
-  color: #ffffff !important;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 138, 0, 0.03);
+  background: #0d0d0c !important;
+  border: 1px solid rgba(255, 138, 0, 0.15);
+  border-radius: 1.5rem;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+  color: #f4f4f5 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 138, 0, 0.02);
 }
 
 .editorial-card:hover {
-  background: #111111 !important;
-  box-shadow: 0 24px 45px rgba(255, 138, 0, 0.25), 0 0 25px rgba(255, 138, 0, 0.15), 0 0 0 1px rgba(255, 138, 0, 0.25);
-  transform: translateY(-3px);
+  background: #111110 !important;
+  border-color: rgba(255, 138, 0, 0.35);
+  box-shadow: 0 20px 40px rgba(255, 138, 0, 0.12), 0 0 25px rgba(255, 138, 0, 0.05);
+  transform: translateY(-2px);
 }
 
 /* Ensure text elements directly inside the dark cards are readable */
@@ -228,75 +229,86 @@ body {
 .editorial-card h2,
 .editorial-card h3,
 .editorial-card h4 {
-  color: #FAF6EF !important;
+  color: #ffffff !important;
 }
 
-.editorial-card p,
-.editorial-card span,
-.editorial-card div,
-.editorial-card label {
-  color: #E2E8F0 !important;
+.editorial-card p {
+  color: #d4d4d8 !important;
 }
 
-/* BUT restore dark text for sub-panels with light backgrounds */
+/* Specific styling for light and custom themed inner panels */
 .gauge-card,
 .breakdown-chart-card,
 .recommendations-box,
-.agent-summary-table {
-  color: #1A1A1A !important;
-  background: #FAF6EF !important;
+.agent-summary-table-container {
+  color: #1a1a1a;
+  background: #FAF6EF;
 }
 
-.gauge-card *,
-.breakdown-chart-card *,
-.recommendations-box *,
-.agent-summary-table * {
-  color: #1A1A1A !important;
+/* Clean score styling on dark score panel */
+.score-pillar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+.score-pillar-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 138, 0, 0.15);
 }
 
-/* Ensure secondary styling like muted text in sub-panels uses proper dark values */
-.gauge-card .text-ink-muted,
-.agent-summary-table .cell-role {
-  color: #8A8578 !important;
+.score-pillar-row .text-ink {
+  color: #f4f4f5 !important;
+}
+.score-pillar-row .text-ink-light {
+  color: #a1a1aa !important;
 }
 
-.agent-summary-table .cell-finding {
-  color: #4A4A4A !important;
+/* Circular Gauge Card Styling */
+.gauge-card {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 16px;
+  color: #ffffff !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+}
+.gauge-card:hover {
+  border-color: rgba(255, 138, 0, 0.3) !important;
+  box-shadow: 0 8px 30px rgba(255, 138, 0, 0.08) !important;
+}
+.gauge-card * {
+  color: #ffffff !important;
+}
+.gauge-card .text-ink-muted {
+  color: #a1a1aa !important;
 }
 
-/* Allow badge, status, and custom colored text to bypass override */
-.editorial-card .badge-pink,
-.editorial-card .badge-pink *,
-.editorial-card .badge-yellow,
-.editorial-card .badge-yellow *,
-.editorial-card .status-pill,
-.editorial-card .status-pill *,
-.editorial-card .score-glow-text,
-.editorial-card .score-glow-text *,
-.editorial-card .cell-num {
-  color: inherit !important;
-}
-
-/* Chic glowing & pulsing overall score animation */
+/* Cohesive Orange Gradient Score text */
 .score-glow-text {
-  background: linear-gradient(135deg, #F7C948 0%, #EC4899 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: linear-gradient(135deg, #ffb74d 0%, #ff5722 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
   display: inline-block;
+  font-weight: 800;
   animation: scoreBounce 2.5s infinite ease-in-out;
 }
 
 @keyframes scoreBounce {
   0%, 100% {
     transform: scale(1);
-    text-shadow: 0 0 15px rgba(247, 201, 72, 0.25);
+    filter: drop-shadow(0 0 10px rgba(255, 138, 0, 0.25));
   }
   50% {
-    transform: scale(1.06);
-    text-shadow: 0 0 25px rgba(247, 201, 72, 0.6), 0 0 10px rgba(247, 201, 72, 0.3);
+    transform: scale(1.04);
+    filter: drop-shadow(0 0 20px rgba(255, 138, 0, 0.5));
   }
 }
+
 
 /* Specific styling for markdown content inside dark editorial cards */
 .editorial-card .markdown-content h1,
@@ -1205,4 +1217,283 @@ body {
   background: rgba(236, 72, 153, 0.08);
   border: 1px solid rgba(236, 72, 153, 0.25);
   box-shadow: 0 0 10px rgba(236, 72, 153, 0.08);
+}
+
+/* ======================================================
+   PREMIUM REDESIGN — DASHBOARD UI CUSTOM STYLES
+   ====================================================== */
+
+/* Cohesive Orange Gradient Variables */
+:root {
+  --orange-50: #FFF3E0;
+  --orange-100: #FFE0B2;
+  --orange-300: #FFB74D;
+  --orange-400: #FFA726;
+  --orange-500: #FF9800;
+  --orange-600: #FB8C00;
+  --orange-700: #F57C00;
+  --orange-800: #EF6C00;
+  --orange-900: #E65100;
+}
+
+/* Premium Action Buttons */
+.dashboard-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 2.5rem;
+  padding: 0 1.25rem;
+  font-family: var(--font-mono-code), monospace;
+  font-size: 0.725rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 8px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.dashboard-action-btn:active {
+  transform: translateY(1px);
+}
+
+.dashboard-action-btn-primary {
+  background: #FF8A00;
+  color: #000000 !important;
+  border: 1px solid #FF8A00;
+  box-shadow: 0 4px 12px rgba(255, 138, 0, 0.15);
+}
+
+.dashboard-action-btn-primary:hover {
+  background: #ffa133;
+  border-color: #ffa133;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 138, 0, 0.25);
+}
+
+.dashboard-action-btn-pink {
+  background: #EC4899;
+  color: #ffffff !important;
+  border: 1px solid #EC4899;
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
+}
+
+.dashboard-action-btn-pink:hover {
+  background: #f062a8;
+  border-color: #f062a8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(236, 72, 153, 0.25);
+}
+
+.dashboard-action-btn-yellow {
+  background: #F7C948;
+  color: #000000 !important;
+  border: 1px solid #F7C948;
+  box-shadow: 0 4px 12px rgba(247, 201, 72, 0.15);
+}
+
+.dashboard-action-btn-yellow:hover {
+  background: #fad770;
+  border-color: #fad770;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(247, 201, 72, 0.25);
+}
+
+.dashboard-action-btn-secondary {
+  background: rgba(255, 255, 255, 0.03);
+  color: #e4e4e7 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dashboard-action-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Premium Key Insights Cards */
+.insight-card {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: #d4d4d8;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.insight-card:hover {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(255, 138, 0, 0.2);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 138, 0, 0.02);
+}
+
+/* Premium Zebra Stripe Table in Dark Dashboard */
+.agent-summary-table-container {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.01) !important;
+}
+
+.agent-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+  color: #e4e4e7 !important;
+  background: transparent !important;
+  table-layout: auto !important;
+}
+
+.agent-summary-table th,
+.agent-summary-table td {
+  border: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+  padding: 10px 14px !important;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.agent-summary-table th {
+  background: rgba(255, 255, 255, 0.02) !important;
+  color: #a1a1aa !important;
+  font-family: var(--font-mono-code), monospace;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+}
+
+.agent-summary-table tbody tr {
+  transition: background-color 0.25s ease;
+}
+
+.agent-summary-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.008);
+}
+
+.agent-summary-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.agent-summary-table .cell-num {
+  font-family: var(--font-mono-code), monospace;
+  font-weight: 500;
+}
+
+.agent-summary-table .cell-role {
+  color: #a1a1aa !important;
+  font-family: var(--font-mono-code), monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 0.625rem;
+}
+
+.agent-summary-table .cell-finding {
+  color: #e4e4e7 !important;
+  font-size: 0.75rem;
+}
+
+/* Premium Status Badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-family: var(--font-mono-code), monospace;
+  background: rgba(34, 197, 94, 0.1);
+  color: #4ade80 !important;
+  border: 1px solid rgba(34, 197, 94, 0.15);
+  white-space: nowrap;
+}
+
+.status-badge-pending {
+  background: rgba(251, 191, 36, 0.08);
+  color: #fbbf24 !important;
+  border: 1px solid rgba(251, 191, 36, 0.12);
+}
+
+/* Premium Verdict Badge */
+.verdict-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-family: var(--font-mono-code), monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(255, 138, 0, 0.08);
+  color: #FF8A00 !important;
+  border: 1px solid rgba(255, 138, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(255, 138, 0, 0.05);
+}
+
+/* Detailed Analysis Accordions */
+.analysis-accordion-item {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.analysis-accordion-item:hover {
+  border-color: rgba(255, 138, 0, 0.25);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.analysis-accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.analysis-accordion-content {
+  padding: 0 18px 18px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/* Orange charts styles */
+.breakdown-chart-card {
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  background: rgba(255, 255, 255, 0.015) !important;
+  border-radius: 14px !important;
+  padding: 16px !important;
+  color: #ffffff !important;
+}
+
+.breakdown-chart-card:hover {
+  border-color: rgba(255, 138, 0, 0.25) !important;
+  box-shadow: 0 8px 24px rgba(255, 138, 0, 0.08) !important;
+}
+
+.breakdown-chart-card * {
+  color: #ffffff !important;
+}
+
+.breakdown-chart-card .text-ink-muted {
+  color: #a1a1aa !important;
 }

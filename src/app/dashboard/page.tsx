@@ -449,21 +449,21 @@ function generatePRD(idea: string, results: AgentResults): string {
 
 /* ── Compact Business Breakdown — 3 chart panels ── */
 const BREAKDOWN_SEGMENTS = [
-  { label: "Market", value: 18, color: "#3B82F6" },
-  { label: "Product", value: 14, color: "#22C55E" },
-  { label: "Technical", value: 14, color: "#F97316" },
-  { label: "GTM", value: 14, color: "#EC4899" },
-  { label: "Ops", value: 12, color: "#8B5CF6" },
-  { label: "Risk", value: 14, color: "#EF4444" },
-  { label: "Finance", value: 14, color: "#10B981" },
+  { label: "Market", value: 18, color: "#FFE0B2" },     // Orange 100
+  { label: "Product", value: 14, color: "#FFCC80" },    // Orange 200
+  { label: "Technical", value: 14, color: "#FFB74D" },  // Orange 300
+  { label: "GTM", value: 14, color: "#FFA726" },        // Orange 400
+  { label: "Ops", value: 12, color: "#FF9800" },        // Orange 500
+  { label: "Risk", value: 14, color: "#FB8C00" },       // Orange 600
+  { label: "Finance", value: 14, color: "#F57C00" },    // Orange 700
 ];
 
 const PILLAR_BARS = [
-  { label: "Validation", value: 82, color: "#F7C948" },
-  { label: "Market Fit", value: 76, color: "#3B82F6" },
-  { label: "Product", value: 88, color: "#22C55E" },
-  { label: "Execution", value: 71, color: "#8B5CF6" },
-  { label: "Financial", value: 79, color: "#10B981" },
+  { label: "Validation", value: 82, color: "#FFE0B2" },
+  { label: "Market Fit", value: 76, color: "#FFB74D" },
+  { label: "Product", value: 88, color: "#FF9800" },
+  { label: "Execution", value: 71, color: "#FB8C00" },
+  { label: "Financial", value: 79, color: "#E65100" },
 ];
 
 function DonutChart({ segments, size = 96 }: { segments: typeof BREAKDOWN_SEGMENTS; size?: number }) {
@@ -483,7 +483,7 @@ function DonutChart({ segments, size = 96 }: { segments: typeof BREAKDOWN_SEGMEN
     const x2i = cx + ir * Math.cos(startRad), y2i = cy + ir * Math.sin(startRad);
     const largeArc = sliceAngle > 180 ? 1 : 0;
     const d = `M ${x1o} ${y1o} A ${r} ${r} 0 ${largeArc} 1 ${x2o} ${y2o} L ${x1i} ${y1i} A ${ir} ${ir} 0 ${largeArc} 0 ${x2i} ${y2i} Z`;
-    return <path key={i} d={d} fill={seg.color} stroke="#FAF6EF" strokeWidth="1" />;
+    return <path key={i} d={d} fill={seg.color} stroke="#121211" strokeWidth="1.5" />;
   });
 
   return (
@@ -498,13 +498,13 @@ function HorizontalBarChart({ bars }: { bars: typeof PILLAR_BARS }) {
     <div className="flex flex-col gap-1.5 w-full">
       {bars.map((bar) => (
         <div key={bar.label} className="flex items-center gap-2">
-          <span className="text-[9px] w-14 truncate uppercase tracking-wide" style={{ fontFamily: "var(--font-mono)", color: "var(--ink-muted)" }}>
+          <span className="text-[9px] w-14 truncate uppercase tracking-wide" style={{ fontFamily: "var(--font-mono)", color: "#a1a1aa" }}>
             {bar.label}
           </span>
-          <div className="flex-1 h-2 rounded-sm overflow-hidden" style={{ background: "var(--cream-dark)", border: "1px solid var(--border-light)" }}>
+          <div className="flex-1 h-2 rounded-sm overflow-hidden" style={{ background: "rgba(255, 255, 255, 0.05)" }}>
             <div className="h-full rounded-sm transition-all" style={{ width: `${bar.value}%`, background: bar.color }} />
           </div>
-          <span className="text-[9px] w-7 text-right font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--ink)" }}>
+          <span className="text-[9px] w-7 text-right font-semibold" style={{ fontFamily: "var(--font-mono)", color: "#ffffff" }}>
             {bar.value}
           </span>
         </div>
@@ -523,7 +523,7 @@ function AgentOutputChart({ results }: { results: AgentResults }) {
           <div key={agent.id} className="flex flex-col items-center gap-1 flex-1 min-w-0">
             <div
               className="w-full max-w-[14px] rounded-t-sm"
-              style={{ height, background: agent.color, opacity: len ? 1 : 0.25 }}
+              style={{ height, background: len ? "linear-gradient(180deg, #FFA726 0%, #FF5722 100%)" : "rgba(255, 255, 255, 0.05)", opacity: len ? 1 : 0.25 }}
               title={agent.name}
             />
             <AgentIcon Icon={agent.Icon} color={agent.color} size={10} />
@@ -639,6 +639,9 @@ export default function Home() {
   const [prdStepIndex, setPrdStepIndex] = useState(0);
   const [prdContent, setPrdContent] = useState("");
   const [prdCopied, setPrdCopied] = useState(false);
+
+  // ── Accordion State for Detailed Analysis ──
+  const [expandedAgentId, setExpandedAgentId] = useState<string | null>("advisor");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1434,53 +1437,50 @@ export default function Home() {
               ) : (
                 <>
                   {/* Dashboard Header Banner */}
-                  <div className="print:hidden px-6 sm:px-8 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4" style={{ borderBottom: '2px solid var(--border)', background: 'var(--surface)' }}>
+                  <div className="print:hidden px-6 sm:px-8 py-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-white/[0.06] bg-[#0d0d0c]/50 backdrop-blur-md sticky top-0 z-30">
                     <div>
                       <div className="badge-yellow mb-2 animate-stamp">
-                        <CheckCircle2 className="w-3 h-3" />
+                        <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>Package Assembled</span>
                       </div>
-                      <h2 className="text-xl font-bold truncate max-w-xl" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>
+                      <h2 className="text-xl font-bold text-white truncate max-w-xl" style={{ fontFamily: "var(--font-sans)" }}>
                         {idea || "Startup Package"}
                       </h2>
                     </div>
                 
                 {/* Actions */}
-                <div className="flex items-center gap-3 w-full md:w-auto flex-wrap">
+                <div className="flex items-center gap-2.5 w-full md:w-auto flex-wrap">
                   <button
                     onClick={() => window.print()}
-                    className="btn-primary px-4 py-2 flex items-center gap-2"
+                    className="dashboard-action-btn dashboard-action-btn-secondary"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>PDF Report</span>
                   </button>
                   <button
                     onClick={() => setInvestorMode(true)}
-                    className="btn-primary px-4 py-2 flex items-center gap-2"
-                    style={{ background: '#FF8A00', color: '#1a1a1a' }}
+                    className="dashboard-action-btn dashboard-action-btn-primary"
                   >
                     <Presentation className="w-3.5 h-3.5" />
-                    <span>Pitch This Startup</span>
+                    <span>Pitch Startup</span>
                   </button>
                   <button
                     onClick={() => setShowNotionModal(true)}
-                    className="btn-primary px-4 py-2 flex items-center gap-2"
-                    style={{ background: 'var(--accent-yellow)', color: 'var(--ink)' }}
+                    className="dashboard-action-btn dashboard-action-btn-yellow"
                   >
                     <BookOpen className="w-3.5 h-3.5" />
                     <span>Notion Doc</span>
                   </button>
                   <button
                     onClick={handleGeneratePrd}
-                    className="btn-primary px-4 py-2 flex items-center gap-2"
-                    style={{ background: '#EC4899', color: '#ffffff' }}
+                    className="dashboard-action-btn dashboard-action-btn-pink"
                   >
                     <FileText className="w-3.5 h-3.5" />
                     <span>Generate PRD</span>
                   </button>
                   <button
                     onClick={handleReset}
-                    className="btn-secondary px-4 py-2 flex items-center gap-2"
+                    className="dashboard-action-btn dashboard-action-btn-secondary"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
                     <span>New Strategy</span>
@@ -1492,63 +1492,76 @@ export default function Home() {
               <div className="summary-report flex-1 max-w-4xl mx-auto w-full px-6 py-6 flex flex-col gap-4 print:p-4 print:gap-4">
                 
                 {/* Cover Header */}
-                <section className="editorial-card p-5 print:border print:border-gray-300">
+                <section className="editorial-card p-6 relative overflow-hidden">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="badge-pink">
+                    <div className="badge-pink bg-[#EC4899]/10 text-[#EC4899] border-[#EC4899]/20">
                       <Rocket className="w-3 h-3" />
                       <span>AI Founder OS</span>
                     </div>
-                    <span className="text-[10px]" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' as const }}>
+                    <span className="text-[10px] font-mono text-[#a1a1aa] tracking-widest uppercase">
                       STAMPED {new Date().getFullYear()}
                     </span>
                   </div>
                   
-                  <div style={{ borderTop: '2px solid var(--border)', margin: '8px 0 16px' }} />
+                  <div className="border-t border-white/[0.06] my-4" />
                   
-                  <h1 className="text-3xl sm:text-4xl tracking-tight leading-tight print:text-black" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>
+                  <h1 className="text-3xl sm:text-4xl tracking-tight leading-tight text-white font-bold" style={{ fontFamily: 'var(--font-sans)' }}>
                     {idea || "Startup Strategy Report"}
                   </h1>
-                  <p className="text-xs mt-2" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' as const }}>
+                  <p className="text-xs text-[#a1a1aa] font-mono tracking-widest uppercase mt-2">
                     Unified Package · {new Date().toLocaleDateString()} · {AGENTS.length} Agent Compilation
                   </p>
                 </section>
 
                 {/* Key Insights */}
                 {insights.length > 0 && (
-                  <section className="editorial-card p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="section-number section-number-yellow" style={{ fontFamily: 'var(--font-heading)' }}>01</span>
-                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Key Insights</h2>
+                  <motion.section 
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="editorial-card p-5"
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="w-8 h-8 rounded-full bg-[#FF8A00] text-black flex items-center justify-center font-mono font-bold text-xs">01</span>
+                      <h2 className="text-lg font-bold text-white">Key Insights</h2>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {insights.map((insight, i) => (
-                        <div
+                        <motion.div
                           key={i}
-                          className="flex gap-2 p-2.5 rounded text-xs leading-relaxed"
-                          style={{ background: 'var(--cream)', border: '1px solid var(--border-light)', color: 'var(--ink-light)' }}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05, duration: 0.3 }}
+                          whileHover={{ y: -2 }}
+                          className="insight-card"
                         >
-                          <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: 'var(--accent-yellow)' }} />
+                          <ChevronRight className="w-4 h-4 flex-shrink-0 mt-0.5 text-[#FF8A00]" />
                           <span dangerouslySetInnerHTML={{ __html: renderMarkdown(insight) }} />
-                        </div>
+                        </motion.div>
                       ))}
                     </div>
-                  </section>
+                  </motion.section>
                 )}
 
                 {/* Agent Summary Table */}
-                <section className="editorial-card p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="section-number section-number-pink" style={{ fontFamily: 'var(--font-heading)' }}>02</span>
-                    <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Agent Summary</h2>
+                <motion.section 
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05, duration: 0.4 }}
+                  className="editorial-card p-5"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="w-8 h-8 rounded-full bg-[#FF8A00] text-black flex items-center justify-center font-mono font-bold text-xs">02</span>
+                    <h2 className="text-lg font-bold text-white">Agent Summary</h2>
                   </div>
-                  <div className="overflow-x-auto">
+                  <div className="agent-summary-table-container">
                     <table className="agent-summary-table w-full">
                       <colgroup>
                         <col style={{ width: "36px" }} />
-                        <col style={{ width: "148px" }} />
-                        <col style={{ width: "112px" }} />
+                        <col style={{ width: "160px" }} />
+                        <col style={{ width: "130px" }} />
                         <col />
-                        <col style={{ width: "72px" }} />
+                        <col style={{ width: "90px" }} />
                       </colgroup>
                       <thead>
                         <tr>
@@ -1567,13 +1580,13 @@ export default function Home() {
                             : "—";
                           const hasResult = Boolean(agentResult);
                           return (
-                            <tr key={agent.id} className={hasResult ? "row-complete" : ""}>
+                            <tr key={agent.id}>
                               <td className="cell-num" style={{ color: agent.color }}>
                                 {String(i + 1).padStart(2, '0')}
                               </td>
                               <td className="cell-agent">
-                                <span className="inline-flex items-center gap-1.5">
-                                  <AgentIcon Icon={agent.Icon} color={agent.color} size={13} />
+                                <span className="inline-flex items-center gap-2">
+                                  <AgentIcon Icon={agent.Icon} color={agent.color} size={14} />
                                   <span className="font-semibold">{agent.name}</span>
                                 </span>
                               </td>
@@ -1581,9 +1594,15 @@ export default function Home() {
                               <td className="cell-finding">{topFinding}</td>
                               <td className="cell-status">
                                 {hasResult ? (
-                                  <span className="status-pill status-complete"><CheckCircle2 size={11} /> Done</span>
+                                  <span className="status-badge">
+                                    <CheckCircle2 size={10} />
+                                    <span>Done</span>
+                                  </span>
                                 ) : (
-                                  <span className="status-pill status-empty">—</span>
+                                  <span className="status-badge status-badge-pending">
+                                    <RefreshCw className="w-2.5 h-2.5 animate-spin" />
+                                    <span>Pending</span>
+                                  </span>
                                 )}
                               </td>
                             </tr>
@@ -1592,33 +1611,38 @@ export default function Home() {
                       </tbody>
                     </table>
                   </div>
-                </section>
+                </motion.section>
 
                 {/* Founder Snapshot Score */}
-                <section className="editorial-card p-5 relative overflow-hidden">
+                <motion.section
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1, duration: 0.4 }}
+                  className="editorial-card p-5 relative overflow-hidden"
+                >
                   <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <span className="section-number section-number-yellow" style={{ fontFamily: 'var(--font-heading)' }}>03</span>
-                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Founder Snapshot Score</h2>
+                    <div className="flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-full bg-[#FF8A00] text-black flex items-center justify-center font-mono font-bold text-xs">03</span>
+                      <h2 className="text-lg font-bold text-white">Founder Snapshot Score</h2>
                     </div>
                     {scoreData && (
-                      <span className="badge-pink">
+                      <span className="verdict-badge">
                         {scoreData.investorVerdict}
                       </span>
                     )}
                   </div>
-
-                  {!scoreData ? (
-                    <div className="flex flex-col items-center justify-center py-8 text-center bg-cream-dark/30 rounded border border-dashed border-border-light">
-                      <Brain className="w-10 h-10 mb-3 animate-float text-accent-yellow" />
-                      <h3 className="text-sm font-bold mb-1" style={{ color: 'var(--ink)' }}>Scoring Engine Ready</h3>
-                      <p className="text-xs max-w-md mb-4 px-4" style={{ color: 'var(--ink-muted)' }}>
+ 
+                   {!scoreData ? (
+                    <div className="flex flex-col items-center justify-center py-8 text-center bg-white/[0.01] rounded-xl border border-dashed border-white/[0.08] p-6">
+                      <Brain className="w-10 h-10 mb-3 animate-float text-[#FF8A00]" />
+                      <h3 className="text-sm font-bold mb-1 text-white">Scoring Engine Ready</h3>
+                      <p className="text-xs max-w-md mb-4 px-4 text-[#a1a1aa]">
                         Evaluate your startup across 5 critical pillars (Market, Revenue, Execution, Competition, Risk) using our weighted scoring algorithm.
                       </p>
                       <button
                         onClick={handleGenerateScore}
                         disabled={isScoring}
-                        className="btn-primary px-6 py-2.5 flex items-center gap-2"
+                        className="dashboard-action-btn dashboard-action-btn-primary"
                       >
                         {isScoring ? (
                           <>
@@ -1628,7 +1652,7 @@ export default function Home() {
                         ) : (
                           <>
                             <Activity className="w-4 h-4" />
-                            <span>Generate Founder Snapshot Score</span>
+                            <span>Generate Snapshot Score</span>
                           </>
                         )}
                       </button>
@@ -1640,17 +1664,17 @@ export default function Home() {
                     <div className="flex flex-col gap-6">
                       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
                         {/* Circle Gauge on Left */}
-                        <div className="md:col-span-4 flex flex-col items-center justify-center p-6 rounded-2xl bg-[#FAF6EF] border border-[#D4CFC5] shadow-inner relative overflow-hidden min-h-[220px] gauge-card">
+                        <div className="md:col-span-4 flex flex-col items-center justify-center p-6 rounded-2xl bg-white/[0.015] border border-white/[0.05] relative overflow-hidden min-h-[220px] gauge-card">
                           {/* Glow behind circle */}
-                          <div className="absolute w-24 h-24 rounded-full bg-[#F7C948]/10 blur-xl pointer-events-none" />
+                          <div className="absolute w-24 h-24 rounded-full bg-[#FF8A00]/5 blur-2xl pointer-events-none" />
                           
                           {/* SVG Circular Gauge */}
                           <div className="relative w-36 h-36 flex items-center justify-center">
                             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                               <defs>
                                 <linearGradient id="scoreProgressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                  <stop offset="0%" stopColor="#F7C948" />
-                                  <stop offset="100%" stopColor="#EC4899" />
+                                  <stop offset="0%" stopColor="#ffb74d" />
+                                  <stop offset="100%" stopColor="#ff5722" />
                                 </linearGradient>
                               </defs>
                               {/* Background Track */}
@@ -1659,7 +1683,7 @@ export default function Home() {
                                 cy="50"
                                 r="40"
                                 fill="transparent"
-                                stroke="var(--cream-dark)"
+                                stroke="rgba(255,255,255,0.04)"
                                 strokeWidth="8"
                               />
                               {/* Animated Progress Arc */}
@@ -1675,27 +1699,27 @@ export default function Home() {
                                 animate={{ strokeDashoffset: 251.2 - (251.2 * scoreData.startupScore) / 100 }}
                                 transition={{ duration: 1.5, ease: "easeOut" }}
                                 strokeLinecap="round"
-                                style={{ filter: "drop-shadow(0px 0px 4px rgba(236, 72, 153, 0.4))" }}
+                                style={{ filter: "drop-shadow(0px 0px 8px rgba(255, 138, 0, 0.45))" }}
                               />
                             </svg>
                             <div className="absolute flex flex-col items-center justify-center">
                               <AnimatedScore value={scoreData.startupScore} />
-                              <span className="text-[9px] font-mono tracking-widest text-ink-muted uppercase mt-0.5">
+                              <span className="text-[9px] font-mono tracking-widest text-[#a1a1aa] uppercase mt-0.5">
                                 OVERALL
                               </span>
                             </div>
                           </div>
                           
                           <div className="text-center mt-3 px-2">
-                            <span className="text-[9px] font-mono uppercase tracking-widest block text-ink-muted">
+                            <span className="text-[9px] font-mono uppercase tracking-widest block text-[#a1a1aa]">
                               INVESTOR VERDICT
                             </span>
-                            <h4 className="text-xs font-bold text-ink uppercase mt-0.5 tracking-tight line-clamp-2" title={scoreData.investorVerdict}>
+                            <h4 className="text-xs font-bold text-white uppercase mt-0.5 tracking-tight line-clamp-2" title={scoreData.investorVerdict}>
                               {scoreData.investorVerdict.split(/[-–—:]/)[0].trim()}
                             </h4>
                           </div>
                         </div>
-
+ 
                         {/* Weights and Explanations on Right */}
                         <div className="md:col-span-8 flex flex-col gap-4">
                           {/* 5 pillars display */}
@@ -1703,141 +1727,172 @@ export default function Home() {
                             {/* Market Score */}
                             <div className="score-pillar-row">
                               <div className="flex justify-between items-center text-xs font-semibold">
-                                <span className="text-ink">Market Score (30% Weight)</span>
-                                <span className="text-ink font-mono">{scoreData.marketScore}/100</span>
+                                <span className="text-white">Market Score (30% Weight)</span>
+                                <span className="text-white font-mono">{scoreData.marketScore}/100</span>
                               </div>
-                              <div className="h-2 w-full bg-cream-dark rounded-sm overflow-hidden mt-1">
-                                <div className="h-full bg-accent-blue rounded-sm" style={{ width: `${scoreData.marketScore}%` }} />
+                              <div className="h-1.5 w-full bg-white/[0.05] rounded-full overflow-hidden mt-1">
+                                <div className="h-full rounded-full" style={{ width: `${scoreData.marketScore}%`, background: "linear-gradient(90deg, #ffb74d 0%, #ffa726 100%)" }} />
                               </div>
-                              <p className="text-[11px] text-ink-light mt-1 leading-relaxed">{scoreData.marketReason}</p>
+                              <p className="text-[11px] text-[#a1a1aa] mt-1 leading-relaxed">{scoreData.marketReason}</p>
                             </div>
-
+ 
                             {/* Revenue Score */}
                             <div className="score-pillar-row">
                               <div className="flex justify-between items-center text-xs font-semibold">
-                                <span className="text-ink">Revenue Score (25% Weight)</span>
-                                <span className="text-ink font-mono">{scoreData.revenueScore}/100</span>
+                                <span className="text-white">Revenue Score (25% Weight)</span>
+                                <span className="text-white font-mono">{scoreData.revenueScore}/100</span>
                               </div>
-                              <div className="h-2 w-full bg-cream-dark rounded-sm overflow-hidden mt-1">
-                                <div className="h-full bg-accent-green rounded-sm" style={{ width: `${scoreData.revenueScore}%` }} />
+                              <div className="h-1.5 w-full bg-white/[0.05] rounded-full overflow-hidden mt-1">
+                                <div className="h-full rounded-full" style={{ width: `${scoreData.revenueScore}%`, background: "linear-gradient(90deg, #ffa726 0%, #ff9800 100%)" }} />
                               </div>
-                              <p className="text-[11px] text-ink-light mt-1 leading-relaxed">{scoreData.revenueReason}</p>
+                              <p className="text-[11px] text-[#a1a1aa] mt-1 leading-relaxed">{scoreData.revenueReason}</p>
                             </div>
-
+ 
                             {/* Execution Score */}
                             <div className="score-pillar-row">
                               <div className="flex justify-between items-center text-xs font-semibold">
-                                <span className="text-ink">Execution Score (20% Weight)</span>
-                                <span className="text-ink font-mono">{scoreData.executionScore}/100</span>
+                                <span className="text-white">Execution Score (20% Weight)</span>
+                                <span className="text-white font-mono">{scoreData.executionScore}/100</span>
                               </div>
-                              <div className="h-2 w-full bg-cream-dark rounded-sm overflow-hidden mt-1">
-                                <div className="h-full bg-accent-orange rounded-sm" style={{ width: `${scoreData.executionScore}%` }} />
+                              <div className="h-1.5 w-full bg-white/[0.05] rounded-full overflow-hidden mt-1">
+                                <div className="h-full rounded-full" style={{ width: `${scoreData.executionScore}%`, background: "linear-gradient(90deg, #ff9800 0%, #fb8c00 100%)" }} />
                               </div>
-                              <p className="text-[11px] text-ink-light mt-1 leading-relaxed">{scoreData.executionReason}</p>
+                              <p className="text-[11px] text-[#a1a1aa] mt-1 leading-relaxed">{scoreData.executionReason}</p>
                             </div>
-
+ 
                             {/* Competition Score */}
                             <div className="score-pillar-row">
                               <div className="flex justify-between items-center text-xs font-semibold">
-                                <span className="text-ink">Competition Score (15% Weight)</span>
-                                <span className="text-ink font-mono">{scoreData.competitionScore}/100</span>
+                                <span className="text-white">Competition Score (15% Weight)</span>
+                                <span className="text-white font-mono">{scoreData.competitionScore}/100</span>
                               </div>
-                              <div className="h-2 w-full bg-cream-dark rounded-sm overflow-hidden mt-1">
-                                <div className="h-full bg-accent-pink rounded-sm" style={{ width: `${scoreData.competitionScore}%` }} />
+                              <div className="h-1.5 w-full bg-white/[0.05] rounded-full overflow-hidden mt-1">
+                                <div className="h-full rounded-full" style={{ width: `${scoreData.competitionScore}%`, background: "linear-gradient(90deg, #fb8c00 0%, #f57c00 100%)" }} />
                               </div>
-                              <p className="text-[11px] text-ink-light mt-1 leading-relaxed">{scoreData.competitionReason}</p>
+                              <p className="text-[11px] text-[#a1a1aa] mt-1 leading-relaxed">{scoreData.competitionReason}</p>
                             </div>
-
+ 
                             {/* Risk Score */}
                             <div className="score-pillar-row">
                               <div className="flex justify-between items-center text-xs font-semibold">
-                                <span className="text-ink">Risk Mitigation Score (10% Weight)</span>
-                                <span className="text-ink font-mono">{scoreData.riskScore}/100</span>
+                                <span className="text-white">Risk Mitigation Score (10% Weight)</span>
+                                <span className="text-white font-mono">{scoreData.riskScore}/100</span>
                               </div>
-                              <div className="h-2 w-full bg-cream-dark rounded-sm overflow-hidden mt-1">
-                                <div className="h-full bg-accent-red rounded-sm" style={{ width: `${scoreData.riskScore}%` }} />
+                              <div className="h-1.5 w-full bg-white/[0.05] rounded-full overflow-hidden mt-1">
+                                <div className="h-full rounded-full" style={{ width: `${scoreData.riskScore}%`, background: "linear-gradient(90deg, #f57c00 0%, #e65100 100%)" }} />
                               </div>
-                              <p className="text-[11px] text-ink-light mt-1 leading-relaxed">{scoreData.riskReason}</p>
+                              <p className="text-[11px] text-[#a1a1aa] mt-1 leading-relaxed">{scoreData.riskReason}</p>
                             </div>
                           </div>
                         </div>
                       </div>
-
-                      <div className="pt-4 border-t border-border-light flex flex-col gap-4">
+ 
+                      <div className="pt-4 border-t border-white/[0.06] flex flex-col gap-4">
                         <div>
-                          <h4 className="text-[10px] font-mono tracking-widest uppercase text-ink mb-1.5">Score Calculation Walkthrough</h4>
-                          <p className="text-xs text-ink-light leading-relaxed bg-cream-dark/30 p-3.5 rounded border border-border-light">
+                          <h4 className="text-[10px] font-mono tracking-widest uppercase text-[#a1a1aa] mb-1.5">Score Calculation Walkthrough</h4>
+                          <p className="text-xs text-[#d4d4d8] leading-relaxed bg-white/[0.015] border border-white/[0.04] p-4 rounded-xl">
                             {scoreData.calculationExplanation}
                           </p>
                         </div>
                         
-                        <div className="bg-[#1A1A1A] text-white p-3.5 rounded font-mono text-[11px] flex flex-col gap-1.5 border border-black shadow">
-                          <span className="text-accent-yellow font-bold">// Weighted Formula Computation</span>
+                        <div className="bg-black/40 border border-white/[0.05] p-4 rounded-xl font-mono text-[11px] flex flex-col gap-1.5 shadow">
+                          <span className="text-[#FF8A00] font-bold">// Weighted Formula Computation</span>
                           <span className="text-gray-300">Startup Score = (Market × 30%) + (Revenue × 25%) + (Execution × 20%) + (Competition × 15%) + (Risk × 10%)</span>
                           <span className="text-gray-400">Startup Score = ({scoreData.marketScore} × 0.30) + ({scoreData.revenueScore} × 0.25) + ({scoreData.executionScore} × 0.20) + ({scoreData.competitionScore} × 0.15) + ({scoreData.riskScore} × 0.10)</span>
-                          <span className="text-accent-yellow font-bold">Startup Score = {((scoreData.marketScore || 0) * 0.30).toFixed(1)} + {((scoreData.revenueScore || 0) * 0.25).toFixed(1)} + {((scoreData.executionScore || 0) * 0.20).toFixed(1)} + {((scoreData.competitionScore || 0) * 0.15).toFixed(1)} + {((scoreData.riskScore || 0) * 0.10).toFixed(1)} = {scoreData.startupScore}</span>
+                          <span className="text-[#FF8A00] font-bold">Startup Score = {((scoreData.marketScore || 0) * 0.30).toFixed(1)} + {((scoreData.revenueScore || 0) * 0.25).toFixed(1)} + {((scoreData.executionScore || 0) * 0.20).toFixed(1)} + {((scoreData.competitionScore || 0) * 0.15).toFixed(1)} + {((scoreData.riskScore || 0) * 0.10).toFixed(1)} = {scoreData.startupScore}</span>
                         </div>
-
+ 
                         <div className="flex flex-col gap-1.5">
-                          <h4 className="text-[10px] font-mono tracking-widest uppercase text-ink">Main Recommendations</h4>
-                          <p className="text-xs text-ink-light leading-relaxed bg-[#F5F0E8] p-3 rounded border border-border-light recommendations-box">{scoreData.recommendation}</p>
+                          <h4 className="text-[10px] font-mono tracking-widest uppercase text-[#a1a1aa] mb-1">Main Recommendations</h4>
+                          <p className="text-xs text-[#d4d4d8] leading-relaxed bg-[#FF8A00]/[0.02] border border-[#FF8A00]/10 p-4 rounded-xl">{scoreData.recommendation}</p>
                         </div>
                       </div>
                     </div>
                   )}
-                </section>
-
+                </motion.section>
+ 
                 {/* Business Breakdown — 3 compact charts */}
-                <section className="editorial-card p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="section-number section-number-blue" style={{ fontFamily: 'var(--font-heading)' }}>04</span>
-                    <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Business Breakdown</h2>
+                <motion.section 
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15, duration: 0.4 }}
+                  className="editorial-card p-5"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="w-8 h-8 rounded-full bg-[#FF8A00] text-black flex items-center justify-center font-mono font-bold text-xs">04</span>
+                    <h2 className="text-lg font-bold text-white">Business Breakdown</h2>
                   </div>
                   <BusinessBreakdownCharts results={results} />
-                </section>
-
-                {/* Full Compiled Report — compact single rendering */}
-                <section className="editorial-card overflow-hidden">
-                  <div className="p-4 flex items-center justify-between" style={{ borderBottom: '2px solid var(--border)', background: 'var(--cream-dark)' }}>
-                    <div className="flex items-center gap-2">
-                      <span className="section-number section-number-orange" style={{ fontFamily: 'var(--font-heading)' }}>05</span>
-                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Detailed Analysis</h2>
+                </motion.section>
+ 
+                {/* Full Compiled Report — Accordion Rendering */}
+                <motion.section 
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.4 }}
+                  className="editorial-card overflow-hidden border border-white/[0.08]"
+                >
+                  <div className="p-5 flex items-center justify-between border-b border-white/[0.06] bg-white/[0.01]">
+                    <div className="flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-full bg-[#FF8A00] text-black flex items-center justify-center font-mono font-bold text-xs">05</span>
+                      <h2 className="text-lg font-bold text-white">Detailed Analysis</h2>
                     </div>
-                    <button onClick={downloadPackage} className="btn-secondary px-3 py-1.5 flex items-center gap-1.5 text-[10px]">
+                    <button onClick={downloadPackage} className="dashboard-action-btn dashboard-action-btn-secondary px-3 py-1.5 h-auto text-[10px]">
                       <FileDown className="w-3 h-3" />
                       <span>Download .md</span>
                     </button>
                   </div>
-                  <div className="p-4 print:p-3">
-                    <div className="flex flex-col gap-4">
-                      {AGENTS.map((agent, i) => {
-                        const agentResult = results[agent.id];
-                        return (
-                          <div key={agent.id} className="agent-output-block">
-                            <div className="flex items-center gap-2 mb-2 pb-1.5" style={{ borderBottom: '1px solid var(--border-light)' }}>
-                              <span className="text-sm font-bold" style={{ fontFamily: 'var(--font-heading)', color: agent.color }}>
+                  <div className="p-5 print:p-3 flex flex-col gap-2">
+                    {AGENTS.map((agent, i) => {
+                      const agentResult = results[agent.id];
+                      const isExpanded = expandedAgentId === agent.id;
+                      
+                      return (
+                        <div key={agent.id} className="analysis-accordion-item">
+                          <button 
+                            onClick={() => setExpandedAgentId(isExpanded ? null : agent.id)}
+                            className="analysis-accordion-header"
+                          >
+                            <div className="flex items-center gap-2 text-left">
+                              <span className="text-[11px] font-mono text-[#a1a1aa] w-5">
                                 {String(i + 1).padStart(2, '0')}
                               </span>
-                              <span className="text-sm font-bold inline-flex items-center gap-1.5" style={{ color: 'var(--ink)' }}>
+                              <div className="flex items-center gap-2">
                                 <AgentIcon Icon={agent.Icon} color={agent.color} size={14} />
-                                {agent.name}
-                              </span>
-                              <span className="text-[9px] uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)' }}>— {agent.role}</span>
+                                <span className="text-sm font-bold text-white">{agent.name}</span>
+                              </div>
+                              <span className="text-[10px] font-mono uppercase tracking-widest text-[#a1a1aa] hidden sm:inline-block ml-2">— {agent.role}</span>
                             </div>
-                            {agentResult ? (
-                              <div
-                                className="markdown-content markdown-compact print:text-black text-xs"
-                                dangerouslySetInnerHTML={{ __html: renderMarkdown(agentResult) }}
-                              />
-                            ) : (
-                              <p className="text-xs italic" style={{ color: 'var(--ink-muted)' }}>No output generated.</p>
+                            <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? "rotate-90 text-[#FF8A00]" : "text-[#a1a1aa]"}`} />
+                          </button>
+                          
+                          <AnimatePresence initial={false}>
+                            {isExpanded && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.25, ease: "easeInOut" }}
+                                className="overflow-hidden"
+                              >
+                                <div className="analysis-accordion-content pt-4">
+                                  {agentResult ? (
+                                    <div
+                                      className="markdown-content markdown-compact print:text-black text-xs text-[#d4d4d8]"
+                                      dangerouslySetInnerHTML={{ __html: renderMarkdown(agentResult) }}
+                                    />
+                                  ) : (
+                                    <p className="text-xs italic text-[#a1a1aa]">No output generated yet.</p>
+                                  )}
+                                </div>
+                              </motion.div>
                             )}
-                          </div>
-                        );
-                      })}
-                    </div>
+                          </AnimatePresence>
+                        </div>
+                      );
+                    })}
                   </div>
-                </section>
+                </motion.section>
               </div>
               </>
               )}
