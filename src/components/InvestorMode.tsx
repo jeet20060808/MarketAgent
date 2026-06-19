@@ -290,24 +290,49 @@ export function InvestorMode({
         </div>
       </div>
 
-      <div className="flex-1 max-w-7xl mx-auto w-full p-6 md:p-8 flex flex-col xl:flex-row gap-8">
+      <div className="flex-1 max-w-7xl mx-auto w-full p-6 md:p-8 flex flex-col xl:flex-row gap-8" style={{ background: 'transparent' }}>
         
         {/* Main Pitch Cards Grid */}
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="flex-1 flex flex-col gap-4">
           {slides.map((slide, i) => (
-            <div key={slide.id} className="bg-white rounded-2xl p-5 border border-zinc-200 shadow-sm flex flex-col hover:shadow-md transition-shadow">
+            <div
+              key={slide.id}
+              className="rounded-2xl p-5 flex flex-col transition-all duration-300"
+              style={{
+                background: '#0d0d0c',
+                border: '1px solid rgba(255, 138, 0, 0.12)',
+                boxShadow: '0 4px 24px rgba(0,0,0,0.4), 0 0 8px rgba(255,138,0,0.03)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255, 138, 0, 0.35)';
+                e.currentTarget.style.boxShadow = '0 12px 36px rgba(255,138,0,0.1), 0 0 16px rgba(255,138,0,0.04)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255, 138, 0, 0.12)';
+                e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4), 0 0 8px rgba(255,138,0,0.03)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-zinc-50 border border-zinc-100" style={{ color: slide.color }}>
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{
+                    background: `${slide.color}15`,
+                    border: `1px solid ${slide.color}30`,
+                    color: slide.color,
+                  }}
+                >
                   <slide.icon className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-mono font-bold text-zinc-400">SLIDE {String(i+1).padStart(2, '0')}</span>
-                  <h3 className="text-sm font-bold text-zinc-900">{slide.title}</h3>
+                  <span className="text-[10px] font-mono font-bold text-zinc-500">SLIDE {String(i+1).padStart(2, '0')}</span>
+                  <h3 className="text-sm font-bold text-white">{slide.title}</h3>
                 </div>
               </div>
-              <div className="flex-1 overflow-y-auto pr-1">
+              <div className="overflow-y-auto pr-1">
                 <div 
-                  className="text-xs text-zinc-600 prose prose-sm max-w-none"
+                  className="text-xs text-zinc-400 prose prose-sm prose-invert max-w-none"
                   dangerouslySetInnerHTML={{ __html: renderMarkdown(slide.content) }}
                 />
               </div>
