@@ -1,5 +1,8 @@
 "use client";
-
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import ArrowButton from "@/components/ArrowButton";
+import { useRouter } from "next/navigation";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -1050,15 +1053,44 @@ export default function Home() {
 
   return (
     <div className="landing-shell min-h-screen bg-[#f5ebe4] p-3 md:p-5 flex items-center justify-center">
+        {/* Button */}
+  <div className="fixed top-16 left-16 z-[99999]">
+    <ArrowButton />
+  </div>
       <div className="landing-window relative w-full max-w-[1440px] min-h-[calc(100vh-24px)] md:min-h-[calc(100vh-40px)] bg-[#f5dccb] border-[10px] border-[#adacaa] rounded-[28px] md:rounded-[36px] overflow-hidden flex flex-col shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)]">
         <div className="absolute inset-0 z-0 opacity-70 pointer-events-none">
-          <Aurora
+        <div className="absolute top-6 left-6 z-20">
+      {/* <Link
+        href="/"
+        className="
+          flex items-center gap-2
+          px-4 py-2 mt-6
+          rounded-full
+          border border-[#D9B08C]
+          bg-[#F5E2D3]/90
+          text-black
+          hover:scale-105
+          transition-all
+        "
+      >
+        <ArrowLeft size={16} />
+        Back
+      </Link> */}
+    
+      
+    </div>
+
+          {/* <Aurora
             colorStops={["#FF8A00", "#FFB347", "#FFD6A5"]}
             blend={0.45}
             amplitude={1.2}
             speed={0.4}
-          />
-        </div>
+          /> */}
+<img
+  src="/landing/search1.jpeg"
+  alt="search"
+  className="w-full h-full object-cover opacity-50"
+/>        </div>
         
         <div className="relative z-10 flex-1 flex flex-col overflow-y-auto" style={{ color: 'var(--foreground)', fontFamily: 'var(--font-body)' }}>
       
@@ -1094,17 +1126,21 @@ export default function Home() {
               transition={{ duration: 0.4 }}
               className="max-w-4xl mx-auto w-full px-6 py-16 flex flex-col items-center justify-center min-h-[85vh]"
             >
+              
               {/* Headline */}
-              <h1 className="text-3xl sm:text-4xl text-center tracking-tight leading-tight mb-3" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>
-                What&apos;s on the agenda today?
-              </h1>
+              <h1
+  className="text-3xl sm:text-4xl text-center tracking-tight leading-tight mb-3 relative -mt-15 text-center"
+  style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}
+>
+  What&apos;s on the agenda today?
+</h1>
 
-              <p className="text-center text-sm max-w-lg mb-8" style={{ color: 'var(--ink-muted)' }}>
+              {/* <p className="text-center text-sm max-w-lg mb-8" style={{ color: 'var(--ink-muted)' }}>
                 Describe your startup idea or attach context files. Eight specialized agents will compile your unified package.
-              </p>
+              </p> */}
 
               {/* Chat-style composer */}
-              <div className="w-full max-w-3xl">
+              <div className="w-full max-w-3xl mt-50">
                 <div
                   className={`chat-composer${isDragging ? " chat-composer-dragging" : ""}`}
                   onDragOver={onDragOver}

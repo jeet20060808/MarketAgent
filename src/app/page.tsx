@@ -4,9 +4,11 @@ import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ChevronsRight, Plus } from "lucide-react";
+import { ChevronsRight, Menu, ChevronsLeft, Plus } from "lucide-react";
 import Aurora from "../components/Aurora/Aurora";
 import AgentsSection from "../components/AgentsSection";
+import WordSearch from "@/components/WordSearch";
+import AnimatedLogo from "@/components/AnimatedLogo";
 
 const float = (
   delay = 0,
@@ -209,22 +211,19 @@ function FloatingBubbles() {
   >([]);
 
   React.useEffect(() => {
-    const t = setTimeout(() => {
-      setBubbles(
-        Array.from({ length: 15 }, () => {
-          const size = 10 + Math.random() * 30;
-          return {
-            size,
-            left: `${Math.random() * 100}%`,
-            top: `${100 + Math.random() * 20}%`,
-            xDrift: [0, Math.random() * 40 - 20, Math.random() * 40 - 20],
-            duration: 8 + Math.random() * 5,
-            delay: Math.random() * 8,
-          };
-        })
-      );
-    }, 0);
-    return () => clearTimeout(t);
+    setBubbles(
+      Array.from({ length: 15 }, () => {
+        const size = 10 + Math.random() * 30;
+        return {
+          size,
+          left: `${Math.random() * 100}%`,
+          top: `${100 + Math.random() * 20}%`,
+          xDrift: [0, Math.random() * 40 - 20, Math.random() * 40 - 20],
+          duration: 8 + Math.random() * 5,
+          delay: Math.random() * 8,
+        };
+      })
+    );
   }, []);
 
   if (bubbles.length === 0) return null;
@@ -273,36 +272,29 @@ export default function LandingPage() {
     />
   </div>
 
+  {/* Animated grid overlay — fades bottom to top */}
+  <div className="landing-grid-bg z-[1]" />
+
   {/* rest of your content */}
       <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
 
-<span className="landing-pixel-text absolute left-[2%] top-[62%] text-white opacity-100 leading-none z-[50]">
+<span className="landing-pixel-text absolute left-[2%] top-[55%] text-white opacity-100 leading-none z-[50]">
   AXORA
 </span>
 
-<span className="landing-pixel-text absolute right-[2%] top-[72%] text-white opacity-100 leading-none z-[1]">
+<span className="landing-pixel-text absolute right-[2%] top-[68%] text-white opacity-100 leading-none z-[1]">
   AGENT
 </span>
 
 </div>
 
-        <header className="relative z-40 flex items-center justify-between px-6 md:px-10 pt-6 md:pt-8">
+        <header className="relative z-40 flex items-start justify-between px-6 md:px-10 pt-6 md:pt-8">
           <div className="flex items-center gap-2.5">
-            <PixelLogo />
+            <AnimatedLogo />
             <span className="landing-heading font-bold text-lg md:text-xl tracking-tight text-[#1a1a1a]">
               AXORA AI
             </span>
           </div>
-
-          <Link
-            href="/dashboard"
-            className="landing-heading bg-[#FF8A00] text-[#1a1a1a] font-bold text-[13px] pl-5 pr-1.5 py-1.5 rounded-xl flex items-center gap-3 hover:bg-[#e07d00] transition-colors group shadow-sm"
-          >
-            <span>START NOW</span>
-            <div className="bg-white text-[#1a1a1a] p-2 rounded-lg">
-              <ChevronsRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" strokeWidth={2.5} />
-            </div>
-          </Link>
 
         </header>
 
@@ -465,7 +457,28 @@ height={105}
             /> */}
           </div>
 
-
+          <div className="absolute left-6 md:left-20 bottom-[3%] md:bottom-[4%] z-30 max-w-[340px]">
+            {/* <p className="text-[13px] md:text-sm font-semibold text-[#4a4a4a] leading-relaxed mb-5">
+              We deploy AI agents that automate market research, validate ideas, draft PRDs, and architect go-to-market strategies.
+            </p> */}
+            <div className="flex items-center gap-3 flex-wrap">
+              <Link
+                href="/dashboard"
+                className="landing-heading bg-[#FF8A00] text-[#1a1a1a] font-bold text-[13px] pl-5 pr-1.5 py-1.5 rounded-xl flex items-center gap-3 hover:bg-black hover:text-white transition-all duration-300 group shadow-sm"
+              >
+                <span>START NOW</span>
+                <div className="bg-white text-[#1a1a1a] p-2 rounded-lg transition-colors duration-300 group-hover:bg-[#FF8A00] group-hover:text-white">
+                  <ChevronsRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" strokeWidth={2.5} />
+                </div>
+              </Link>
+              {/* <Link
+                href="/dashboard"
+                className="landing-heading bg-[#d4d4d4] text-[#1a1a1a] font-bold text-[13px] px-5 py-3.5 rounded-xl hover:bg-[#c8c8c8] transition-colors shadow-sm border border-[#bbb]"
+              >
+                VIEW DEMO
+              </Link> */}
+            </div>
+          </div>
 
           <div className="absolute right-6 md:right-10 bottom-[16%] md:bottom-[14%] z-30 max-w-[220px] text-right hidden sm:block">
             {/* <p className="text-[13px] font-semibold text-[#4a4a4a] leading-relaxed">
@@ -488,6 +501,60 @@ height={105}
 <div className="mt-6">
   <AgentsSection />
 </div>
+<section className="mt-6">
+  <div className="relative w-full bg-[#f5dccb] border-[10px] border-[#adacaa] rounded-[36px] overflow-hidden py-24">
+    
+    {/* Grid Background */}
+    <div className="ws-grid-bg" />
+
+    {/* Bottom Orange Gradient */}
+    <div className="ws-bottom-gradient" />
+
+    <div className="relative z-10">
+      <motion.h2
+        initial={{ opacity: 0, y: 80 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{
+          duration: 0.8,
+          ease: "easeOut",
+        }}
+        className="font-heading text-6xl font-bold text-black mb-6 text-center"
+      >
+        Build With Ideas
+      </motion.h2>
+
+      <motion.p
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.3 }}
+        className="font-heading text-lg text-black max-w-2xl mx-auto text-center mb-16"
+      >
+        AI Founder OS deploys specialized agents across every business function.
+      </motion.p>
+
+      <WordSearch />
+    </div>
+
+    {/* Floating Robot in the bottom right corner of the box */}
+    <div className="hidden md:block">
+      <FloatingDevice
+        src="/landing/wr.png"
+        alt="Agent Robot"
+        width={520}
+        height={570}
+        x="84%"
+        y="75%"
+        zIndex={20}
+        delay={0.4}
+        duration={4.5}
+        distance={12}
+      />
+    </div>
+
+  </div>
+</section>
 </div> 
   );
 }

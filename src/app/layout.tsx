@@ -37,6 +37,8 @@ export const metadata: Metadata = {
     "Turn a single startup idea into a validated plan, market research, PRD, architecture, and marketing strategy — powered by 6 specialized AI agents working in sequence.",
 };
 
+import SplashScreen from "@/components/SplashScreen";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -44,7 +46,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${dmSerif.variable} ${ibmPlexMono.variable} ${spaceGrotesk.variable} ${pixelifySans.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <SplashScreen />
+        {children}
+      </body>
     </html>
   );
 }
