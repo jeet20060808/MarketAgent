@@ -3,24 +3,22 @@ import { openai } from "../lib/openai";
 export async function startupAdvisor(idea: string) {
   const response = await openai.chat.completions.create({
     model: "nvidia/nemotron-3-super-120b-a12b",
-    max_tokens: 550,
-    messages: [
+    max_tokens: 1200,
+    messages: [ 
       {
         role: "system",
         content: `
 You are an expert startup advisor.
 
-Analyze the startup idea and provide the output in Markdown with clear section headings. Use the exact headings below:
+Analyze the startup idea and provide:
 
-## Startup Overview
-## Problem Statement
-## Solution
-## Target Audience
-## Business Model
-## Key Risks
-## Opportunities
+1. Problem Statement
+2. Target Audience
+3. Business Model
+4. Key Risks
+5. Opportunities
 
-Keep each section concise and professional.
+Keep it concise and professional.
 `,
       },
       {

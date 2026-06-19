@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ChevronsRight, Menu, ChevronsLeft, Plus } from "lucide-react";
+import { ChevronsRight, Plus } from "lucide-react";
 import Aurora from "../components/Aurora/Aurora";
 import AgentsSection from "../components/AgentsSection";
 
@@ -209,19 +209,22 @@ function FloatingBubbles() {
   >([]);
 
   React.useEffect(() => {
-    setBubbles(
-      Array.from({ length: 15 }, () => {
-        const size = 10 + Math.random() * 30;
-        return {
-          size,
-          left: `${Math.random() * 100}%`,
-          top: `${100 + Math.random() * 20}%`,
-          xDrift: [0, Math.random() * 40 - 20, Math.random() * 40 - 20],
-          duration: 8 + Math.random() * 5,
-          delay: Math.random() * 8,
-        };
-      })
-    );
+    const t = setTimeout(() => {
+      setBubbles(
+        Array.from({ length: 15 }, () => {
+          const size = 10 + Math.random() * 30;
+          return {
+            size,
+            left: `${Math.random() * 100}%`,
+            top: `${100 + Math.random() * 20}%`,
+            xDrift: [0, Math.random() * 40 - 20, Math.random() * 40 - 20],
+            duration: 8 + Math.random() * 5,
+            delay: Math.random() * 8,
+          };
+        })
+      );
+    }, 0);
+    return () => clearTimeout(t);
   }, []);
 
   if (bubbles.length === 0) return null;
@@ -273,23 +276,33 @@ export default function LandingPage() {
   {/* rest of your content */}
       <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
 
-<span className="landing-pixel-text absolute left-[2%] top-[55%] text-white opacity-100 leading-none z-[50]">
+<span className="landing-pixel-text absolute left-[2%] top-[62%] text-white opacity-100 leading-none z-[50]">
   AXORA
 </span>
 
-<span className="landing-pixel-text absolute right-[2%] top-[68%] text-white opacity-100 leading-none z-[1]">
+<span className="landing-pixel-text absolute right-[2%] top-[72%] text-white opacity-100 leading-none z-[1]">
   AGENT
 </span>
 
 </div>
 
-        <header className="relative z-40 flex items-start justify-between px-6 md:px-10 pt-6 md:pt-8">
+        <header className="relative z-40 flex items-center justify-between px-6 md:px-10 pt-6 md:pt-8">
           <div className="flex items-center gap-2.5">
             <PixelLogo />
             <span className="landing-heading font-bold text-lg md:text-xl tracking-tight text-[#1a1a1a]">
               AXORA AI
             </span>
           </div>
+
+          <Link
+            href="/dashboard"
+            className="landing-heading bg-[#FF8A00] text-[#1a1a1a] font-bold text-[13px] pl-5 pr-1.5 py-1.5 rounded-xl flex items-center gap-3 hover:bg-[#e07d00] transition-colors group shadow-sm"
+          >
+            <span>START NOW</span>
+            <div className="bg-white text-[#1a1a1a] p-2 rounded-lg">
+              <ChevronsRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" strokeWidth={2.5} />
+            </div>
+          </Link>
 
         </header>
 
@@ -452,28 +465,7 @@ height={105}
             /> */}
           </div>
 
-          <div className="absolute left-6 md:left-10 bottom-[2%] md:bottom-[2%] z-30 max-w-[340px]">
-            {/* <p className="text-[13px] md:text-sm font-semibold text-[#4a4a4a] leading-relaxed mb-5">
-              We deploy AI agents that automate market research, validate ideas, draft PRDs, and architect go-to-market strategies.
-            </p> */}
-            <div className="flex items-center gap-3 flex-wrap">
-              <Link
-                href="/dashboard"
-                className="landing-heading bg-[#FF8A00] text-[#1a1a1a] font-bold text-[13px] pl-5 pr-1.5 py-1.5 rounded-xl flex items-center gap-3 hover:bg-[#e07d00] transition-colors group shadow-sm"
-              >
-                <span>START NOW</span>
-                <div className="bg-white text-[#1a1a1a] p-2 rounded-lg">
-                  <ChevronsRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" strokeWidth={2.5} />
-                </div>
-              </Link>
-              {/* <Link
-                href="/dashboard"
-                className="landing-heading bg-[#d4d4d4] text-[#1a1a1a] font-bold text-[13px] px-5 py-3.5 rounded-xl hover:bg-[#c8c8c8] transition-colors shadow-sm border border-[#bbb]"
-              >
-                VIEW DEMO
-              </Link> */}
-            </div>
-          </div>
+
 
           <div className="absolute right-6 md:right-10 bottom-[16%] md:bottom-[14%] z-30 max-w-[220px] text-right hidden sm:block">
             {/* <p className="text-[13px] font-semibold text-[#4a4a4a] leading-relaxed">

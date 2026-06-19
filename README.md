@@ -34,8 +34,8 @@ Each agent is fully equipped with context-driven tools to execute their specific
 - **⚡ Unified Document Workspace**: All agent reports stream sequentially into a single frame, providing a cohesive startup blueprint without needing tabbed navigation.
 - **📂 File Tool Dropzone**: Upload raw business plans, competitor spreadsheets, existing mock PRDs, or startup idea PDFs to act as additional context for agent prompts.
 - **📟 Automated Tool Logs Console**: Live terminal emulation displaying active system tool triggers (`Search Tool`, `GitHub Tool`, `Notion Tool`, `PDF Tool`, `File Tool`) during agent execution.
-- **📄 PDF Export Utility**: Integrated browser print styling (`@media print`) that strips out UI containers and navigation to generate a high-contrast, clean-layout PDF report.
-- **✨ Professional Aesthetics**: Cinematic dark theme built with TailwindCSS, smooth Framer Motion transitions, glowing inputs, custom CSS animations, and canvas confetti indicators on success.
+- **📄 Custom PDF Report Export**: High-fidelity `@media print` CSS configurations that hide executive summary containers and focus purely on generating the **Full Detailed Analysis** report starting directly from page 1.
+- **✨ Premium Dark Theme Pitch Startup**: The Pitch Deck (Investor Mode) features a high-end dark theme matching the consolidated report aesthetics, with dynamically sizing slide boxes that expand naturally based on their contents to eliminate scrollbars.
 
 ---
 

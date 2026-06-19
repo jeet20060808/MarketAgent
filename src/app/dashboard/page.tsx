@@ -9,10 +9,8 @@ import {
   FileText, 
   X, 
   CheckCircle2, 
-  ArrowRight,
   RefreshCw,
   Download,
-  Terminal,
   GitBranch,
   Copy,
   ChevronRight,
@@ -36,6 +34,26 @@ import {
 import confetti from "canvas-confetti";
 import { InvestorMode } from "@/components/InvestorMode";
 import Aurora from "@/components/Aurora/Aurora";
+
+interface ISpeechRecognition {
+  lang: string;
+  interimResults: boolean;
+  maxAlternatives: number;
+  continuous: boolean;
+  onstart: (() => void) | null;
+  onend: (() => void) | null;
+  onerror: ((event: { error: string; message?: string }) => void) | null;
+  onresult: ((event: {
+    results: {
+      isFinal: boolean;
+      0: {
+        transcript: string;
+      };
+    }[];
+  }) => void) | null;
+  start: () => void;
+  stop: () => void;
+}
 
 // ── Agent Configurations ──
 export interface AgentConfig {
@@ -351,7 +369,7 @@ function extractPrdSection(text: string | null, keywords: string[], fallbackTitl
   if (!text) return "";
   const lines = text.split("\n");
   let capturing = false;
-  let content: string[] = [];
+  const content: string[] = [];
   
   for (const line of lines) {
     const cleanLine = line.trim();
@@ -478,15 +496,15 @@ const PILLAR_BARS = [
 
 function DonutChart({ segments, size = 96 }: { segments: typeof BREAKDOWN_SEGMENTS; size?: number }) {
   const total = segments.reduce((sum, s) => sum + s.value, 0);
-  let cumulative = 0;
   const cx = 50, cy = 50, r = 38, ir = 24;
 
   const paths = segments.map((seg, i) => {
-    const startAngle = cumulative;
+    const previousSegments = segments.slice(0, i);
+    const startAngle = (previousSegments.reduce((sum, s) => sum + s.value, 0) / total) * 360;
     const sliceAngle = (seg.value / total) * 360;
-    cumulative += sliceAngle;
+    const endAngle = startAngle + sliceAngle;
     const startRad = (startAngle - 90) * (Math.PI / 180);
-    const endRad = (cumulative - 90) * (Math.PI / 180);
+    const endRad = (endAngle - 90) * (Math.PI / 180);
     const x1o = cx + r * Math.cos(startRad), y1o = cy + r * Math.sin(startRad);
     const x2o = cx + r * Math.cos(endRad), y2o = cy + r * Math.sin(endRad);
     const x1i = cx + ir * Math.cos(endRad), y1i = cy + ir * Math.sin(endRad);
@@ -550,9 +568,9 @@ function AnimatedScore({ value, duration = 1500 }: { value: number; duration?: n
   useEffect(() => {
     let start = 0;
     const end = value;
-    if (start === end) {
-      setDisplayValue(end);
-      return;
+    if (end === 0) {
+      const t = setTimeout(() => setDisplayValue(0), 0);
+      return () => clearTimeout(t);
     }
 
     const totalMiliseconds = duration;
@@ -625,7 +643,6 @@ export default function Home() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [completedAgents, setCompletedAgents] = useState<string[]>([]);
-  const [activeRollingIndex, setActiveRollingIndex] = useState(0);
   const [results, setResults] = useState<AgentResults>({});
   const [toolLogs, setToolLogs] = useState<string[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -635,7 +652,7 @@ export default function Home() {
   const [isRecording, setIsRecording] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<ISpeechRecognition | null>(null);
   const processingRef = useRef(false);
 
   // ── Scoring Engine States ──
@@ -653,13 +670,13 @@ export default function Home() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = (window as unknown as { SpeechRecognition?: new () => ISpeechRecognition; webkitSpeechRecognition?: new () => ISpeechRecognition }).SpeechRecognition || (window as unknown as { SpeechRecognition?: new () => ISpeechRecognition; webkitSpeechRecognition?: new () => ISpeechRecognition }).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      setSpeechSupported(false);
-      return;
+      const t = setTimeout(() => setSpeechSupported(false), 0);
+      return () => clearTimeout(t);
     }
 
-    setSpeechSupported(true);
+    const t = setTimeout(() => setSpeechSupported(true), 0);
     const recognition = new SpeechRecognition();
     recognition.lang = "en-US";
     recognition.interimResults = true;
@@ -668,24 +685,27 @@ export default function Home() {
 
     recognition.onstart = () => setIsRecording(true);
     recognition.onend = () => setIsRecording(false);
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event: { error: string; message?: string }) => {
       const errorType = event?.error ?? event?.message ?? "unknown";
-      // Permission errors are common when users deny microphone access — handle quietly
-      if (errorType === "not-allowed" || errorType === "service-not-allowed" || errorType === "permission-denied") {
-        console.warn("Speech recognition permission denied:", errorType);
+      if (["not-allowed", "service-not-allowed", "permission-denied"].includes(errorType)) {
         setIsRecording(false);
         setSpeechSupported(false);
         return;
       }
-
-      console.error("Speech recognition error:", errorType, event);
       setIsRecording(false);
     };
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: {
+      results: {
+        isFinal: boolean;
+        0: {
+          transcript: string;
+        };
+      }[];
+    }) => {
       const transcript = Array.from(event.results || [])
-        .filter((result: any) => result.isFinal)
-        .map((result: any) => result[0]?.transcript ?? "")
+        .filter((result) => result.isFinal)
+        .map((result) => result[0]?.transcript ?? "")
         .join(" ")
         .trim();
 
@@ -693,11 +713,11 @@ export default function Home() {
       setIdea((prev) => `${prev.trim()}${prev.trim() ? " " : ""}${transcript}`);
     };
 
-    recognitionRef.current = recognition;
+    recognitionRef.current = recognition as ISpeechRecognition;
 
     return () => {
-      recognition.stop?.();
-      recognitionRef.current = null;
+      clearTimeout(t);
+      recognitionRef.current?.stop?.();
     };
   }, []);
 
@@ -736,17 +756,7 @@ export default function Home() {
     setToolLogs((prev) => [...prev, logs[stepIndex] || ""]);
   }, []);
 
-  // Rolling agent transition effect
-  useEffect(() => {
-    if (state !== "processing") return;
-    
-    const agentIds = AGENTS.map(a => a.id);
-    const currentCompleted = completedAgents.length;
-    
-    if (currentCompleted < agentIds.length) {
-      setActiveRollingIndex(currentCompleted);
-    }
-  }, [completedAgents, state]);
+  const activeRollingIndex = completedAgents.length;
 
   const revealAgentsProgressively = useCallback(() => {
     const agentIds = AGENTS.map((a) => a.id);
@@ -791,7 +801,6 @@ export default function Home() {
     processingRef.current = true;
 
     setCompletedAgents([]);
-    setActiveRollingIndex(0);
     setResults({});
     setToolLogs([]);
     setState("processing");
@@ -840,7 +849,6 @@ export default function Home() {
     setIdea("");
     setUploadedFiles([]);
     setCompletedAgents([]);
-    setActiveRollingIndex(0);
     setResults({});
     setToolLogs([]);
     setFileError(null);
@@ -1503,7 +1511,7 @@ export default function Home() {
               <div className="summary-report flex-1 max-w-4xl mx-auto w-full px-6 py-6 flex flex-col gap-4 print:p-4 print:gap-4">
                 
                 {/* Cover Header */}
-                <section className="editorial-card p-5 print:border print:border-gray-300">
+                <section className="editorial-card p-5 print:border print:border-gray-300 print:hidden">
                   <div className="flex items-center justify-between mb-4">
                     <div className="badge-pink">
                       <Rocket className="w-3 h-3" />
@@ -1526,7 +1534,7 @@ export default function Home() {
 
                 {/* Key Insights */}
                 {insights.length > 0 && (
-                  <section className="editorial-card p-4">
+                  <section className="editorial-card p-4 print:hidden">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="section-number section-number-yellow" style={{ fontFamily: 'var(--font-heading)' }}>01</span>
                       <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Key Insights</h2>
@@ -1547,7 +1555,7 @@ export default function Home() {
                 )}
 
                 {/* Agent Summary Table */}
-                <section className="editorial-card p-4">
+                <section className="editorial-card p-4 print:hidden">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="section-number section-number-pink" style={{ fontFamily: 'var(--font-heading)' }}>02</span>
                     <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Agent Summary</h2>
@@ -1606,7 +1614,7 @@ export default function Home() {
                 </section>
 
                 {/* Founder Snapshot Score */}
-                <section className="editorial-card p-5 relative overflow-hidden">
+                <section className="editorial-card p-5 relative overflow-hidden print:hidden">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <span className="section-number section-number-yellow" style={{ fontFamily: 'var(--font-heading)' }}>03</span>
@@ -1783,7 +1791,7 @@ export default function Home() {
                         </div>
                         
                         <div className="bg-[#1A1A1A] text-white p-3.5 rounded font-mono text-[11px] flex flex-col gap-1.5 border border-black shadow">
-                          <span className="text-accent-yellow font-bold">// Weighted Formula Computation</span>
+                          <span className="text-accent-yellow font-bold">Weighted Formula Computation</span>
                           <span className="text-gray-300">Startup Score = (Market × 30%) + (Revenue × 25%) + (Execution × 20%) + (Competition × 15%) + (Risk × 10%)</span>
                           <span className="text-gray-400">Startup Score = ({scoreData.marketScore} × 0.30) + ({scoreData.revenueScore} × 0.25) + ({scoreData.executionScore} × 0.20) + ({scoreData.competitionScore} × 0.15) + ({scoreData.riskScore} × 0.10)</span>
                           <span className="text-accent-yellow font-bold">Startup Score = {((scoreData.marketScore || 0) * 0.30).toFixed(1)} + {((scoreData.revenueScore || 0) * 0.25).toFixed(1)} + {((scoreData.executionScore || 0) * 0.20).toFixed(1)} + {((scoreData.competitionScore || 0) * 0.15).toFixed(1)} + {((scoreData.riskScore || 0) * 0.10).toFixed(1)} = {scoreData.startupScore}</span>
@@ -1799,7 +1807,7 @@ export default function Home() {
                 </section>
 
                 {/* Business Breakdown — 3 compact charts */}
-                <section className="editorial-card p-4">
+                <section className="editorial-card p-4 print:hidden">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="section-number section-number-blue" style={{ fontFamily: 'var(--font-heading)' }}>04</span>
                     <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Business Breakdown</h2>
@@ -1808,7 +1816,7 @@ export default function Home() {
                 </section>
 
                 {/* Full Compiled Report — compact single rendering */}
-                <section className="editorial-card overflow-hidden">
+                <section className="editorial-card overflow-hidden print:hidden">
                   <div className="p-4 flex items-center justify-between" style={{ borderBottom: '2px solid var(--border)', background: 'var(--cream-dark)' }}>
                     <div className="flex items-center gap-2">
                       <span className="section-number section-number-orange" style={{ fontFamily: 'var(--font-heading)' }}>05</span>
@@ -1852,6 +1860,40 @@ export default function Home() {
               </div>
               </>
               )}
+
+              {/* Print-only Full Detailed Analysis (Only visible when printing) */}
+              <div className="hidden print:block space-y-8 bg-white text-black p-6 w-full">
+                <div className="border-b-2 border-black pb-4 mb-8 text-center">
+                  <h1 className="text-3xl font-bold text-black uppercase tracking-tight">
+                    {idea || "Startup Strategy Report"}
+                  </h1>
+                  <p className="text-sm text-zinc-600 font-mono tracking-widest uppercase mt-2">
+                    Unified Package · {new Date().toLocaleDateString()} · Detailed Analysis
+                  </p>
+                </div>
+                {AGENTS.map((agent, i) => {
+                  const agentResult = results[agent.id];
+                  return (
+                    <div key={agent.id} className="page-break-after avoid-break-inside pb-6 border-b border-zinc-200 last:border-0 last:pb-0">
+                      <div className="flex items-center gap-2 border-b border-zinc-200 pb-2 mb-4">
+                        <span className="text-lg font-mono text-zinc-500 font-bold">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                        <h2 className="text-2xl font-bold text-black">{agent.name}</h2>
+                        <span className="text-sm font-mono text-zinc-500 font-semibold">— {agent.role}</span>
+                      </div>
+                      {agentResult ? (
+                        <div
+                          className="markdown-content text-black text-sm leading-relaxed"
+                          dangerouslySetInnerHTML={{ __html: renderMarkdown(agentResult) }}
+                        />
+                      ) : (
+                        <p className="text-xs italic text-zinc-400">No output generated yet.</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
