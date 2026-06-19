@@ -233,12 +233,17 @@ export default function AgentsSection() {
     
     <section className="landing-window relative w-full max-w-[1440px] min-h-[calc(100vh-24px)] md:min-h-[calc(100vh-40px)] bg-[#f5dccb] border-[10px] border-[#adacaa] rounded-[28px] md:rounded-[36px] overflow-hidden flex flex-col shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)]">
       <div className="absolute inset-0 z-0 opacity-70 pointer-events-none">
-        <Aurora
+        {/* <Aurora
           colorStops={["#FF8A00", "#FFB347", "#FFD6A5"]}
           blend={0.45}
           amplitude={1.2}
           speed={0.4}
-        />
+        /> */}
+        <img
+  src="/landing/landingbg.jpeg"
+  alt="Background"
+  className="absolute inset-0 h-full w-full object-cover"
+/>
       </div>
 
        <FloatingBubbles />

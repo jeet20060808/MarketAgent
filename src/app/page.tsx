@@ -452,7 +452,7 @@ height={105}
             /> */}
           </div>
 
-          <div className="absolute left-6 md:left-10 bottom-[2%] md:bottom-[2%] z-30 max-w-[340px]">
+          <div className="absolute left-6 md:left-20 bottom-[3%] md:bottom-[4%] z-30 max-w-[340px]">
             {/* <p className="text-[13px] md:text-sm font-semibold text-[#4a4a4a] leading-relaxed mb-5">
               We deploy AI agents that automate market research, validate ideas, draft PRDs, and architect go-to-market strategies.
             </p> */}
@@ -497,6 +497,5 @@ height={105}
   <AgentsSection />
 </div>
 </div> 
-    
   );
 }
