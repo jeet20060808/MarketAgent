@@ -4,6 +4,33 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Aurora from "./Aurora/Aurora";
 
+const icons: Record<string, React.ReactNode> = {
+  "Market Research": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E97816" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  ),
+  "Startup advisor Agent": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E97816" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  ),
+  "Product Manager Agent": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E97816" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+  ),
+  "Engineering Agent": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E97816" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+  ),
+  "Financial analyst Agent": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E97816" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+  ),
+  "Marketing Agent": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E97816" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  ),
+  "Risk Agent": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E97816" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  ),
+  "Architect Agent": (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E97816" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+  ),
+};
+
 export default function AgentsSection() {
   function FloatingBubbles() {
     const [bubbles, setBubbles] = React.useState<
@@ -95,7 +122,7 @@ export default function AgentsSection() {
   ];
   const [flippedCard, setFlippedCard] = React.useState<number | null>(null);
   const orbitRadius = 341;
-  const orbitSteps = 23;
+  const orbitSteps = 80;
 
   const buildOrbitPath = (index: number) => {
     const phase = (index / agents.length) * Math.PI * 2;
@@ -120,7 +147,7 @@ export default function AgentsSection() {
     return (
       <motion.div
         key={agent.title}
-        className="absolute left-1/2 top-1/2 h-[160px] w-[260px] -translate-x-1/2 -translate-y-1/2"
+        className="absolute left-1/2 top-1/2 h-[135px] w-[260px] -translate-x-1/2 -translate-y-1/2"
         style={{ perspective: 1200 }}
       >
         <motion.div
@@ -137,60 +164,67 @@ export default function AgentsSection() {
           className="relative h-full w-full"
         >
           <motion.div
-  className="relative h-full w-full cursor-pointer"
-  onClick={() =>
-    setFlippedCard(flippedCard === index ? null : index)
-  }
-  animate={{
-    rotateY: flippedCard === index ? 180 : 0,
-  }}
-  transition={{ duration: 0.6 }}
-  style={{
-    transformStyle: "preserve-3d",
-  }}
->
+            className="relative h-full w-full cursor-pointer"
+            onClick={() =>
+              setFlippedCard(flippedCard === index ? null : index)
+            }
+            animate={{
+              rotateY: flippedCard === index ? 180 : 0,
+            }}
+            transition={{ duration: 0.6 }}
+            style={{
+              transformStyle: "preserve-3d",
+            }}
+          >
             {/* FRONT */}
             <div
-  className="absolute inset-0 overflow-hidden rounded-[22px]"
-  style={{
-    backfaceVisibility: "hidden",
-  }}
->
-  <div
-    className="
-      relative
-      z-20
-      h-full
-      rounded-[22px]
-      border
-      border-white/10
-      bg-[#111111]/65
-      backdrop-blur-3xl
-      flex
-      items-center
-      justify-center
-      p-6
-    "
-  >
-    <h3 className="text-2xl font-bold text-white text-center">
-      {agent.title}
-    </h3>
-  </div>
-</div>
+              className="absolute inset-0 overflow-hidden rounded-[22px]"
+              style={{
+                backfaceVisibility: "hidden",
+              }}
+            >
+              <div
+                className="
+                  relative
+                  z-20
+                  h-full
+                  rounded-[22px]
+                  border
+                  border-black/5
+                  bg-white
+                  shadow-sm
+                  flex
+                  flex-col
+                  items-center
+                  justify-center
+                  gap-2.5
+                  p-5
+                "
+              >
+                {icons[agent.title] && (
+                  <div className="flex items-center justify-center p-2 rounded-xl bg-orange-500/10 text-orange-500 mb-0.5">
+                    {icons[agent.title]}
+                  </div>
+                )}
+                <h3 className="text-lg font-bold text-zinc-900 text-center">
+                  {agent.title}
+                </h3>
+              </div>
+            </div>
             {/* BACK */}
             <div
-  className="absolute inset-0 overflow-hidden rounded-[22px]"
-  style={{
-    transform: "rotateY(180deg)",
-    backfaceVisibility: "hidden",
-  }}
->
-  <div className="h-full rounded-[22px] border border-orange-500/70 bg-[#141414]/70 backdrop-blur-2xl flex items-center justify-center p-6">
-    <p className="font-serif font-bold text-sm text-white text-center leading-relaxed">
-      {agent.desc}
-    </p>
-  </div>
-</div>
+              className="absolute inset-0 overflow-hidden rounded-[22px]"
+              style={{
+                transform: "rotateY(180deg)",
+                backfaceVisibility: "hidden",
+              }}
+            >
+              <div className="h-full rounded-[22px] border border-orange-500/20 bg-white shadow-sm flex items-center justify-center p-5">
+                <p className="font-sans font-medium text-xs text-zinc-700 text-center leading-relaxed">
+                  {agent.desc}
+                </p>
+              </div>
+            </div>
           </motion.div>
         </motion.div>
       </motion.div>
@@ -242,7 +276,7 @@ export default function AgentsSection() {
         <img
   src="/landing/landingbg.jpeg"
   alt="Background"
-  className="absolute inset-0 h-full w-full object-cover"
+  className="absolute inset-0 h-full w-full object-cover opacity-40"
 />
       </div>
 
