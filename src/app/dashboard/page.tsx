@@ -1526,7 +1526,7 @@ export default function Home() {
                   {/* Dashboard Header Banner */}
                   <div className="print:hidden pl-24 pr-6 sm:pl-28 sm:pr-8 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative border-b border-zinc-800 bg-[#121214]">
                     <div className="absolute left-6 top-1/2 -translate-y-1/2">
-                      <ArrowButton onClick={() => setShowConfirmBackModal(true)} />
+                      <ArrowButton onClick={() => setShowConfirmBackModal(true)} className="arrow-btn-white" />
                     </div>
                     <div>
                       <div className="badge-yellow mb-2 animate-stamp">
@@ -1543,6 +1543,7 @@ export default function Home() {
                   <button
                     onClick={() => window.print()}
                     className="btn-primary px-4 py-2 flex items-center gap-2"
+                    style={{ background: 'transparent', color: '#ffffff', borderColor: '#ffffff' }}
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>PDF Report</span>
@@ -1558,7 +1559,7 @@ export default function Home() {
                   <button
                     onClick={() => setShowNotionModal(true)}
                     className="btn-primary px-4 py-2 flex items-center gap-2"
-                    style={{ background: 'var(--accent-yellow)', color: 'var(--ink)', borderColor: 'var(--accent-yellow)' }}
+                    style={{ background: 'transparent', color: '#ffffff', borderColor: '#ffffff' }}
                   >
                     <BookOpen className="w-3.5 h-3.5" />
                     <span>Notion Doc</span>
@@ -2152,22 +2153,19 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.25 }}
             onClick={(e) => e.stopPropagation()}
-            style={{ width: '90%', maxWidth: '380px' }}
+            style={{ width: '90%', maxWidth: '380px', borderRadius: '24px' }}
           >
             <div className="notion-modal-header">
               <div className="flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-amber-500" />
                 <span>Go Back?</span>
               </div>
-              <button onClick={() => setShowConfirmBackModal(false)} className="p-1 hover:opacity-60 transition-opacity">
-                <X className="w-4 h-4" />
-              </button>
             </div>
             <div className="notion-modal-body text-center py-6 px-4">
-              <p className="text-sm font-medium text-gray-800 mb-2">
+              <p className="text-sm font-medium text-white mb-2">
                 Do you really want to go back?
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-300">
                 Your current compilation and progress will be lost.
               </p>
             </div>
