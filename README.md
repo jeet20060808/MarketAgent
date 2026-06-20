@@ -43,11 +43,14 @@ Each agent is fully equipped with context-driven tools to execute their specific
 
 ### Prerequisites
 
-Create a `.env.local` file in the root directory and add your NVIDIA API key:
+Create a `.env.local` file in the root directory:
 
 ```env
 NVIDIA_API_KEY=your-api-key-here
+ALLOWED_ORIGIN=http://localhost:3000
 ```
+
+> **Note:** `ALLOWED_ORIGIN` controls CORS — set it to your production domain when deploying.
 
 ### Installation
 
@@ -66,6 +69,16 @@ NVIDIA_API_KEY=your-api-key-here
 3. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
+
+## 🛡️ Security Features
+
+- **Content Security Policy**: Strict CSP headers restrict script, style, and connection sources to prevent XSS and data exfiltration.
+- **Rate Limiting**: API endpoints are rate-limited (20 requests/minute per IP) to prevent abuse.
+- **Request Validation**: Body size limits (5MB), idea length caps (10K chars), file count/size limits (10 files, 500KB each, 1MB total).
+- **File Upload Safety**: MIME type allowlisting, file name sanitization (rejects path separators and special chars).
+- **CORS Restriction**: Cross-origin requests locked to the `ALLOWED_ORIGIN` environment variable.
+- **No Secret Leakage**: API error messages are generic (no implementation details exposed). The `/api/test` endpoint that leaked API key existence has been removed.
+- **HTTP Security Headers**: `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Referrer-Policy` are all set to hardened values.
 
 ## 🛠️ Technology Stack
 

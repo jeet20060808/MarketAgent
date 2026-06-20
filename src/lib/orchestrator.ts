@@ -9,7 +9,7 @@ import { financialAnalyst } from "@/agents/financialAnalyst";
 
 interface UploadedFile {
   name: string;
-  type: string;
+  type?: string;
   content: string;
 }
 

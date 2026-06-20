@@ -5,8 +5,7 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LANDING = path.join(__dirname, "../public/landing");
 
-const ASSETS =
-  "/Users/nirjanavinkumarchorghe/.cursor/projects/Users-nirjanavinkumarchorghe-Downloads-marketagent/assets";
+const ASSETS = path.join(__dirname, "../assets");
 
 const sources = {
   "laptop.png": `${ASSETS}/WhatsApp_Image_2026-06-16_at_17.05.29-ca7824fb-831b-4226-b761-0919011519cc.png`,
