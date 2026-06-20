@@ -1,4 +1,4 @@
-import { openai } from "../lib/openai";
+import { getOpenAI } from "../lib/openai";
 
 export interface ScoreData {
   startupScore: number;
@@ -108,7 +108,7 @@ Multi-Agent Analysis Reports:
 ${agentReportsContext}
 `;
 
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAI().chat.completions.create({
     model: "nvidia/nemotron-3-super-120b-a12b",
     max_tokens: 1500,
     temperature: 0.1,

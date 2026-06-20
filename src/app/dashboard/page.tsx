@@ -1558,7 +1558,7 @@ export default function Home() {
                   <button
                     onClick={() => setShowNotionModal(true)}
                     className="btn-primary px-4 py-2 flex items-center gap-2"
-                    style={{ background: 'var(--accent-yellow)', color: 'var(--ink)', borderColor: 'var(--accent-yellow)' }}
+                    style={{ background: 'var(--accent-yellow)', color: '#ffffff', borderColor: 'var(--accent-yellow)' }}
                   >
                     <BookOpen className="w-3.5 h-3.5" />
                     <span>Notion Doc</span>

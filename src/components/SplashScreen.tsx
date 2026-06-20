@@ -197,7 +197,7 @@ const SplashScreen = () => {
     >
       <video
   autoPlay
-  // muted
+  muted
   playsInline
   className="w-full h-full"
   onEnded={() => setIsVisible(false)}

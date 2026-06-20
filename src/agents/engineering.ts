@@ -1,7 +1,7 @@
-import { openai } from "@/lib/openai";
+import { getOpenAI } from "@/lib/openai";
 
 export async function engineeringManager(idea: string) {
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAI().chat.completions.create({
     model: "nvidia/nemotron-3-super-120b-a12b",
     max_tokens: 1200,
 
