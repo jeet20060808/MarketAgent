@@ -1,11 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+interface ArrowButtonProps {
+  onClick?: () => void;
+}
 
-export default function ArrowButton() {
-  const router = useRouter();
+export default function ArrowButton({ onClick }: ArrowButtonProps) {
   return (
-    <button onClick={() => router.back()} className="arrow-btn cursor-pointer">
+    <button onClick={onClick} className="arrow-btn cursor-pointer">
       <div className="button-box">
         <span className="button-elem">
           <svg viewBox="0 0 46 40" xmlns="http://www.w3.org/2000/svg">

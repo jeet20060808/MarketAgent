@@ -291,8 +291,10 @@ body {
 .editorial-card .status-pill *,
 .editorial-card .score-glow-text,
 .editorial-card .score-glow-text *,
-.editorial-card .cell-num {
-  color: inherit !important;
+.editorial-card .cell-num,
+.editorial-card .btn-secondary,
+.editorial-card .btn-secondary * {
+  color: #1A1A1A !important;
 }
 
 /* Chic glowing & pulsing overall score animation */

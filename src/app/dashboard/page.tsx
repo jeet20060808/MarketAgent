@@ -1062,7 +1062,7 @@ export default function Home() {
     <div className="landing-shell min-h-screen bg-[#f5ebe4] p-3 md:p-5 flex items-center justify-center">
         {/* Button */}
   <div className="fixed top-16 left-16 z-[99999]">
-    <ArrowButton />
+    <ArrowButton onClick={handleReset} />
   </div>
       <div className="landing-window relative w-full max-w-[1440px] min-h-[calc(100vh-24px)] md:min-h-[calc(100vh-40px)] bg-[#f5dccb] border-[10px] border-[#adacaa] rounded-[28px] md:rounded-[36px] overflow-hidden flex flex-col shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)]">
         <div className="absolute inset-0 z-0 opacity-70 pointer-events-none">
@@ -1867,11 +1867,11 @@ export default function Home() {
                   <div className="p-4 flex items-center justify-between" style={{ borderBottom: '2px solid var(--border)', background: 'var(--cream-dark)' }}>
                     <div className="flex items-center gap-2">
                       <span className="section-number section-number-orange" style={{ fontFamily: 'var(--font-heading)' }}>05</span>
-                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--BLACK)' }}>DETAILED ANALYSIS </h2>
+                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--CREAM-DARK)' }}>DETAILED ANALYSIS </h2>
                     </div>
-                    <button onClick={downloadPackage} className="btn-secondary px-3 py-1.5 flex items-center gap-1.5 text-[10px]">
-                      <FileDown className="w-3 h-3" />
-                      <span>Download .md</span>
+                    <button onClick={downloadPackage} className="btn-secondary px-3 py-1.5 flex items-center gap-1.5 text-[10px]" style={{ color: '#1A1A1A' }}>
+                      <FileDown className="w-3 h-3" style={{ color: '#1A1A1A' }} />
+                      <span style={{ color: '#1A1A1A' }}>Download .md</span>
                     </button>
                   </div>
                   <div className="p-4 print:p-3">
