@@ -410,8 +410,10 @@ function extractPrdSection(text: string | null, keywords: string[], fallbackTitl
   
   const res = content.join("\n").trim();
   if (!res && fallbackTitle) {
-    // Return first 3 paragraphs as fallback
     const paras = text.split("\n\n").filter(p => p.trim() && !p.trim().startsWith("#"));
+    if (fallbackTitle === "Problem Statement") {
+      return paras.length > 3 ? paras.slice(3, 6).join("\n\n") : paras.slice(Math.min(1, paras.length - 1)).join("\n\n");
+    }
     return paras.slice(0, 3).join("\n\n");
   }
   return res;
@@ -487,21 +489,21 @@ function generatePRD(idea: string, results: AgentResults): string {
 
 /* ── Compact Business Breakdown — 3 chart panels ── */
 const BREAKDOWN_SEGMENTS = [
-  { label: "Market", value: 18, color: "#3B82F6" },
-  { label: "Product", value: 14, color: "#22C55E" },
-  { label: "Technical", value: 14, color: "#F97316" },
-  { label: "GTM", value: 14, color: "#EC4899" },
-  { label: "Ops", value: 12, color: "#8B5CF6" },
-  { label: "Risk", value: 14, color: "#EF4444" },
-  { label: "Finance", value: 14, color: "#10B981" },
+  { label: "Market", value: 18, color: "#ea580c" },
+  { label: "Product", value: 14, color: "#f97316" },
+  { label: "Technical", value: 14, color: "#fb923c" },
+  { label: "GTM", value: 14, color: "#f59e0b" },
+  { label: "Ops", value: 12, color: "#fbbf24" },
+  { label: "Risk", value: 14, color: "#fcd34d" },
+  { label: "Finance", value: 14, color: "#fde047" },
 ];
 
 const PILLAR_BARS = [
-  { label: "Validation", value: 82, color: "#F7C948" },
-  { label: "Market Fit", value: 76, color: "#3B82F6" },
-  { label: "Product", value: 88, color: "#22C55E" },
-  { label: "Execution", value: 71, color: "#8B5CF6" },
-  { label: "Financial", value: 79, color: "#10B981" },
+  { label: "Validation", value: 82, color: "#ea580c" },
+  { label: "Market Fit", value: 76, color: "#f97316" },
+  { label: "Product", value: 88, color: "#f59e0b" },
+  { label: "Execution", value: 71, color: "#fbbf24" },
+  { label: "Financial", value: 79, color: "#fcd34d" },
 ];
 
 function DonutChart({ segments, size = 96 }: { segments: typeof BREAKDOWN_SEGMENTS; size?: number }) {
@@ -521,7 +523,18 @@ function DonutChart({ segments, size = 96 }: { segments: typeof BREAKDOWN_SEGMEN
     const x2i = cx + ir * Math.cos(startRad), y2i = cy + ir * Math.sin(startRad);
     const largeArc = sliceAngle > 180 ? 1 : 0;
     const d = `M ${x1o} ${y1o} A ${r} ${r} 0 ${largeArc} 1 ${x2o} ${y2o} L ${x1i} ${y1i} A ${ir} ${ir} 0 ${largeArc} 0 ${x2i} ${y2i} Z`;
-    return <path key={i} d={d} fill={seg.color} stroke="#FAF6EF" strokeWidth="1" />;
+    return (
+      <motion.path
+        key={i}
+        d={d}
+        fill={seg.color}
+        stroke="#111113"
+        strokeWidth="1.5"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: i * 0.05 }}
+      />
+    );
   });
 
   return (
@@ -533,16 +546,22 @@ function DonutChart({ segments, size = 96 }: { segments: typeof BREAKDOWN_SEGMEN
 
 function HorizontalBarChart({ bars }: { bars: typeof PILLAR_BARS }) {
   return (
-    <div className="flex flex-col gap-1.5 w-full">
-      {bars.map((bar) => (
+    <div className="flex flex-col gap-2.5 w-full">
+      {bars.map((bar, i) => (
         <div key={bar.label} className="flex items-center gap-2">
-          <span className="text-[9px] w-14 truncate uppercase tracking-wide" style={{ fontFamily: "var(--font-mono)", color: "var(--ink-muted)" }}>
+          <span className="text-[9px] w-14 truncate uppercase tracking-wide font-mono text-zinc-400">
             {bar.label}
           </span>
-          <div className="flex-1 h-2 rounded-sm overflow-hidden" style={{ background: "var(--cream-dark)", border: "1px solid var(--border-light)" }}>
-            <div className="h-full rounded-sm transition-all" style={{ width: `${bar.value}%`, background: bar.color }} />
+          <div className="flex-1 h-2 rounded bg-zinc-800/80 border border-zinc-700/50 overflow-hidden">
+            <motion.div
+              className="h-full rounded transition-all"
+              style={{ background: bar.color }}
+              initial={{ width: 0 }}
+              animate={{ width: `${bar.value}%` }}
+              transition={{ duration: 0.8, delay: i * 0.1, ease: "easeOut" }}
+            />
           </div>
-          <span className="text-[9px] w-7 text-right font-semibold" style={{ fontFamily: "var(--font-mono)", color: "var(--ink)" }}>
+          <span className="text-[9px] w-7 text-right font-semibold font-mono text-zinc-100">
             {bar.value}
           </span>
         </div>
@@ -553,17 +572,26 @@ function HorizontalBarChart({ bars }: { bars: typeof PILLAR_BARS }) {
 
 function AgentOutputChart({ results }: { results: AgentResults }) {
   return (
-    <div className="flex items-end justify-between gap-1 h-[72px] w-full px-1">
-      {AGENTS.map((agent) => {
+    <div className="flex items-end justify-between gap-1.5 h-[72px] w-full px-1">
+      {AGENTS.map((agent, i) => {
         const len = results[agent.id]?.length ?? 0;
         const height = Math.max(12, Math.min(72, (len / 1200) * 72));
         return (
-          <div key={agent.id} className="flex flex-col items-center gap-1 flex-1 min-w-0">
-            <div
-              className="w-full max-w-[14px] rounded-t-sm"
-              style={{ height, background: agent.color, opacity: len ? 1 : 0.25 }}
-              title={agent.name}
-            />
+          <div key={agent.id} className="flex flex-col items-center gap-1.5 flex-1 min-w-0">
+            <div className="relative w-full flex items-end justify-center h-full">
+              <motion.div
+                className="w-full max-w-[14px] rounded-t"
+                style={{ 
+                  height, 
+                  background: "linear-gradient(to top, #ea580c, #f59e0b)", 
+                  opacity: len ? 1 : 0.25 
+                }}
+                title={`${agent.name}: ${len} chars`}
+                initial={{ height: 0 }}
+                animate={{ height }}
+                transition={{ duration: 0.8, delay: i * 0.05, ease: "easeOut" }}
+              />
+            </div>
             <AgentIcon Icon={agent.Icon} color={agent.color} size={10} />
           </div>
         );
@@ -608,38 +636,38 @@ function AnimatedScore({ value, duration = 1500 }: { value: number; duration?: n
 
 function BusinessBreakdownCharts({ results }: { results: AgentResults }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <div className="breakdown-chart-card">
-        <div className="flex items-center gap-1.5 mb-2">
-          <TrendingUp size={13} style={{ color: "var(--accent-blue)" }} />
-          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)", color: "var(--ink)" }}>Allocation</span>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="breakdown-chart-card bg-[#161618] border border-zinc-800/80 p-4 rounded-xl">
+        <div className="flex items-center gap-1.5 mb-3">
+          <TrendingUp size={13} className="text-amber-500" />
+          <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-zinc-300">Allocation</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <DonutChart segments={BREAKDOWN_SEGMENTS} />
-          <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+          <div className="flex flex-col gap-1 flex-1 min-w-0">
             {BREAKDOWN_SEGMENTS.slice(0, 4).map((seg) => (
-              <div key={seg.label} className="flex items-center gap-1.5 text-[9px]">
-                <span className="w-2 h-2 rounded-sm flex-shrink-0" style={{ background: seg.color }} />
-                <span className="truncate" style={{ color: "var(--ink-muted)" }}>{seg.label}</span>
-                <span className="ml-auto font-semibold" style={{ color: "var(--ink)" }}>{seg.value}%</span>
+              <div key={seg.label} className="flex items-center gap-1.5 text-[9px] font-mono">
+                <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ background: seg.color }} />
+                <span className="truncate text-zinc-400">{seg.label}</span>
+                <span className="ml-auto font-semibold text-zinc-100">{seg.value}%</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="breakdown-chart-card">
-        <div className="flex items-center gap-1.5 mb-2">
-          <BarChart3 size={13} style={{ color: "var(--accent-green)" }} />
-          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)", color: "var(--ink)" }}>Pillar Scores</span>
+      <div className="breakdown-chart-card bg-[#161618] border border-zinc-800/80 p-4 rounded-xl">
+        <div className="flex items-center gap-1.5 mb-3">
+          <BarChart3 size={13} className="text-amber-500" />
+          <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-zinc-300">Pillar Scores</span>
         </div>
         <HorizontalBarChart bars={PILLAR_BARS} />
       </div>
 
-      <div className="breakdown-chart-card">
-        <div className="flex items-center gap-1.5 mb-2">
-          <Activity size={13} style={{ color: "var(--accent-orange)" }} />
-          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)", color: "var(--ink)" }}>Agent Output</span>
+      <div className="breakdown-chart-card bg-[#161618] border border-zinc-800/80 p-4 rounded-xl">
+        <div className="flex items-center gap-1.5 mb-3">
+          <Activity size={13} className="text-amber-500" />
+          <span className="text-[10px] font-bold uppercase tracking-wider font-mono text-zinc-300">Agent Output</span>
         </div>
         <AgentOutputChart results={results} />
       </div>
@@ -677,6 +705,18 @@ export default function Home() {
   const [prdContent, setPrdContent] = useState("");
   const [prdCopied, setPrdCopied] = useState(false);
   const [showConfirmBackModal, setShowConfirmBackModal] = useState(false);
+
+  // ── Accordion State for Detailed Analysis ──
+  const [expandedAgents, setExpandedAgents] = useState<Record<string, boolean>>({
+    advisor: true,
+  });
+
+  const toggleAgentAccordion = (agentId: string) => {
+    setExpandedAgents((prev) => ({
+      ...prev,
+      [agentId]: !prev[agentId],
+    }));
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1484,7 +1524,7 @@ export default function Home() {
               ) : (
                 <>
                   {/* Dashboard Header Banner */}
-                  <div className="print:hidden pl-24 pr-6 sm:pl-28 sm:pr-8 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative" style={{ borderBottom: '2px solid var(--border)', background: '#ffffff' }}>
+                  <div className="print:hidden pl-24 pr-6 sm:pl-28 sm:pr-8 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative border-b border-zinc-800 bg-[#121214]">
                     <div className="absolute left-6 top-1/2 -translate-y-1/2">
                       <ArrowButton onClick={() => setShowConfirmBackModal(true)} />
                     </div>
@@ -1493,7 +1533,7 @@ export default function Home() {
                         <CheckCircle2 className="w-3 h-3" />
                         <span>PACKAGE ASSEMBLED</span>
                       </div>
-                      <h2 className="text-xl font-bold truncate max-w-xl" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>
+                      <h2 className="text-xl font-bold truncate max-w-xl text-white" style={{ fontFamily: 'var(--font-heading)' }}>
                         {idea || "Startup Package"}
                       </h2>
                     </div>
@@ -1510,7 +1550,7 @@ export default function Home() {
                   <button
                     onClick={() => setInvestorMode(true)}
                     className="btn-primary px-4 py-2 flex items-center gap-2"
-                    style={{ background: '#FF8A00', color: '#1a1a1a' }}
+                    style={{ background: '#FF8A00', color: '#1a1a1a', borderColor: '#FF8A00' }}
                   >
                     <Presentation className="w-3.5 h-3.5" />
                     <span>Pitch This Startup</span>
@@ -1518,7 +1558,7 @@ export default function Home() {
                   <button
                     onClick={() => setShowNotionModal(true)}
                     className="btn-primary px-4 py-2 flex items-center gap-2"
-                    style={{ background: 'var(--accent-yellow)', color: 'var(--ink)' }}
+                    style={{ background: 'var(--accent-yellow)', color: 'var(--ink)', borderColor: 'var(--accent-yellow)' }}
                   >
                     <BookOpen className="w-3.5 h-3.5" />
                     <span>Notion Doc</span>
@@ -1526,7 +1566,7 @@ export default function Home() {
                   <button
                     onClick={handleGeneratePrd}
                     className="btn-primary px-4 py-2 flex items-center gap-2"
-                    style={{ background: '#EC4899', color: '#ffffff' }}
+                    style={{ background: '#EC4899', color: '#ffffff', borderColor: '#EC4899' }}
                   >
                     <FileText className="w-3.5 h-3.5" />
                     <span>Generate PRD</span>
@@ -1534,6 +1574,7 @@ export default function Home() {
                   <button
                     onClick={handleReset}
                     className="btn-secondary px-4 py-2 flex items-center gap-2"
+                    style={{ background: 'transparent', color: '#ffffff', borderColor: 'rgba(255,255,255,0.15)' }}
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
                     <span>New Strategy</span>
@@ -1542,101 +1583,122 @@ export default function Home() {
               </div>
 
               {/* ── Consolidated Summary Report (1-2 pages max) ── */}
-              <div className="summary-report flex-1 max-w-4xl mx-auto w-full px-6 py-6 flex flex-col gap-4 print:p-4 print:gap-4">
+              <div className="summary-report flex-1 max-w-4xl mx-auto w-full px-6 py-6 flex flex-col gap-5 print:p-4 print:gap-4">
                 
                 {/* Cover Header */}
-                <section className="editorial-card p-5 print:border print:border-gray-300 print:hidden">
+                <section className="editorial-card p-6 print:border print:border-gray-300 print:hidden">
                   <div className="flex items-center justify-between mb-4">
                     <div className="badge-pink">
                       <Rocket className="w-3 h-3" />
                       <span>AI Founder OS</span>
                     </div>
-                    <span className="text-[10px]" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' as const }}>
+                    <span className="text-[10px] font-mono text-zinc-400 tracking-widest uppercase">
                       STAMPED {new Date().getFullYear()}
                     </span>
                   </div>
                   
-                  <div style={{ borderTop: '2px solid var(--border)', margin: '8px 0 16px' }} />
+                  <div className="border-t border-zinc-800 my-4" />
                   
-                  <h1 className="text-3xl sm:text-4xl tracking-tight leading-tight print:text-black" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>
+                  <h1 className="text-3xl sm:text-4xl tracking-tight leading-tight text-white font-heading">
                     {idea || "Startup Strategy Report"}
                   </h1>
-                  <p className="text-xs mt-2" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' as const }}>
+                  <p className="text-xs mt-2 font-mono text-zinc-400 tracking-widest uppercase">
                     Unified Package · {new Date().toLocaleDateString()} · {AGENTS.length} Agent Compilation
                   </p>
                 </section>
 
                 {/* Key Insights */}
                 {insights.length > 0 && (
-                  <section className="editorial-card p-4 print:hidden">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="section-number section-number-yellow" style={{ fontFamily: 'var(--font-heading)' }}>01</span>
-                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>KEY INSIGHTS</h2>
+                  <motion.section 
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                    className="editorial-card p-5 print:hidden"
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="section-number section-number-yellow font-heading">01</span>
+                      <h2 className="text-lg font-bold tracking-tight font-heading">KEY INSIGHTS</h2>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {insights.map((insight, i) => (
-                        <div
+                        <motion.div
                           key={i}
-                          className="flex gap-2 p-2.5 rounded text-xs leading-relaxed"
-                          style={{ background: 'var(--cream)', border: '1px solid var(--border-light)', color: 'var(--ink-light)' }}
+                          whileHover={{ scale: 1.01, translateY: -2 }}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.4, delay: i * 0.05 }}
+                          className="flex gap-3 p-4 rounded-xl text-xs leading-relaxed border bg-[#161618] border-zinc-800/80 hover:border-amber-500/30 transition-all duration-300"
                         >
-                          <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: 'var(--accent-yellow)' }} />
-                          <span dangerouslySetInnerHTML={{ __html: renderMarkdown(insight) }} />
-                        </div>
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center bg-amber-500/10 text-amber-500 flex-shrink-0 mt-0.5 border border-amber-500/20">
+                            <Zap className="w-3 h-3" />
+                          </div>
+                          <div className="flex-1 text-zinc-300" dangerouslySetInnerHTML={{ __html: renderMarkdown(insight) }} />
+                        </motion.div>
                       ))}
                     </div>
-                  </section>
+                  </motion.section>
                 )}
 
                 {/* Agent Summary Table */}
-                <section className="editorial-card p-4 print:hidden">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="section-number section-number-pink" style={{ fontFamily: 'var(--font-heading)' }}>02</span>
-                    <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>AGENT SUMMARY</h2>
+                <motion.section 
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.15 }}
+                  className="editorial-card p-5 print:hidden"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="section-number section-number-pink font-heading">02</span>
+                    <h2 className="text-lg font-bold tracking-tight font-heading">AGENT SUMMARY</h2>
                   </div>
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto rounded-xl border border-zinc-800/80 bg-[#161618]">
                     <table className="agent-summary-table w-full">
                       <colgroup>
-                        <col style={{ width: "36px" }} />
-                        <col style={{ width: "148px" }} />
-                        <col style={{ width: "112px" }} />
+                        <col style={{ width: "42px" }} />
+                        <col style={{ width: "160px" }} />
+                        <col style={{ width: "130px" }} />
                         <col />
-                        <col style={{ width: "72px" }} />
+                        <col style={{ width: "85px" }} />
                       </colgroup>
                       <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Agent</th>
-                          <th>Role</th>
-                          <th>Top Finding</th>
-                          <th>Status</th>
+                        <tr className="border-b border-zinc-800">
+                          <th className="font-mono text-zinc-400">#</th>
+                          <th className="font-mono text-zinc-400">Agent</th>
+                          <th className="font-mono text-zinc-400">Role</th>
+                          <th className="font-mono text-zinc-400">Top Finding</th>
+                          <th className="font-mono text-zinc-400">Status</th>
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody className="divide-y divide-zinc-800/60">
                         {AGENTS.map((agent, i) => {
                           const agentResult = results[agent.id];
                           const topFinding = agentResult
-                            ? agentResult.split('\n').filter(l => l.trim() && !l.startsWith('#') && !l.startsWith('---'))[0]?.replace(/^[\*\-\d\.]+\s*/, '').replace(/\*\*/g, '').trim().slice(0, 90) || "—"
+                            ? agentResult.split('\n').filter(l => l.trim() && !l.startsWith('#') && !l.startsWith('---'))[0]?.replace(/^[\*\-\d\.]+\s*/, '').replace(/\*\*/g, '').trim().slice(0, 95) || "—"
                             : "—";
                           const hasResult = Boolean(agentResult);
                           return (
-                            <tr key={agent.id} className={hasResult ? "row-complete" : ""}>
-                              <td className="cell-num" style={{ color: agent.color }}>
+                            <tr key={agent.id} className={hasResult ? "bg-amber-500/[0.01]" : ""}>
+                              <td className="cell-num font-mono text-zinc-500 font-bold">
                                 {String(i + 1).padStart(2, '0')}
                               </td>
                               <td className="cell-agent">
-                                <span className="inline-flex items-center gap-1.5">
-                                  <AgentIcon Icon={agent.Icon} color={agent.color} size={13} />
-                                  <span className="font-semibold">{agent.name}</span>
+                                <span className="inline-flex items-center gap-2 font-medium">
+                                  <AgentIcon Icon={agent.Icon} color={agent.color} size={14} />
+                                  <span>{agent.name}</span>
                                 </span>
                               </td>
-                              <td className="cell-role">{agent.role}</td>
-                              <td className="cell-finding">{topFinding}</td>
+                              <td className="cell-role text-xs text-zinc-400">{agent.role}</td>
+                              <td className="cell-finding text-zinc-300 text-xs">{topFinding}</td>
                               <td className="cell-status">
                                 {hasResult ? (
-                                  <span className="status-pill status-complete"><CheckCircle2 size={11} /> Done</span>
+                                  <span className="status-pill status-complete inline-flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                    <span>Done</span>
+                                  </span>
                                 ) : (
-                                  <span className="status-pill status-empty">—</span>
+                                  <span className="status-pill status-empty inline-flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
+                                    <span>Pending</span>
+                                  </span>
                                 )}
                               </td>
                             </tr>
@@ -1645,33 +1707,41 @@ export default function Home() {
                       </tbody>
                     </table>
                   </div>
-                </section>
+                </motion.section>
 
                 {/* Founder Snapshot Score */}
-                <section className="editorial-card p-5 relative overflow-hidden print:hidden">
+                <motion.section 
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="editorial-card p-5 relative overflow-hidden print:hidden"
+                >
                   <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <span className="section-number section-number-yellow" style={{ fontFamily: 'var(--font-heading)' }}>03</span>
-                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>FOUNDER  SNAPSHOT SCORE</h2>
+                    <div className="flex items-center gap-3">
+                      <span className="section-number section-number-yellow font-heading">03</span>
+                      <h2 className="text-lg font-bold tracking-tight font-heading">FOUNDER SNAPSHOT SCORE</h2>
                     </div>
                     {scoreData && (
-                      <span className="badge-pink">
-                        {scoreData.investorVerdict}
+                      <span className="badge-yellow">
+                        {scoreData.investorVerdict.split(/[-–—:]/)[0].trim()}
                       </span>
                     )}
                   </div>
 
                   {!scoreData ? (
-                    <div className="flex flex-col items-center justify-center py-8 text-center bg-cream-dark/30 rounded border border-dashed border-border-light">
-                      <Brain className="w-10 h-10 mb-3 animate-float text-accent-yellow" />
-                      <h3 className="text-sm font-bold mb-1" style={{ color: 'var(--ink)' }}>FOUNDER SCORE READY</h3>
-                      <p className="text-xs max-w-md mb-4 px-4" style={{ color: 'var(--ink-muted)' }}>
+                    <div className="flex flex-col items-center justify-center py-10 text-center bg-[#161618] rounded-xl border border-dashed border-zinc-800/80">
+                      <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center mb-4 border border-amber-500/20">
+                        <Brain className="w-6 h-6 animate-float text-amber-500" />
+                      </div>
+                      <h3 className="text-sm font-bold mb-1.5 text-zinc-100">FOUNDER SCORE READY</h3>
+                      <p className="text-xs max-w-md mb-5 px-4 text-zinc-400 leading-relaxed">
                         Evaluate your startup across 5 critical pillars (Market, Revenue, Execution, Competition, Risk) using our weighted scoring algorithm.
                       </p>
                       <button
                         onClick={handleGenerateScore}
                         disabled={isScoring}
-                        className="btn-primary px-6 py-2.5 flex items-center gap-2"
+                        className="btn-primary px-6 py-3 flex items-center gap-2"
+                        style={{ background: '#FF8A00', borderColor: '#FF8A00', color: '#000000' }}
                       >
                         {isScoring ? (
                           <>
@@ -1686,36 +1756,32 @@ export default function Home() {
                         )}
                       </button>
                       {scoreError && (
-                        <p className="text-xs text-red-500 mt-2 font-medium">⚠️ {scoreError}</p>
+                        <p className="text-xs text-red-500 mt-3 font-medium">⚠️ {scoreError}</p>
                       )}
                     </div>
                   ) : (
                     <div className="flex flex-col gap-6">
-                      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                         {/* Circle Gauge on Left */}
-                        <div className="md:col-span-4 flex flex-col items-center justify-center p-6 rounded-2xl bg-[#FAF6EF] border border-[#D4CFC5] shadow-inner relative overflow-hidden min-h-[220px] gauge-card">
-                          {/* Glow behind circle */}
-                          <div className="absolute w-24 h-24 rounded-full bg-[#F7C948]/10 blur-xl pointer-events-none" />
+                        <div className="lg:col-span-4 flex flex-col items-center justify-center p-6 rounded-xl bg-[#161618] border border-zinc-850 shadow-inner relative overflow-hidden min-h-[240px] gauge-card">
+                          <div className="absolute w-24 h-24 rounded-full bg-amber-500/5 blur-2xl pointer-events-none" />
                           
-                          {/* SVG Circular Gauge */}
                           <div className="relative w-36 h-36 flex items-center justify-center">
                             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                               <defs>
                                 <linearGradient id="scoreProgressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                  <stop offset="0%" stopColor="#F7C948" />
-                                  <stop offset="100%" stopColor="#EC4899" />
+                                  <stop offset="0%" stopColor="#ea580c" />
+                                  <stop offset="100%" stopColor="#f59e0b" />
                                 </linearGradient>
                               </defs>
-                              {/* Background Track */}
                               <circle
                                 cx="50"
                                 cy="50"
                                 r="40"
                                 fill="transparent"
-                                stroke="var(--cream-dark)"
-                                strokeWidth="8"
+                                stroke="#27272a"
+                                strokeWidth="7"
                               />
-                              {/* Animated Progress Arc */}
                               <motion.circle
                                 cx="50"
                                 cy="50"
@@ -1728,167 +1794,193 @@ export default function Home() {
                                 animate={{ strokeDashoffset: 251.2 - (251.2 * scoreData.startupScore) / 100 }}
                                 transition={{ duration: 1.5, ease: "easeOut" }}
                                 strokeLinecap="round"
-                                style={{ filter: "drop-shadow(0px 0px 4px rgba(236, 72, 153, 0.4))" }}
+                                style={{ filter: "drop-shadow(0px 0px 4px rgba(245, 158, 11, 0.4))" }}
                               />
                             </svg>
                             <div className="absolute flex flex-col items-center justify-center">
                               <AnimatedScore value={scoreData.startupScore} />
-                              <span className="text-[9px] font-mono tracking-widest text-ink-muted uppercase mt-0.5">
+                              <span className="text-[9px] font-mono tracking-widest text-zinc-400 uppercase mt-0.5">
                                 OVERALL
                               </span>
                             </div>
                           </div>
                           
-                          <div className="text-center mt-3 px-2">
-                            <span className="text-[9px] font-mono uppercase tracking-widest block text-ink-muted">
+                          <div className="text-center mt-4 px-2">
+                            <span className="text-[9px] font-mono uppercase tracking-widest block text-zinc-400">
                               INVESTOR VERDICT
                             </span>
-                            <h4 className="text-xs font-bold text-ink uppercase mt-0.5 tracking-tight line-clamp-2" title={scoreData.investorVerdict}>
-                              {scoreData.investorVerdict.split(/[-–—:]/)[0].trim()}
+                            <h4 className="text-sm font-bold text-zinc-100 uppercase mt-1 tracking-tight">
+                              {scoreData.investorVerdict}
                             </h4>
                           </div>
                         </div>
 
                         {/* Weights and Explanations on Right */}
-                        <div className="md:col-span-8 flex flex-col gap-4">
-                          {/* 5 pillars display */}
-                          <div className="flex flex-col gap-3">
+                        <div className="lg:col-span-8 flex flex-col justify-between gap-4">
+                          <div className="flex flex-col gap-4">
                             {/* Market Score */}
                             <div className="score-pillar-row">
                               <div className="flex justify-between items-center text-xs font-semibold">
-                                <span className="text-ink">Market Score (30% Weight)</span>
-                                <span className="text-ink font-mono">{scoreData.marketScore}/100</span>
+                                <span className="text-zinc-200">Market Score (30% Weight)</span>
+                                <span className="text-zinc-100 font-mono">{scoreData.marketScore}/100</span>
                               </div>
-                              <div className="h-2 w-full bg-cream-dark rounded-sm overflow-hidden mt-1">
-                                <div className="h-full bg-accent-blue rounded-sm" style={{ width: `${scoreData.marketScore}%` }} />
+                              <div className="h-2 w-full bg-zinc-800/80 rounded-sm overflow-hidden mt-1.5">
+                                <div className="h-full bg-amber-500 rounded-sm" style={{ width: `${scoreData.marketScore}%` }} />
                               </div>
-                              <p className="text-[11px] text-ink-light mt-1 leading-relaxed">{scoreData.marketReason}</p>
+                              <p className="text-[11px] text-zinc-400 mt-1.5 leading-relaxed">{scoreData.marketReason}</p>
                             </div>
 
                             {/* Revenue Score */}
                             <div className="score-pillar-row">
                               <div className="flex justify-between items-center text-xs font-semibold">
-                                <span className="text-ink">Revenue Score (25% Weight)</span>
-                                <span className="text-ink font-mono">{scoreData.revenueScore}/100</span>
+                                <span className="text-zinc-200">Revenue Score (25% Weight)</span>
+                                <span className="text-zinc-100 font-mono">{scoreData.revenueScore}/100</span>
                               </div>
-                              <div className="h-2 w-full bg-cream-dark rounded-sm overflow-hidden mt-1">
-                                <div className="h-full bg-accent-green rounded-sm" style={{ width: `${scoreData.revenueScore}%` }} />
+                              <div className="h-2 w-full bg-zinc-800/80 rounded-sm overflow-hidden mt-1.5">
+                                <div className="h-full bg-orange-500 rounded-sm" style={{ width: `${scoreData.revenueScore}%` }} />
                               </div>
-                              <p className="text-[11px] text-ink-light mt-1 leading-relaxed">{scoreData.revenueReason}</p>
+                              <p className="text-[11px] text-zinc-400 mt-1.5 leading-relaxed">{scoreData.revenueReason}</p>
                             </div>
 
                             {/* Execution Score */}
                             <div className="score-pillar-row">
                               <div className="flex justify-between items-center text-xs font-semibold">
-                                <span className="text-ink">Execution Score (20% Weight)</span>
-                                <span className="text-ink font-mono">{scoreData.executionScore}/100</span>
+                                <span className="text-zinc-200">Execution Score (20% Weight)</span>
+                                <span className="text-zinc-100 font-mono">{scoreData.executionScore}/100</span>
                               </div>
-                              <div className="h-2 w-full bg-cream-dark rounded-sm overflow-hidden mt-1">
-                                <div className="h-full bg-accent-orange rounded-sm" style={{ width: `${scoreData.executionScore}%` }} />
+                              <div className="h-2 w-full bg-zinc-800/80 rounded-sm overflow-hidden mt-1.5">
+                                <div className="h-full bg-amber-400 rounded-sm" style={{ width: `${scoreData.executionScore}%` }} />
                               </div>
-                              <p className="text-[11px] text-ink-light mt-1 leading-relaxed">{scoreData.executionReason}</p>
+                              <p className="text-[11px] text-zinc-400 mt-1.5 leading-relaxed">{scoreData.executionReason}</p>
                             </div>
 
                             {/* Competition Score */}
                             <div className="score-pillar-row">
                               <div className="flex justify-between items-center text-xs font-semibold">
-                                <span className="text-ink">Competition Score (15% Weight)</span>
-                                <span className="text-ink font-mono">{scoreData.competitionScore}/100</span>
+                                <span className="text-zinc-200">Competition Score (15% Weight)</span>
+                                <span className="text-zinc-100 font-mono">{scoreData.competitionScore}/100</span>
                               </div>
-                              <div className="h-2 w-full bg-cream-dark rounded-sm overflow-hidden mt-1">
-                                <div className="h-full bg-accent-pink rounded-sm" style={{ width: `${scoreData.competitionScore}%` }} />
+                              <div className="h-2 w-full bg-zinc-800/80 rounded-sm overflow-hidden mt-1.5">
+                                <div className="h-full bg-orange-400 rounded-sm" style={{ width: `${scoreData.competitionScore}%` }} />
                               </div>
-                              <p className="text-[11px] text-ink-light mt-1 leading-relaxed">{scoreData.competitionReason}</p>
+                              <p className="text-[11px] text-zinc-400 mt-1.5 leading-relaxed">{scoreData.competitionReason}</p>
                             </div>
 
                             {/* Risk Score */}
                             <div className="score-pillar-row">
                               <div className="flex justify-between items-center text-xs font-semibold">
-                                <span className="text-ink">Risk Mitigation Score (10% Weight)</span>
-                                <span className="text-ink font-mono">{scoreData.riskScore}/100</span>
+                                <span className="text-zinc-200">Risk Mitigation Score (10% Weight)</span>
+                                <span className="text-zinc-100 font-mono">{scoreData.riskScore}/100</span>
                               </div>
-                              <div className="h-2 w-full bg-cream-dark rounded-sm overflow-hidden mt-1">
-                                <div className="h-full bg-accent-red rounded-sm" style={{ width: `${scoreData.riskScore}%` }} />
+                              <div className="h-2 w-full bg-zinc-800/80 rounded-sm overflow-hidden mt-1.5">
+                                <div className="h-full bg-amber-300 rounded-sm" style={{ width: `${scoreData.riskScore}%` }} />
                               </div>
-                              <p className="text-[11px] text-ink-light mt-1 leading-relaxed">{scoreData.riskReason}</p>
+                              <p className="text-[11px] text-zinc-400 mt-1.5 leading-relaxed">{scoreData.riskReason}</p>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div className="pt-4 border-t border-border-light flex flex-col gap-4">
+                      <div className="pt-5 border-t border-zinc-800/80 flex flex-col gap-4">
                         <div>
-                          <h4 className="text-[10px] font-mono tracking-widest uppercase text-ink mb-1.5">SCORE CALCULATION WALKTHROUGH</h4>
-                          <p className="text-xs text-ink-light leading-relaxed bg-cream-dark/30 p-3.5 rounded border border-border-light">
+                          <h4 className="text-[10px] font-mono tracking-widest uppercase text-zinc-400 mb-2">SCORE CALCULATION WALKTHROUGH</h4>
+                          <p className="text-xs text-zinc-300 leading-relaxed bg-[#161618] p-4 rounded-xl border border-zinc-800/80">
                             {scoreData.calculationExplanation}
                           </p>
                         </div>
                         
-                        <div className="bg-[#1A1A1A] text-white p-3.5 rounded font-mono text-[11px] flex flex-col gap-1.5 border border-black shadow">
-                          <span className="text-accent-yellow font-bold">Weighted Formula Computation</span>
-                          <span className="text-gray-300">Startup Score = (Market × 30%) + (Revenue × 25%) + (Execution × 20%) + (Competition × 15%) + (Risk × 10%)</span>
-                          <span className="text-gray-400">Startup Score = ({scoreData.marketScore} × 0.30) + ({scoreData.revenueScore} × 0.25) + ({scoreData.executionScore} × 0.20) + ({scoreData.competitionScore} × 0.15) + ({scoreData.riskScore} × 0.10)</span>
-                          <span className="text-accent-yellow font-bold">Startup Score = {((scoreData.marketScore || 0) * 0.30).toFixed(1)} + {((scoreData.revenueScore || 0) * 0.25).toFixed(1)} + {((scoreData.executionScore || 0) * 0.20).toFixed(1)} + {((scoreData.competitionScore || 0) * 0.15).toFixed(1)} + {((scoreData.riskScore || 0) * 0.10).toFixed(1)} = {scoreData.startupScore}</span>
+                        <div className="bg-[#161618] text-zinc-300 p-4 rounded-xl font-mono text-[11px] flex flex-col gap-2 border border-zinc-800/80 shadow">
+                          <span className="text-amber-500 font-bold">Weighted Formula Computation</span>
+                          <span className="text-zinc-400">Startup Score = (Market × 30%) + (Revenue × 25%) + (Execution × 20%) + (Competition × 15%) + (Risk × 10%)</span>
+                          <span className="text-zinc-400">Startup Score = ({scoreData.marketScore} × 0.30) + ({scoreData.revenueScore} × 0.25) + ({scoreData.executionScore} × 0.20) + ({scoreData.competitionScore} × 0.15) + ({scoreData.riskScore} × 0.10)</span>
+                          <span className="text-amber-500 font-bold">Startup Score = {((scoreData.marketScore || 0) * 0.30).toFixed(1)} + {((scoreData.revenueScore || 0) * 0.25).toFixed(1)} + {((scoreData.executionScore || 0) * 0.20).toFixed(1)} + {((scoreData.competitionScore || 0) * 0.15).toFixed(1)} + {((scoreData.riskScore || 0) * 0.10).toFixed(1)} = {scoreData.startupScore}</span>
                         </div>
 
-                        <div className="flex flex-col gap-1.5">
-                          <h4 className="text-[10px] font-mono tracking-widest uppercase text-ink">MAIN RECOMMENDATIONS</h4>
-                          <p className="text-xs text-ink-light leading-relaxed bg-[#F5F0E8] p-3 rounded border border-border-light recommendations-box">{scoreData.recommendation}</p>
+                        <div className="flex flex-col gap-2">
+                          <h4 className="text-[10px] font-mono tracking-widest uppercase text-zinc-400">MAIN RECOMMENDATIONS</h4>
+                          <p className="text-xs text-zinc-300 leading-relaxed bg-[#161618] p-4 rounded-xl border border-zinc-800/80">{scoreData.recommendation}</p>
                         </div>
                       </div>
                     </div>
                   )}
-                </section>
+                </motion.section>
 
                 {/* Business Breakdown — 3 compact charts */}
-                <section className="editorial-card p-4 print:hidden">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="section-number section-number-blue" style={{ fontFamily: 'var(--font-heading)' }}>04</span>
-                    <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>BUSINESS BREAKDOWN</h2>
+                <section className="editorial-card p-5 print:hidden">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="section-number section-number-blue font-heading">04</span>
+                    <h2 className="text-lg font-bold tracking-tight font-heading">BUSINESS BREAKDOWN</h2>
                   </div>
                   <BusinessBreakdownCharts results={results} />
                 </section>
 
-                {/* Full Compiled Report — compact single rendering */}
+                {/* Full Compiled Report — expandable accordions */}
                 <section className="editorial-card overflow-hidden print:hidden">
-                  <div className="p-4 flex items-center justify-between" style={{ borderBottom: '2px solid var(--border)', background: 'var(--cream-dark)' }}>
-                    <div className="flex items-center gap-2">
-                      <span className="section-number section-number-orange" style={{ fontFamily: 'var(--font-heading)' }}>05</span>
-                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--CREAM-DARK)' }}>DETAILED ANALYSIS </h2>
+                  <div className="p-5 flex items-center justify-between border-b border-zinc-850 bg-[#161618]">
+                    <div className="flex items-center gap-3">
+                      <span className="section-number section-number-orange font-heading">05</span>
+                      <h2 className="text-lg font-bold tracking-tight font-heading">DETAILED ANALYSIS</h2>
                     </div>
-                    <button onClick={downloadPackage} className="btn-secondary px-3 py-1.5 flex items-center gap-1.5 text-[10px]" style={{ color: '#1A1A1A' }}>
-                      <FileDown className="w-3 h-3" style={{ color: '#1A1A1A' }} />
-                      <span style={{ color: '#1A1A1A' }}>Download .md</span>
+                    <button onClick={downloadPackage} className="btn-secondary px-4 py-2 flex items-center gap-1.5 text-[10px]" style={{ color: '#ffffff', background: 'transparent', borderColor: 'rgba(255,255,255,0.15)' }}>
+                      <FileDown className="w-3.5 h-3.5 text-white" />
+                      <span>Download .md</span>
                     </button>
                   </div>
-                  <div className="p-4 print:p-3">
-                    <div className="flex flex-col gap-4">
-                      {AGENTS.map((agent, i) => {
-                        const agentResult = results[agent.id];
-                        return (
-                          <div key={agent.id} className="agent-output-block">
-                            <div className="flex items-center gap-2 mb-2 pb-1.5" style={{ borderBottom: '1px solid var(--border-light)' }}>
-                              <span className="text-sm font-bold" style={{ fontFamily: 'var(--font-heading)', color: agent.color }}>
+                  <div className="p-5 flex flex-col gap-3">
+                    {AGENTS.map((agent, i) => {
+                      const agentResult = results[agent.id];
+                      const isExpanded = expandedAgents[agent.id];
+                      return (
+                        <div key={agent.id} className="rounded-xl border border-zinc-800 bg-[#161618]/70 overflow-hidden">
+                          {/* Accordion Trigger */}
+                          <button
+                            onClick={() => toggleAgentAccordion(agent.id)}
+                            className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-zinc-800/20 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs font-mono text-zinc-500 font-bold">
                                 {String(i + 1).padStart(2, '0')}
                               </span>
-                              <span className="text-sm font-bold inline-flex items-center gap-1.5" style={{ color: 'var(--ink)' }}>
-                                <AgentIcon Icon={agent.Icon} color={agent.color} size={14} />
+                              <span className="text-sm font-semibold inline-flex items-center gap-2 text-white">
+                                <AgentIcon Icon={agent.Icon} color={agent.color} size={15} />
                                 {agent.name}
                               </span>
-                              <span className="text-[9px] uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink-muted)' }}>— {agent.role}</span>
+                              <span className="text-[10px] text-zinc-400 font-mono hidden sm:inline">— {agent.role}</span>
                             </div>
-                            {agentResult ? (
-                              <div
-                                className="markdown-content markdown-compact print:text-black text-xs"
-                                dangerouslySetInnerHTML={{ __html: renderMarkdown(agentResult) }}
-                              />
-                            ) : (
-                              <p className="text-xs italic" style={{ color: 'var(--ink)' }}>No output generated.</p>
+                            <motion.div
+                              animate={{ rotate: isExpanded ? 180 : 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="text-zinc-400"
+                            >
+                              <ChevronRight className="w-4 h-4 transform rotate-90" />
+                            </motion.div>
+                          </button>
+                          
+                          {/* Accordion Content */}
+                          <AnimatePresence initial={false}>
+                            {isExpanded && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3, ease: "easeInOut" }}
+                              >
+                                <div className="px-5 pb-5 pt-2 border-t border-zinc-850/50 bg-[#0d0d0f]/40">
+                                  {agentResult ? (
+                                    <div
+                                      className="markdown-content markdown-compact text-xs text-zinc-300 leading-relaxed"
+                                      dangerouslySetInnerHTML={{ __html: renderMarkdown(agentResult) }}
+                                    />
+                                  ) : (
+                                    <p className="text-xs italic text-zinc-500">No output generated.</p>
+                                  )}
+                                </div>
+                              </motion.div>
                             )}
-                          </div>
-                        );
-                      })}
-                    </div>
+                          </AnimatePresence>
+                        </div>
+                      );
+                    })}
                   </div>
                 </section>
               </div>

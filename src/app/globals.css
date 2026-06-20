@@ -209,18 +209,19 @@ body {
    ══════════════════════════════════════ */
 
 .editorial-card {
-  background: #000000 !important;
+  background: #0d0d0f !important;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1.75rem;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
-  color: #ffffff !important;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 138, 0, 0.03);
+  border-radius: 1.25rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  color: #f4f4f5 !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7), 0 1px 1px rgba(255, 255, 255, 0.05) inset;
 }
 
 .editorial-card:hover {
-  background: #111111 !important;
-  box-shadow: 0 24px 45px rgba(255, 138, 0, 0.25), 0 0 25px rgba(255, 138, 0, 0.15), 0 0 0 1px rgba(255, 138, 0, 0.25);
-  transform: translateY(-3px);
+  background: #111113 !important;
+  border-color: rgba(247, 201, 72, 0.3);
+  box-shadow: 0 20px 40px -15px rgba(247, 201, 72, 0.1), 0 1px 1px rgba(255, 255, 255, 0.08) inset;
+  transform: translateY(-2px);
 }
 
 /* Ensure text elements directly inside the dark cards are readable */
@@ -228,23 +229,23 @@ body {
 .editorial-card h2,
 .editorial-card h3,
 .editorial-card h4 {
-  color: #FAF6EF !important;
+  color: #ffffff !important;
 }
 
 .editorial-card p,
 .editorial-card span,
 .editorial-card div,
 .editorial-card label {
-  color: #FFFFFF !important;
+  color: #d4d4d8 !important;
 }
 
-/* BUT restore dark text for sub-panels with light backgrounds */
+/* BUT restore dark text/custom themes for specific sub-panels where appropriate, or use high contrast modern colors */
 .gauge-card,
 .breakdown-chart-card,
-.recommendations-box,
-.agent-summary-table {
-  color: #1A1A1A !important;
-  background: #FAF6EF !important;
+.recommendations-box {
+  color: #f4f4f5 !important;
+  background: #161618 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 .editorial-card .gauge-card *,
@@ -269,17 +270,17 @@ body {
 .editorial-card .agent-summary-table label,
 .editorial-card .agent-summary-table td,
 .editorial-card .agent-summary-table th {
-  color: #1A1A1A !important;
+  color: #f4f4f5 !important;
 }
 
 /* Ensure secondary styling like muted text in sub-panels uses proper dark values */
 .editorial-card .gauge-card .text-ink-muted,
 .editorial-card .agent-summary-table .cell-role {
-  color: #8A8578 !important;
+  color: #a1a1aa !important;
 }
 
 .editorial-card .agent-summary-table .cell-finding {
-  color: #4A4A4A !important;
+  color: #d4d4d8 !important;
 }
 
 /* Allow badge, status, and custom colored text to bypass override */
@@ -291,10 +292,15 @@ body {
 .editorial-card .status-pill *,
 .editorial-card .score-glow-text,
 .editorial-card .score-glow-text *,
-.editorial-card .cell-num,
+.editorial-card .cell-num {
+  color: #1A1A1A !important;
+}
+
+/* Ensure secondary buttons inside editorial cards are white/readable and not overridden to black */
 .editorial-card .btn-secondary,
 .editorial-card .btn-secondary * {
-  color: #1A1A1A !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 /* Chic glowing & pulsing overall score animation */
@@ -820,26 +826,31 @@ body {
 .agent-summary-table {
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 0.6875rem;
+  font-size: 0.725rem;
+  width: 100%;
 }
 
 .agent-summary-table th,
 .agent-summary-table td {
-  border: 1px solid #D4CFC5;
-  padding: 0.4rem 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.65rem 0.85rem;
   text-align: left;
   vertical-align: middle;
-  line-height: 1.35;
+  line-height: 1.45;
 }
 
 .agent-summary-table th {
-  background: #F0EBE0;
-  color: #1A1A1A;
+  background: #141416;
+  color: #a1a1aa !important;
   font-family: var(--font-mono-code), monospace;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  font-size: 0.625rem;
+  font-size: 0.65rem;
+}
+
+.agent-summary-table td {
+  color: #e4e4e7 !important;
 }
 
 .agent-summary-table .cell-num {
@@ -849,15 +860,15 @@ body {
 }
 
 .agent-summary-table .cell-role {
-  color: #8A8578;
+  color: #71717a !important;
   font-family: var(--font-mono-code), monospace;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  font-size: 0.6rem;
+  font-size: 0.625rem;
 }
 
 .agent-summary-table .cell-finding {
-  color: #4A4A4A;
+  color: #d4d4d8 !important;
   word-break: break-word;
 }
 
@@ -865,43 +876,61 @@ body {
   text-align: center;
 }
 
+.agent-summary-table tr {
+  transition: background-color 0.2s ease;
+}
+
+.agent-summary-table tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
 .agent-summary-table tr.row-complete {
-  background: rgba(34, 197, 94, 0.04);
+  background: rgba(245, 158, 11, 0.03);
+}
+
+.agent-summary-table tr.row-complete:hover {
+  background: rgba(245, 158, 11, 0.05);
 }
 
 .status-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.2rem;
-  font-size: 0.6rem;
-  font-weight: 700;
+  gap: 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   font-family: var(--font-mono-code), monospace;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .status-complete {
-  color: #16A34A;
+  color: #f59e0b !important;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .status-empty {
-  color: #8A8578;
+  color: #71717a !important;
 }
 
 /* ── Business breakdown mini charts ── */
 .breakdown-chart-card {
-  padding: 0.65rem 0.75rem;
-  background: #FAF6EF;
-  border: 1px solid #D4CFC5;
-  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  background: #111113;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
   min-height: 118px;
-  color: #1A1A1A !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  color: #e4e4e7 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
 }
 
 .breakdown-chart-card:hover {
-  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.12), 0 0 10px rgba(59, 130, 246, 0.05);
+  box-shadow: 0 12px 30px rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.2);
   transform: translateY(-2px);
 }
 
@@ -913,15 +942,16 @@ body {
 
 /* ── Overall Gauge sub-card ── */
 .gauge-card {
-  background: #FAF6EF;
-  border: 1px solid #D4CFC5;
-  color: #1A1A1A !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  background: #111113;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #e4e4e7 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
 }
 
 .gauge-card:hover {
-  box-shadow: 0 15px 35px rgba(247, 201, 72, 0.18), 0 0 15px rgba(247, 201, 72, 0.08);
+  box-shadow: 0 15px 35px rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.25);
   transform: translateY(-2px);
 }
 
@@ -1118,7 +1148,8 @@ body {
 .notion-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1126,9 +1157,10 @@ body {
 }
 
 .notion-modal {
-  background: #FFFFFF;
-  border: 2px solid #1A1A1A;
-  border-radius: 4px;
+  background: #000000;
+  border: 2px solid #ea580c;
+  box-shadow: 0 0 35px rgba(234, 88, 12, 0.25), 0 0 15px rgba(234, 88, 12, 0.15);
+  border-radius: 1.25rem;
   width: 90%;
   max-width: 640px;
   max-height: 80vh;
@@ -1139,7 +1171,7 @@ body {
 
 .notion-modal-header {
   padding: 16px 20px;
-  border-bottom: 2px solid #1A1A1A;
+  border-bottom: 2px solid #ea580c;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1148,18 +1180,19 @@ body {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #1A1A1A;
+  color: #ea580c;
 }
 
 .notion-modal-body {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
+  background: #111113;
 }
 
 .notion-modal-body pre {
-  background: #F0EBE0;
-  border: 1px solid #D4CFC5;
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 4px;
   padding: 16px;
   font-family: var(--font-mono-code), 'Courier New', monospace;
@@ -1167,17 +1200,18 @@ body {
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
-  color: #1A1A1A;
+  color: #e4e4e7 !important;
   max-height: 50vh;
   overflow-y: auto;
 }
 
 .notion-modal-footer {
   padding: 14px 20px;
-  border-top: 2px solid #1A1A1A;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+  background: #000000;
 }
 
 .landing-pixel-text {
