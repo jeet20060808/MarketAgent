@@ -7,6 +7,7 @@ Axora AI is a high-performance **Multi-Agent Orchestration System** built on Nex
 ---
 
 ## ⚙️ Multi-Agent Architecture & Tools
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/dc5bad3a-e0ab-4d6f-ba94-4d95c7df5b09" />
 
 Each agent is fully equipped with context-driven tools to execute their specific startup lifecycle workflow:
 
