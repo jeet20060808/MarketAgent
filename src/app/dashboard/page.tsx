@@ -32,6 +32,7 @@ import {
   TrendingUp,
   Activity,
   Presentation,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -78,7 +79,7 @@ function AgentIcon({ Icon, color, size = 15, className = "" }: { Icon: LucideIco
 export const AGENTS: AgentConfig[] = [
   {
     id: "advisor",
-    name: "Startup Advisor",
+    name: "STARTUP ADVISOR",
     Icon: Brain,
     color: "#F7C948",
     accentClass: "badge-yellow",
@@ -89,7 +90,7 @@ export const AGENTS: AgentConfig[] = [
   },
   {
     id: "research",
-    name: "Market Research",
+    name: "MARKET RESEARCH",
     Icon: BarChart3,
     color: "#3B82F6",
     accentClass: "badge-blue",
@@ -100,9 +101,9 @@ export const AGENTS: AgentConfig[] = [
   },
   {
     id: "product",
-    name: "Product Manager",
+    name: "PRODUCT MANAGER",
     Icon: ClipboardList,
-    color: "#22C55E",
+    color: "#36e376ff",
     accentClass: "badge-yellow",
     numberClass: "section-number-green",
     role: "Product Strategy",
@@ -111,9 +112,9 @@ export const AGENTS: AgentConfig[] = [
   },
   {
     id: "architecture",
-    name: "Architect",
+    name: "ARCHITECTURE",
     Icon: Cog,
-    color: "#F97316",
+    color: "#ffa60dff",
     accentClass: "badge-pink",
     numberClass: "section-number-orange",
     role: "Technical Design",
@@ -122,7 +123,7 @@ export const AGENTS: AgentConfig[] = [
   },
   {
     id: "marketing",
-    name: "Marketing",
+    name: "MARKETING",
     Icon: Rocket,
     color: "#EC4899",
     accentClass: "badge-pink",
@@ -133,7 +134,7 @@ export const AGENTS: AgentConfig[] = [
   },
   {
     id: "engineering",
-    name: "Engineering Manager",
+    name: "ENGINEERING MANAGER",
     Icon: Wrench,
     color: "#8B5CF6",
     accentClass: "badge-blue",
@@ -144,7 +145,7 @@ export const AGENTS: AgentConfig[] = [
   },
   {
     id: "risk",
-    name: "Risk Analyst",
+    name: "RISK ANALYST",
     Icon: AlertTriangle,
     color: "#EF4444",
     accentClass: "badge-pink",
@@ -155,7 +156,7 @@ export const AGENTS: AgentConfig[] = [
   },
   {
     id: "financial",
-    name: "Financial Analyst",
+    name: "FINANCIAL ANALYST",
     Icon: DollarSign,
     color: "#10B981",
     accentClass: "badge-yellow",
@@ -260,6 +261,7 @@ function renderMarkdown(text: string): string {
   flushTable();
 
   let html = processed.join("\n")
+    .replace(/\$(\d)/g, '₹$1')
     .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\*\*(.+?)\*\*/g, '<strong class="md-emphasis">$1</strong>')
@@ -305,13 +307,18 @@ function distillInsights(results: AgentResults): string[] {
   
   for (const [agentId, result] of Object.entries(results)) {
     if (!result) continue;
-    // Extract first meaningful sentence from each agent's output
+    const agent = AGENTS.find(a => a.id === agentId);
+    if (!agent) continue;
     const lines = result.split('\n').filter(l => l.trim() && !l.startsWith('#') && !l.startsWith('---') && !l.startsWith('|'));
-    if (lines.length > 0) {
-      const agent = AGENTS.find(a => a.id === agentId);
-      const firstLine = lines[0].replace(/^[\*\-\d\.]+\s*/, '').replace(/\*\*/g, '').trim();
-      if (firstLine.length > 10 && agent) {
-        insights.push(`**${agent.name}**: ${firstLine.slice(0, 150)}${firstLine.length > 150 ? '...' : ''}`);
+    // Look for lines with insight keywords (score, verdict, recommendation, finding)
+    const keywordLine = lines.find(l =>
+      /score|verdict|recommend|key finding|insight|opportunit|critical|top \d|market size|tam|break[-\s]even/i.test(l)
+    );
+    const chosenLine = keywordLine || lines[lines.length - 1];
+    if (chosenLine) {
+      const cleaned = chosenLine.replace(/^[\*\-\d\.]+\s*/, '').replace(/\*\*/g, '').trim();
+      if (cleaned.length > 10) {
+        insights.push(`**${agent.name}**: ${cleaned.slice(0, 150)}${cleaned.length > 150 ? '...' : ''}`);
       }
     }
   }
@@ -647,7 +654,7 @@ export default function Home() {
   const [isDragging, setIsDragging] = useState(false);
   const [completedAgents, setCompletedAgents] = useState<string[]>([]);
   const [results, setResults] = useState<AgentResults>({});
-  const [toolLogs, setToolLogs] = useState<string[]>([]);
+  const [toolLogs, setToolLogs] = useState<{ icon: string; text: string }[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
   const [showNotionModal, setShowNotionModal] = useState(false);
   const [investorMode, setInvestorMode] = useState(false);
@@ -744,19 +751,19 @@ export default function Home() {
   // ── Tool Simulation Logs ──
   const simulateToolExecution = useCallback((stepIndex: number) => {
     const logs = [
-      "⚡ File Tool: Parsing uploaded documents & context...",
-      "🔍 Search Tool: Market Research Agent searching competitor matrices & TAM data...",
-      "📓 Notion Tool: Startup Advisor generating validation workspace & feedback summary...",
-      "📓 Notion Tool: Product Manager compiling Product Requirements Document (PRD)...",
-      "🐙 GitHub Tool: Architect provisioning workspace repository & generating system schemas...",
-      "📓 Notion Tool: Marketing Agent drafting launch copy & GTM strategy...",
-      "🐙 GitHub Tool: Engineering Manager filing Sprint milestones & P0/P1/P2 issues...",
-      "⚠️ Risk Tool: Risk Analyst scoring market, technical & compliance exposure...",
-      "💰 Finance Tool: Financial Analyst modeling revenue, CAC/LTV & burn rate...",
-      "📄 PDF Tool: Compiling unified Startup Package report..."
+      { icon: "Zap", text: "File Tool: Parsing uploaded documents & context..." },
+      { icon: "Search", text: "Search Tool: Market Research Agent searching competitor matrices & TAM data..." },
+      { icon: "BookOpen", text: "Notion Tool: Startup Advisor generating validation workspace & feedback summary..." },
+      { icon: "BookOpen", text: "Notion Tool: Product Manager compiling Product Requirements Document (PRD)..." },
+      { icon: "GitBranch", text: "GitHub Tool: Architect provisioning workspace repository & generating system schemas..." },
+      { icon: "BookOpen", text: "Notion Tool: Marketing Agent drafting launch copy & GTM strategy..." },
+      { icon: "GitBranch", text: "GitHub Tool: Engineering Manager filing Sprint milestones & P0/P1/P2 issues..." },
+      { icon: "AlertTriangle", text: "Risk Tool: Risk Analyst scoring market, technical & compliance exposure..." },
+      { icon: "DollarSign", text: "Finance Tool: Financial Analyst modeling revenue, CAC/LTV & burn rate..." },
+      { icon: "FileText", text: "PDF Tool: Compiling unified Startup Package report..." },
     ];
     
-    setToolLogs((prev) => [...prev, logs[stepIndex] || ""]);
+    setToolLogs((prev) => [...prev, logs[stepIndex] || { icon: "", text: "" }]);
   }, []);
 
   const activeRollingIndex = completedAgents.length;
@@ -1444,29 +1451,33 @@ export default function Home() {
                 </div>
 
                 {/* Right: Tool logs console */}
-                <div className="lg:col-span-2 flex flex-col h-[380px] overflow-hidden" style={{ background: 'var(--ink)', border: '2px solid var(--ink)', borderRadius: '4px' }}>
-                  <div className="px-4 py-2.5 flex items-center justify-between" style={{ background: '#111', borderBottom: '1px solid #333' }}>
-                    <span className="text-[10px] font-bold tracking-widest uppercase" style={{ fontFamily: 'var(--font-mono)', color: '#888' }}>Automated Tool Logs</span>
+                <div className="lg:col-span-2 flex flex-col h-[380px] overflow-hidden bg-[#1a1a1a] border-2 border-[#1a1a1a] rounded-sm">
+                  <div className="px-4 py-2.5 flex items-center justify-between bg-[#111] border-b border-[#333]">
+                    <span className="text-[10px] font-bold tracking-widest uppercase text-zinc-300" style={{ fontFamily: 'var(--font-mono)' }}>Automated Tool Logs</span>
                     <div className="flex gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#EF4444' }} />
-                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#F7C948' }} />
-                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#22C55E' }} />
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#F7C948]" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
                     </div>
                   </div>
                   <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-2.5" style={{ fontFamily: 'var(--font-mono)', fontSize: '11px' }}>
-                    {toolLogs.map((log, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="p-2.5 rounded"
-                        style={{ background: 'rgba(255,255,255,0.05)', color: '#ccc' }}
-                      >
-                        {log}
-                      </motion.div>
-                    ))}
-                    <div className="flex items-center gap-2 mt-auto pt-2 animate-pulse-subtle" style={{ color: '#555' }}>
+                    {toolLogs.map((log, index) => {
+                      const IconMap: Record<string, LucideIcon> = { Zap, Search, BookOpen, GitBranch, AlertTriangle, DollarSign, FileText };
+                      const IconComp = log.icon ? IconMap[log.icon] : null;
+                      return (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="p-2.5 rounded flex items-center gap-2 bg-white/5 text-zinc-100"
+                        >
+                          {IconComp && <IconComp size={12} className="flex-shrink-0" />}
+                          <span>{log.text}</span>
+                        </motion.div>
+                      );
+                    })}
+                    <div className="flex items-center gap-2 mt-auto pt-2 animate-pulse-subtle text-zinc-400">
                       <span>&gt;_ Listening for workspace triggers...</span>
                     </div>
                   </div>
@@ -1493,7 +1504,7 @@ export default function Home() {
                     <div>
                       <div className="badge-yellow mb-2 animate-stamp">
                         <CheckCircle2 className="w-3 h-3" />
-                        <span>Package Assembled</span>
+                        <span>PACKAGE ASSEMBLED</span>
                       </div>
                       <h2 className="text-xl font-bold truncate max-w-xl" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>
                         {idea || "Startup Package"}
@@ -1573,7 +1584,7 @@ export default function Home() {
                   <section className="editorial-card p-4 print:hidden">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="section-number section-number-yellow" style={{ fontFamily: 'var(--font-heading)' }}>01</span>
-                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Key Insights</h2>
+                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>KEY INSIGHTS</h2>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {insights.map((insight, i) => (
@@ -1594,7 +1605,7 @@ export default function Home() {
                 <section className="editorial-card p-4 print:hidden">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="section-number section-number-pink" style={{ fontFamily: 'var(--font-heading)' }}>02</span>
-                    <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Agent Summary</h2>
+                    <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>AGENT SUMMARY</h2>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="agent-summary-table w-full">
@@ -1654,7 +1665,7 @@ export default function Home() {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <span className="section-number section-number-yellow" style={{ fontFamily: 'var(--font-heading)' }}>03</span>
-                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Founder Snapshot Score</h2>
+                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>FOUNDER  SNAPSHOT SCORE</h2>
                     </div>
                     {scoreData && (
                       <span className="badge-pink">
@@ -1666,7 +1677,7 @@ export default function Home() {
                   {!scoreData ? (
                     <div className="flex flex-col items-center justify-center py-8 text-center bg-cream-dark/30 rounded border border-dashed border-border-light">
                       <Brain className="w-10 h-10 mb-3 animate-float text-accent-yellow" />
-                      <h3 className="text-sm font-bold mb-1" style={{ color: 'var(--ink)' }}>Scoring Engine Ready</h3>
+                      <h3 className="text-sm font-bold mb-1" style={{ color: 'var(--ink)' }}>FOUNDER SCORE READY</h3>
                       <p className="text-xs max-w-md mb-4 px-4" style={{ color: 'var(--ink-muted)' }}>
                         Evaluate your startup across 5 critical pillars (Market, Revenue, Execution, Competition, Risk) using our weighted scoring algorithm.
                       </p>
@@ -1683,7 +1694,7 @@ export default function Home() {
                         ) : (
                           <>
                             <Activity className="w-4 h-4" />
-                            <span>Generate Founder Snapshot Score</span>
+                            <span>GENERATE SCORE</span>
                           </>
                         )}
                       </button>
@@ -1820,7 +1831,7 @@ export default function Home() {
 
                       <div className="pt-4 border-t border-border-light flex flex-col gap-4">
                         <div>
-                          <h4 className="text-[10px] font-mono tracking-widest uppercase text-ink mb-1.5">Score Calculation Walkthrough</h4>
+                          <h4 className="text-[10px] font-mono tracking-widest uppercase text-ink mb-1.5">SCORE CALCULATION WALKTHROUGH</h4>
                           <p className="text-xs text-ink-light leading-relaxed bg-cream-dark/30 p-3.5 rounded border border-border-light">
                             {scoreData.calculationExplanation}
                           </p>
@@ -1834,7 +1845,7 @@ export default function Home() {
                         </div>
 
                         <div className="flex flex-col gap-1.5">
-                          <h4 className="text-[10px] font-mono tracking-widest uppercase text-ink">Main Recommendations</h4>
+                          <h4 className="text-[10px] font-mono tracking-widest uppercase text-ink">MAIN RECOMMENDATIONS</h4>
                           <p className="text-xs text-ink-light leading-relaxed bg-[#F5F0E8] p-3 rounded border border-border-light recommendations-box">{scoreData.recommendation}</p>
                         </div>
                       </div>
@@ -1846,7 +1857,7 @@ export default function Home() {
                 <section className="editorial-card p-4 print:hidden">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="section-number section-number-blue" style={{ fontFamily: 'var(--font-heading)' }}>04</span>
-                    <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Business Breakdown</h2>
+                    <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>BUSINESS BREAKDOWN</h2>
                   </div>
                   <BusinessBreakdownCharts results={results} />
                 </section>
@@ -1856,7 +1867,7 @@ export default function Home() {
                   <div className="p-4 flex items-center justify-between" style={{ borderBottom: '2px solid var(--border)', background: 'var(--cream-dark)' }}>
                     <div className="flex items-center gap-2">
                       <span className="section-number section-number-orange" style={{ fontFamily: 'var(--font-heading)' }}>05</span>
-                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}>Detailed Analysis</h2>
+                      <h2 className="text-lg font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--BLACK)' }}>DETAILED ANALYSIS </h2>
                     </div>
                     <button onClick={downloadPackage} className="btn-secondary px-3 py-1.5 flex items-center gap-1.5 text-[10px]">
                       <FileDown className="w-3 h-3" />
@@ -1885,7 +1896,7 @@ export default function Home() {
                                 dangerouslySetInnerHTML={{ __html: renderMarkdown(agentResult) }}
                               />
                             ) : (
-                              <p className="text-xs italic" style={{ color: 'var(--ink-muted)' }}>No output generated.</p>
+                              <p className="text-xs italic" style={{ color: 'var(--ink)' }}>No output generated.</p>
                             )}
                           </div>
                         );

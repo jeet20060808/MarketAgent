@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function ArrowButton() {
+  const router = useRouter();
   return (
-    <Link href="/" className="arrow-btn">
+    <button onClick={() => router.back()} className="arrow-btn cursor-pointer">
       <div className="button-box">
         <span className="button-elem">
           <svg viewBox="0 0 46 40" xmlns="http://www.w3.org/2000/svg">
@@ -18,6 +19,6 @@ export default function ArrowButton() {
           </svg>
         </span>
       </div>
-    </Link>
+    </button>
   );
 }

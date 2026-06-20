@@ -288,14 +288,22 @@ export default function LandingPage() {
 
 </div>
 
-        <header className="relative z-40 flex items-start justify-between px-6 md:px-10 pt-6 md:pt-8">
+        <header className="relative z-40 flex items-center justify-between px-6 md:px-10 pt-6 md:pt-8">
           <div className="flex items-center gap-2.5">
             <AnimatedLogo />
             <span className="landing-heading font-bold text-lg md:text-xl tracking-tight text-[#1a1a1a]">
               AXORA AI
             </span>
           </div>
-
+          <Link
+            href="/dashboard"
+            className="landing-heading bg-[#FF8A00] text-[#1a1a1a] font-bold text-[13px] pl-5 pr-1.5 py-1.5 rounded-xl flex items-center gap-3 hover:bg-black hover:text-white transition-all duration-300 group shadow-sm"
+          >
+            <span className="uppercase">START NOW</span>
+            <div className="bg-white text-[#1a1a1a] p-2 rounded-lg transition-colors duration-300 group-hover:bg-[#FF8A00] group-hover:text-white">
+              <ChevronsRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" strokeWidth={2.5} />
+            </div>
+          </Link>
         </header>
 
         <main className="relative z-10 flex-1 px-6 md:px-10 pb-6 md:pb-8 min-h-[520px] md:min-h-[600px]">
@@ -457,28 +465,7 @@ height={105}
             /> */}
           </div>
 
-          <div className="absolute left-6 md:left-20 bottom-[3%] md:bottom-[4%] z-30 max-w-[340px]">
-            {/* <p className="text-[13px] md:text-sm font-semibold text-[#4a4a4a] leading-relaxed mb-5">
-              We deploy AI agents that automate market research, validate ideas, draft PRDs, and architect go-to-market strategies.
-            </p> */}
-            <div className="flex items-center gap-3 flex-wrap">
-              <Link
-                href="/dashboard"
-                className="landing-heading bg-[#FF8A00] text-[#1a1a1a] font-bold text-[13px] pl-5 pr-1.5 py-1.5 rounded-xl flex items-center gap-3 hover:bg-black hover:text-white transition-all duration-300 group shadow-sm"
-              >
-                <span>START NOW</span>
-                <div className="bg-white text-[#1a1a1a] p-2 rounded-lg transition-colors duration-300 group-hover:bg-[#FF8A00] group-hover:text-white">
-                  <ChevronsRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" strokeWidth={2.5} />
-                </div>
-              </Link>
-              {/* <Link
-                href="/dashboard"
-                className="landing-heading bg-[#d4d4d4] text-[#1a1a1a] font-bold text-[13px] px-5 py-3.5 rounded-xl hover:bg-[#c8c8c8] transition-colors shadow-sm border border-[#bbb]"
-              >
-                VIEW DEMO
-              </Link> */}
-            </div>
-          </div>
+
 
           <div className="absolute right-6 md:right-10 bottom-[16%] md:bottom-[14%] z-30 max-w-[220px] text-right hidden sm:block">
             {/* <p className="text-[13px] font-semibold text-[#4a4a4a] leading-relaxed">

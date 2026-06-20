@@ -12,7 +12,7 @@ export const AGENTS: AgentConfig[] = [
   {
     id: "advisor",
     name: "Startup Advisor",
-    icon: "🧠",
+    icon: "Brain",
     color: "#a78bfa",
     role: "Idea Validation",
     description: "Validates your startup idea with deep analysis of problem-market fit",
@@ -21,7 +21,7 @@ export const AGENTS: AgentConfig[] = [
   {
     id: "research",
     name: "Market Research",
-    icon: "📊",
+    icon: "BarChart3",
     color: "#38bdf8",
     role: "Market Intelligence",
     description: "Maps the competitive landscape and quantifies market opportunity",
@@ -30,7 +30,7 @@ export const AGENTS: AgentConfig[] = [
   {
     id: "product",
     name: "Product Manager",
-    icon: "📋",
+    icon: "ClipboardList",
     color: "#34d399",
     role: "Product Strategy",
     description: "Defines features, user stories, and a roadmap for your MVP",
@@ -39,7 +39,7 @@ export const AGENTS: AgentConfig[] = [
   {
     id: "architecture",
     name: "Architect",
-    icon: "⚙️",
+    icon: "Cog",
     color: "#fb923c",
     role: "Technical Design",
     description: "Designs the database schema, APIs, and system architecture",
@@ -48,7 +48,7 @@ export const AGENTS: AgentConfig[] = [
   {
     id: "marketing",
     name: "Marketing",
-    icon: "🚀",
+    icon: "Rocket",
     color: "#f472b6",
     role: "Go-To-Market",
     description: "Creates launch copy, social posts, and an email campaign",
@@ -57,7 +57,7 @@ export const AGENTS: AgentConfig[] = [
   {
     id: "engineering",
     name: "Engineering Manager",
-    icon: "🛠️",
+    icon: "Wrench",
     color: "#2dd4bf",
     role: "Engineering Execution",
     description: "Plans sprints, team structure, backlog, and release strategy",
