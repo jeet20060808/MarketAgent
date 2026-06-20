@@ -676,6 +676,7 @@ export default function Home() {
   const [prdStepIndex, setPrdStepIndex] = useState(0);
   const [prdContent, setPrdContent] = useState("");
   const [prdCopied, setPrdCopied] = useState(false);
+  const [showConfirmBackModal, setShowConfirmBackModal] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1060,44 +1061,16 @@ export default function Home() {
 
   return (
     <div className="landing-shell min-h-screen bg-[#f5ebe4] p-3 md:p-5 flex items-center justify-center">
-        {/* Button */}
-  <div className="fixed top-16 left-16 z-[99999]">
-    <ArrowButton onClick={handleReset} />
-  </div>
       <div className="landing-window relative w-full max-w-[1440px] min-h-[calc(100vh-24px)] md:min-h-[calc(100vh-40px)] bg-[#f5dccb] border-[10px] border-[#adacaa] rounded-[28px] md:rounded-[36px] overflow-hidden flex flex-col shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)]">
         <div className="absolute inset-0 z-0 opacity-70 pointer-events-none">
-        <div className="absolute top-6 left-6 z-20">
-      {/* <Link
-        href="/"
-        className="
-          flex items-center gap-2
-          px-4 py-2 mt-6
-          rounded-full
-          border border-[#D9B08C]
-          bg-[#F5E2D3]/90
-          text-black
-          hover:scale-105
-          transition-all
-        "
-      >
-        <ArrowLeft size={16} />
-        Back
-      </Link> */}
-    
-      
-    </div>
-
-          {/* <Aurora
-            colorStops={["#FF8A00", "#FFB347", "#FFD6A5"]}
-            blend={0.45}
-            amplitude={1.2}
-            speed={0.4}
-          /> */}
-<img
-  src="/landing/search1.jpeg"
-  alt="search"
-  className="w-full h-full object-cover opacity-50"
-/>        </div>
+          {state !== "results" && (
+            <img
+              src="/landing/search1.jpeg"
+              alt="search"
+              className="w-full h-full object-cover opacity-50"
+            />
+          )}
+        </div>
         
         <div className="relative z-10 flex-1 flex flex-col overflow-y-auto" style={{ color: 'var(--foreground)', fontFamily: 'var(--font-body)' }}>
       
@@ -1131,20 +1104,24 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.4 }}
-              className="max-w-4xl mx-auto w-full px-6 py-16 flex flex-col items-center justify-center min-h-[85vh]"
+              className="w-full px-6 py-16 flex flex-col items-center justify-center min-h-[85vh] relative"
             >
+              {/* Back Button */}
+              <div className="absolute left-6 top-6 z-20">
+                <Link href="/">
+                  <ArrowButton />
+                </Link>
+              </div>
+              
+              <div className="max-w-4xl mx-auto w-full flex flex-col items-center justify-center">
               
               {/* Headline */}
               <h1
-  className="text-3xl sm:text-4xl text-center tracking-tight leading-tight mb-3 relative -mt-15 text-center"
-  style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}
->
-  What&apos;s on the agenda today?
-</h1>
-
-              {/* <p className="text-center text-sm max-w-lg mb-8" style={{ color: 'var(--ink-muted)' }}>
-                Describe your startup idea or attach context files. Eight specialized agents will compile your unified package.
-              </p> */}
+                className="text-3xl sm:text-4xl text-center tracking-tight leading-tight mb-3 relative -mt-15 text-center"
+                style={{ fontFamily: 'var(--font-heading)', color: 'var(--ink)' }}
+              >
+                What&apos;s on the agenda today?
+              </h1>
 
               {/* Chat-style composer */}
               <div className="w-full max-w-3xl mt-50">
@@ -1247,8 +1224,7 @@ export default function Home() {
                 <div className="editorial-card tool-card p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Search className="w-4 h-4" style={{ color: 'var(--accent-blue)' }} />
-                                        <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)' }}>Search Tool</span>
-
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ fontFamily: 'var(--font-mono)' }}>Search Tool</span>
                   </div>
                   <p className="text-xs leading-relaxed">Runs real-time web scans for TAM, competitor data, and market dynamics.</p>
                 </div>
@@ -1285,6 +1261,7 @@ export default function Home() {
                   <p className="text-xs leading-relaxed">Builds revenue models, CAC/LTV projections, and funding requirements.</p>
                 </div>
               </div>
+              </div>
             </motion.div>
           )}
 
@@ -1295,10 +1272,16 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="max-w-5xl mx-auto w-full px-6 py-16 flex flex-col justify-center min-h-[85vh]"
+              className="w-full px-6 py-16 flex flex-col justify-center min-h-[85vh] relative"
             >
+              {/* Back Button */}
+              <div className="absolute left-6 top-6 z-20">
+                <ArrowButton onClick={() => setShowConfirmBackModal(true)} />
+              </div>
+              
+              <div className="max-w-5xl mx-auto w-full flex flex-col justify-center">
               {/* Header */}
-              <div className="text-center mb-10">
+              <div className="text-center mb-10 -mt-12 relative">
                 <div className="badge-yellow mb-4 mx-auto inline-flex animate-stamp">
                   <span>Compiling</span>
                 </div>
@@ -1483,6 +1466,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+              </div>
             </motion.div>
           )}
 
@@ -1500,7 +1484,10 @@ export default function Home() {
               ) : (
                 <>
                   {/* Dashboard Header Banner */}
-                  <div className="print:hidden px-6 sm:px-8 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4" style={{ borderBottom: '2px solid var(--border)', background: 'var(--surface)' }}>
+                  <div className="print:hidden pl-24 pr-6 sm:pl-28 sm:pr-8 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative" style={{ borderBottom: '2px solid var(--border)', background: '#ffffff' }}>
+                    <div className="absolute left-6 top-1/2 -translate-y-1/2">
+                      <ArrowButton onClick={() => setShowConfirmBackModal(true)} />
+                    </div>
                     <div>
                       <div className="badge-yellow mb-2 animate-stamp">
                         <CheckCircle2 className="w-3 h-3" />
@@ -2058,6 +2045,56 @@ export default function Home() {
               <button onClick={handleDownloadPrd} className="btn-primary px-4 py-2 flex items-center gap-2" style={{ background: '#EC4899', color: '#ffffff', borderColor: '#EC4899' }}>
                 <Download className="w-3.5 h-3.5" />
                 <span>Download Spec</span>
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* ── Custom Confirmation Modal ── */}
+      {showConfirmBackModal && (
+        <div className="notion-modal-overlay" onClick={() => setShowConfirmBackModal(false)}>
+          <motion.div 
+            className="notion-modal max-w-sm"
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={(e) => e.stopPropagation()}
+            style={{ width: '90%', maxWidth: '380px' }}
+          >
+            <div className="notion-modal-header">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-500" />
+                <span>Go Back?</span>
+              </div>
+              <button onClick={() => setShowConfirmBackModal(false)} className="p-1 hover:opacity-60 transition-opacity">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="notion-modal-body text-center py-6 px-4">
+              <p className="text-sm font-medium text-gray-800 mb-2">
+                Do you really want to go back?
+              </p>
+              <p className="text-xs text-gray-500">
+                Your current compilation and progress will be lost.
+              </p>
+            </div>
+            <div className="notion-modal-footer justify-center gap-4">
+              <button 
+                onClick={() => {
+                  setShowConfirmBackModal(false);
+                  handleReset();
+                }} 
+                className="btn-primary px-5 py-2"
+                style={{ background: '#EF4444', color: '#fff', borderColor: '#EF4444' }}
+              >
+                Go Back
+              </button>
+              <button 
+                onClick={() => setShowConfirmBackModal(false)} 
+                className="btn-secondary px-5 py-2"
+              >
+                Stay
               </button>
             </div>
           </motion.div>
