@@ -37,6 +37,10 @@ export const metadata: Metadata = {
     "Turn a single startup idea into a validated plan, market research, PRD, architecture, and marketing strategy — powered by 6 specialized AI agents working in sequence.",
 };
 
+export const viewport = {
+  width: 1280,
+};
+
 import SplashScreen from "@/components/SplashScreen";
 
 export default function RootLayout({

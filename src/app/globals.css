@@ -42,10 +42,16 @@ html {
   color-scheme: light !important;
 }
 
+html {
+  min-width: 1280px;
+  overflow-x: auto;
+}
+
 body {
   background: #FAF6EF !important;
   color: #1A1A1A !important;
   font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  min-width: 1280px;
 }
 
 /* ── Scrollbar — editorial warm ── */
