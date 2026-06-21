@@ -202,7 +202,7 @@ const SplashScreen = () => {
   className="w-full h-full"
   onEnded={() => setIsVisible(false)}
 >
-  <source src="/videos/axora.mp4" type="video/mp4" />
+  <source src="/videos/final.mp4" type="video/mp4" />
 </video>
     </motion.div>
   )}

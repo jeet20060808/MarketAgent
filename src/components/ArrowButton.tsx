@@ -2,11 +2,12 @@
 
 interface ArrowButtonProps {
   onClick?: () => void;
+  className?: string;
 }
 
-export default function ArrowButton({ onClick }: ArrowButtonProps) {
+export default function ArrowButton({ onClick, className = "" }: ArrowButtonProps) {
   return (
-    <button onClick={onClick} className="arrow-btn cursor-pointer">
+    <button onClick={onClick} className={`arrow-btn cursor-pointer ${className}`}>
       <div className="button-box">
         <span className="button-elem">
           <svg viewBox="0 0 46 40" xmlns="http://www.w3.org/2000/svg">

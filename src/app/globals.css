@@ -1368,6 +1368,19 @@ body {
   transition: 0.4s;
 }
 
+/* White Arrow Button variant */
+.arrow-btn-white::before,
+.arrow-btn-white::after {
+  border-color: #ffffff !important;
+}
+.arrow-btn-white svg,
+.arrow-btn-white svg path,
+.arrow-btn-white .button-elem svg,
+.arrow-btn-white .button-elem svg path {
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
 /* ── Grid Backgrounds ── */
 
 /* WordSearch section: animated grid overlay */
