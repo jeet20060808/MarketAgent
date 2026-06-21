@@ -2194,7 +2194,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-5 px-8 text-center" style={{ borderTop: '2px solid var(--border)', background: 'var(--ink)', color: 'var(--ink-muted)', fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>
         <span style={{ color: 'var(--cream-dark)' }}>
-          AI Founder OS System Workspace · Tools: Search · GitHub · Notion · PDF · File Reader
+        AXORA AI System Workspace · Tools: Search · GitHub · Notion · PDF · File Reader
         </span>
       </footer>
     </div>
