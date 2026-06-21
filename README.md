@@ -1,42 +1,44 @@
-# AXORA AI 🚀
+# AI Founder OS — AXORA AI
 
-> Your founding team, on demand. Turn a single startup idea into a comprehensive, print-ready Startup Package in seconds.
+> Your founding team, on demand. Turn a single startup idea into a comprehensive startup package — validated, researched, planned, architected, marketed, risk-assessed, and financially modeled in seconds.
 
-Axora AI is a high-performance **Multi-Agent Orchestration System** built on Next.js. A team of **8 specialized AI agents** work in parallel using simulated system workspace tools to validate, research, draft, design, plan, model, assess, and market your startup idea.
-
----
-
-## ⚙️ Multi-Agent Architecture & Tools
-<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/dc5bad3a-e0ab-4d6f-ba94-4d95c7df5b09" />
-
-Each agent is fully equipped with context-driven tools to execute their specific startup lifecycle workflow:
-
-1. **🧠 Startup Advisor Agent** — _Idea Validation_
-   - **Notion Tool**: Generates validation workspaces, evaluates problem-market fit, analyzes target audiences, business models, and potential project risks.
-2. **📊 Market Research Agent** — _Market Intelligence_
-   - **Search Tool**: Scans active web data for competitor matrices, TAM assessments, and key market growth trends.
-3. **📋 Product Manager Agent** — _Product Strategy_
-   - **Notion Tool**: Drafts detailed Product Requirements Documents (PRDs), compiles MVP feature scopes, and defines user stories.
-4. **⚙️ Architect Agent** — _Technical Design_
-   - **GitHub Tool**: Generates high-level technical layouts, recommended tech stacks, API endpoints, and database schemas.
-5. **🚀 Marketing Agent** — _Go-To-Market Strategy_
-   - **Notion Tool**: Crafts landing page headlines, launch value propositions, social copy, and initial email outreach campaigns.
-6. **🛠️ Engineering Manager Agent** — _Engineering Execution_
-   - **GitHub Tool**: Formulates development execution blueprints, maps engineering staffing requirements, structures sprint milestones, and populates P0/P1/P2 backlogs.
-7. **🛡️ Risk Analyst Agent** — _Risk Assessment_
-   - **Risk Tool**: Identifies market, technical, financial, and compliance risks with detailed mitigation strategies.
-8. **💰 Financial Analyst Agent** — _Financial Modeling_
-   - **Finance Tool**: Models revenue streams, pricing strategies, CAC/LTV projections, break-even estimations, and funding requirements.
+AI Founder OS is a high-performance **Multi-Agent Orchestration System** powered by NVIDIA's LLM APIs. A team of **8 specialized AI agents** run in parallel to analyze your startup idea and produce a complete, investor-ready package.
 
 ---
 
-## 🎨 Key Features & Frontend Experience
+## ⚙️ Multi-Agent Architecture
 
-- **⚡ Unified Document Workspace**: All agent reports stream sequentially into a single frame, providing a cohesive startup blueprint without needing tabbed navigation.
-- **📂 File Tool Dropzone**: Upload raw business plans, competitor spreadsheets, existing mock PRDs, or startup idea PDFs to act as additional context for agent prompts.
-- **📟 Automated Tool Logs Console**: Live terminal emulation displaying active system tool triggers (`Search Tool`, `GitHub Tool`, `Notion Tool`, `PDF Tool`, `File Tool`) during agent execution.
-- **📄 Custom PDF Report Export**: High-fidelity `@media print` CSS configurations that hide executive summary containers and focus purely on generating the **Full Detailed Analysis** report starting directly from page 1.
-- **✨ Premium Dark Theme Pitch Startup**: The Pitch Deck (Investor Mode) features a high-end dark theme matching the consolidated report aesthetics, with dynamically sizing slide boxes that expand naturally based on their contents to eliminate scrollbars.
+Each agent uses tool-specific prompts to execute their role in the startup lifecycle:
+
+| Agent | Role | Tools |
+|-------|------|-------|
+| **Startup Advisor** | Idea Validation | Notion Workspace — validates problem-market fit, target audience, business model |
+| **Market Research** | Market Intelligence | Search Tool — competitor matrices, TAM, market trends |
+| **Product Manager** | Product Strategy | Notion Workspace — PRD, MVP scope, user stories, roadmap |
+| **Architect** | Technical Design | GitHub Tool — tech stack, API endpoints, DB schemas |
+| **Marketing** | Go-To-Market | Notion Workspace — landing copy, social posts, email campaigns |
+| **Engineering Manager** | Engineering Execution | GitHub Tool — sprint plans, staffing, backlog, milestones |
+| **Risk Analyst** | Risk Assessment | Risk Tool — market, technical, financial & compliance risks |
+| **Financial Analyst** | Financial Modeling | Finance Tool — revenue models, CAC/LTV, break-even, funding |
+
+All agents execute in parallel via a single `/api/orchestrate` endpoint. A separate scoring engine (`/api/score`) computes the **Founder Snapshot Score**.
+
+---
+
+## 🎨 Features
+
+- **Chat-Style Idea Input** — Text input with file attachments and voice recording (Speech-to-Text)
+- **File Upload Dropzone** — Drag & drop business plans, spreadsheets, or PDFs as extra agent context (500KB/file, 1MB total)
+- **Live Tool Logs Console** — Animated terminal-style logs showing which tool each agent triggers during execution
+- **Tabbed Results Dashboard** — Agent outputs rendered as expandable accordion cards with markdown formatting
+- **Founder Snapshot Score** — Weighted scoring (Market 30%, Revenue 25%, Execution 20%, Competition 15%, Risk 10%) with investor verdict
+- **PRD Generator** — Compiles a full Product Requirements Document from agent outputs
+- **Investor Mode (Pitch Deck)** — VC-ready dark-theme deck with auto-extracted content for 12 slides (problem, solution, market, financials, etc.)
+- **Export Formats** — Markdown (Notion-compatible), plain text (Startup Package), PPTX (Pitch Deck), PDF
+- **Business Breakdown Charts** — Donut chart, pillar score bars, and agent output volume visualization
+- **Confetti Celebration** — Canvas confetti on agent completion and score generation
+- **3D Aurora Background** — Animated aurora shader effect on landing page
+- **Animated Agent Cards** — Orbiting flip cards on the landing page showcasing each agent
 
 ---
 
@@ -51,41 +53,37 @@ NVIDIA_API_KEY=your-api-key-here
 ALLOWED_ORIGIN=http://localhost:3000
 ```
 
-> **Note:** `ALLOWED_ORIGIN` controls CORS — set it to your production domain when deploying.
+`ALLOWED_ORIGIN` controls CORS — set it to your production domain when deploying.
 
 ### Installation
 
-1. Install dependencies:
+```bash
+npm install
+npm run dev
+```
 
-   ```bash
-   npm install
-   ```
-
-2. Run the local development server:
-
-   ```bash
-   npm run dev
-   ```
-
-3. Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🛡️ Security Features
+## 🛡️ Security
 
-- **Content Security Policy**: Strict CSP headers restrict script, style, and connection sources to prevent XSS and data exfiltration.
-- **Rate Limiting**: API endpoints are rate-limited (20 requests/minute per IP) to prevent abuse.
-- **Request Validation**: Body size limits (5MB), idea length caps (10K chars), file count/size limits (10 files, 500KB each, 1MB total).
-- **File Upload Safety**: MIME type allowlisting, file name sanitization (rejects path separators and special chars).
-- **CORS Restriction**: Cross-origin requests locked to the `ALLOWED_ORIGIN` environment variable.
-- **No Secret Leakage**: API error messages are generic (no implementation details exposed). The `/api/test` endpoint that leaked API key existence has been removed.
-- **HTTP Security Headers**: `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Referrer-Policy` are all set to hardened values.
+- **CSP Headers**: Strict Content-Security-Policy restricting script, style, and connection sources (only NVIDIA API allowed)
+- **Rate Limiting**: 20 requests/minute per IP via in-memory rate limiter
+- **File Upload Limits**: 500KB per file, 1MB total, sanitized file names
+- **CORS**: Locked to `ALLOWED_ORIGIN` env var, restricted to GET/POST with Content-Type
+- **HTTP Security Headers**: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `X-XSS-Protection: 1; mode=block`, `Referrer-Policy: strict-origin-when-cross-origin`
+- **No Secret Leakage**: Generic API error messages, no implementation details exposed
 
 ## 🛠️ Technology Stack
 
-- **Framework**: Next.js 16 (Turbopack)
-- **Styling**: TailwindCSS & Vanilla CSS
-- **Animation**: Framer Motion
-- **Icons**: Lucide React
-- **LLM Orchestration**: OpenAI SDK (routed via NVIDIA Integrate APIs)
-- **Exporting**: High-fidelity `@media print` CSS configurations
+| Category | Libraries |
+|----------|-----------|
+| **Framework** | Next.js 16 (Turbopack), React 19, TypeScript 5 |
+| **Styling** | TailwindCSS 4, CSS Modules, Styled Components |
+| **Animation** | Framer Motion, OGL (3D WebGL) |
+| **Icons** | Lucide React |
+| **Charts** | Recharts, custom SVG (donut/bar) |
+| **AI/LLM** | OpenAI SDK → NVIDIA Integrate API (`integrate.api.nvidia.com/v1`) |
+| **Export** | pptxgenjs (PPTX), canvas-confetti, marked (Markdown) |
+| **Fonts** | Inter, DM Serif Display, IBM Plex Mono, Space Grotesk, Pixelify Sans |
