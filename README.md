@@ -4,6 +4,7 @@
 
 AI Founder OS is a high-performance **Multi-Agent Orchestration System** powered by NVIDIA's LLM APIs. A team of **8 specialized AI agents** run in parallel to analyze your startup idea and produce a complete, investor-ready package.
 
+![Uploading Screenshot 2026-06-23 at 10.36.40 PM.png…]()
 ---
 
 ## ⚙️ Multi-Agent Architecture
